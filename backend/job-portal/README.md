@@ -203,7 +203,7 @@ Sử dụng profile `default` với cấu hình trong `application.properties` �
 
 ### Cấu hình JWT:
 - **Secret**: Đã được cấu hình sẵn (nên thay đổi trong production)
-- **Expiration**: 24 giờ (86400000ms)
+- **Expiration**: 24 giờ (86400000ms) (mặc định mới đăng nhập chỉ có 5 phút, sau khi refresh thì mới được 24 giờ)
 - **Refresh Token**: 24 giờ
 
 ### Cấu hình MySQL:
