@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: job-portal-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: demodb
+      MYSQL_USER: jobportal
+      MYSQL_PASSWORD: jobportal123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./src/main/resources/db.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - job-portal-network
+    restart: unless-stopped
+    command: --default-authentication-plugin=mysql_native_password
+
+  job-portal-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: job-portal-backend
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/demodb
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 123456
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    networks:
+      - job-portal-network
+    restart: unless-stopped
+    volumes:
+      - ./logs:/app/logs
+
+volumes:
+  mysql_data:
+
+networks:
+  job-portal-network:
+    driver: bridge
