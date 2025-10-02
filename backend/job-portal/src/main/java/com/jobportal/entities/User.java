@@ -1,0 +1,45 @@
+package com.jobportal.entities;
+
+import com.jobportal.commons.BaseEntity;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDateTime;
+import java.util.Set;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "users")
+@Entity
+@Getter
+@Setter
+@Builder(toBuilder = true)
+public class User extends BaseEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "email", unique = true)
+    private String email;
+
+    @Column(name = "password")
+    private String password;
+
+    @Column(name = "phone")
+    private String phone;
+
+    @Column(name = "address")
+    private String address;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles;
+}
