@@ -27,7 +27,7 @@ import java.util.Optional;
 @Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/auth")
+@RequestMapping("api/auth")
 public class AuthController {
     private final AuthServiceInterface userService;
     private final BlacklistedService blacklistedService;

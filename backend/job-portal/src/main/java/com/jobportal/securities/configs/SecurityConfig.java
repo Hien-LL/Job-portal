@@ -37,10 +37,12 @@ public class SecurityConfig {
     private final CustomUserDetailsService uds;
 
     private static final String[] AUTH_WHITELIST = {
-            "/api/v1/auth/login",
+            "/api/auth/login",
+            "api/categories",
+            "api/locations/list",
             "/public/**",
-            "/api/v1/auth/refresh",
-            "/api/v1/auth/register",
+            "/api/auth/refresh",
+            "/api/auth/register",
             "/error",
             "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html"
     };

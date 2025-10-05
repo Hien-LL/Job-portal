@@ -28,7 +28,7 @@ import java.util.Map;
 @Validated
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("api/v1/roles")
+@RequestMapping("api/roles")
 public class RoleController {
 
     private final RoleServiceInterface roleService;

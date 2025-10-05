@@ -27,7 +27,7 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/users")
+@RequestMapping("api/users")
 public class UserController {
     private final AuthServiceInterface authService;
     private final UserServiceInterface userService;

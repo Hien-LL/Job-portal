@@ -27,7 +27,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Validated
 @Controller
-@RequestMapping("api/v1/permissions")
+@RequestMapping("api/permissions")
 public class PermissionController {
     private final PermissionServiceInterface permissionService;
     private final PermissionMapper permissionMapper;
