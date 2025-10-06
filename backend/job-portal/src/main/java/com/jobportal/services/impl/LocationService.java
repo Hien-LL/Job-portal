@@ -2,7 +2,7 @@ package com.jobportal.services.impl;
 
 import com.jobportal.commons.BaseService;
 import com.jobportal.entities.Location;
-import com.jobportal.mappers.LocationRepository;
+import com.jobportal.repositories.LocationRepository;
 import com.jobportal.services.interfaces.LocationServiceInterface;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;

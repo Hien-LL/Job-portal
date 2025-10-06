@@ -1,11 +1,7 @@
 package com.jobportal.cronjobs;
 
-import com.jobportal.entities.Permission;
-import com.jobportal.entities.Role;
-import com.jobportal.entities.User;
-import com.jobportal.repositories.PermissionRepository;
-import com.jobportal.repositories.RoleRepository;
-import com.jobportal.repositories.UserRepository;
+import com.jobportal.entities.*;
+import com.jobportal.repositories.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
@@ -36,14 +32,14 @@ public class DataSeeder implements ApplicationRunner {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final PermissionRepository permissionRepository;
-
+    private final SkillRepository skillRepository;
     @Override
     @Transactional // đảm bảo session mở suốt quá trình seed (fix LazyInitialization)
     public void run(ApplicationArguments args) {
         seedRoles();
         seedPermissions();
-        assignAllPermissionsToRoles(Set.of(ROLE_DEV, ROLE_TESTER)); // gán full quyền cho DEV & TESTER như code cũ
         seedAdminUser();
+        seedSkills();
     }
 
     /* ================================== Seed Roles ================================== */
@@ -152,5 +148,128 @@ public class DataSeeder implements ApplicationRunner {
 
         userRepository.save(adminUser);
         log.info("✅ Seeded admin user {}", adminUser.getEmail());
+    }
+
+    private void seedSkills() {
+        if (skillRepository.count() > 0) {
+            log.info("➡️ Skills already exist, skip seeding.");
+            return;
+        }
+
+        log.info("Seeding default skills...");
+
+        List<Skill> skills = List.of(
+                // ===== IT / SOFTWARE ENGINEERING =====
+                Skill.builder().name("Java").slug("java").build(),
+                Skill.builder().name("Spring Boot").slug("spring-boot").build(),
+                Skill.builder().name("Hibernate / JPA").slug("hibernate-jpa").build(),
+                Skill.builder().name("Maven").slug("maven").build(),
+                Skill.builder().name("Gradle").slug("gradle").build(),
+                Skill.builder().name("MySQL").slug("mysql").build(),
+                Skill.builder().name("PostgreSQL").slug("postgresql").build(),
+                Skill.builder().name("MongoDB").slug("mongodb").build(),
+                Skill.builder().name("Redis").slug("redis").build(),
+                Skill.builder().name("RESTful API").slug("restful-api").build(),
+                Skill.builder().name("GraphQL").slug("graphql").build(),
+                Skill.builder().name("Microservices Architecture").slug("microservices-architecture").build(),
+                Skill.builder().name("Spring Security").slug("spring-security").build(),
+                Skill.builder().name("JWT Authentication").slug("jwt-authentication").build(),
+                Skill.builder().name("OAuth2").slug("oauth2").build(),
+                Skill.builder().name("JUnit / Mockito").slug("junit-mockito").build(),
+                Skill.builder().name("CI/CD").slug("ci-cd").build(),
+                Skill.builder().name("Docker").slug("docker").build(),
+                Skill.builder().name("Kubernetes").slug("kubernetes").build(),
+                Skill.builder().name("Linux").slug("linux").build(),
+                Skill.builder().name("Bash / Shell Script").slug("bash-shell-script").build(),
+                Skill.builder().name("Git / GitHub / GitLab").slug("git-github-gitlab").build(),
+                Skill.builder().name("VS Code / IntelliJ IDEA").slug("vscode-intellij").build(),
+                Skill.builder().name("Agile / Scrum").slug("agile-scrum").build(),
+                Skill.builder().name("System Design").slug("system-design").build(),
+                Skill.builder().name("Software Architecture").slug("software-architecture").build(),
+                Skill.builder().name("Clean Code").slug("clean-code").build(),
+                Skill.builder().name("Design Patterns").slug("design-patterns").build(),
+                Skill.builder().name("API Documentation (Swagger)").slug("api-documentation-swagger").build(),
+                Skill.builder().name("Jenkins").slug("jenkins").build(),
+                Skill.builder().name("Nginx").slug("nginx").build(),
+                Skill.builder().name("Apache Tomcat").slug("apache-tomcat").build(),
+                Skill.builder().name("AWS").slug("aws").build(),
+                Skill.builder().name("Azure").slug("azure").build(),
+                Skill.builder().name("Google Cloud Platform").slug("gcp").build(),
+                Skill.builder().name("HTML / CSS / JS").slug("html-css-js").build(),
+                Skill.builder().name("ReactJS").slug("reactjs").build(),
+                Skill.builder().name("NextJS").slug("nextjs").build(),
+                Skill.builder().name("NodeJS / Express").slug("nodejs-express").build(),
+                Skill.builder().name("TypeScript").slug("typescript").build(),
+                Skill.builder().name("Android Development").slug("android-development").build(),
+                Skill.builder().name("iOS Development").slug("ios-development").build(),
+                Skill.builder().name("Flutter").slug("flutter").build(),
+                Skill.builder().name("React Native").slug("react-native").build(),
+                Skill.builder().name("Firebase").slug("firebase").build(),
+                Skill.builder().name("WebSocket / Socket.IO").slug("websocket-socketio").build(),
+                Skill.builder().name("Unit Testing").slug("unit-testing").build(),
+                Skill.builder().name("API Integration").slug("api-integration").build(),
+                Skill.builder().name("Performance Optimization").slug("performance-optimization").build(),
+                Skill.builder().name("Problem Solving").slug("problem-solving").build(),
+
+                // ===== MARKETING =====
+                Skill.builder().name("Digital Marketing").slug("digital-marketing").build(),
+                Skill.builder().name("Content Marketing").slug("content-marketing").build(),
+                Skill.builder().name("SEO / SEM").slug("seo-sem").build(),
+                Skill.builder().name("Google Ads").slug("google-ads").build(),
+                Skill.builder().name("Facebook Ads").slug("facebook-ads").build(),
+                Skill.builder().name("Email Marketing").slug("email-marketing").build(),
+                Skill.builder().name("Copywriting").slug("copywriting").build(),
+                Skill.builder().name("Social Media Management").slug("social-media-management").build(),
+                Skill.builder().name("Brand Strategy").slug("brand-strategy").build(),
+                Skill.builder().name("Influencer Marketing").slug("influencer-marketing").build(),
+                Skill.builder().name("Tiktok Marketing").slug("tiktok-marketing").build(),
+                Skill.builder().name("YouTube Marketing").slug("youtube-marketing").build(),
+                Skill.builder().name("Market Research").slug("market-research").build(),
+                Skill.builder().name("Customer Journey Mapping").slug("customer-journey-mapping").build(),
+                Skill.builder().name("Campaign Planning").slug("campaign-planning").build(),
+                Skill.builder().name("Data-Driven Marketing").slug("data-driven-marketing").build(),
+                Skill.builder().name("Affiliate Marketing").slug("affiliate-marketing").build(),
+                Skill.builder().name("CRM Management").slug("crm-management").build(),
+                Skill.builder().name("Lead Generation").slug("lead-generation").build(),
+                Skill.builder().name("A/B Testing").slug("a-b-testing").build(),
+
+                // ===== DATA / AI =====
+                Skill.builder().name("Data Analysis").slug("data-analysis").build(),
+                Skill.builder().name("Data Visualization").slug("data-visualization").build(),
+                Skill.builder().name("Power BI").slug("power-bi").build(),
+                Skill.builder().name("Tableau").slug("tableau").build(),
+                Skill.builder().name("Excel / Google Sheets").slug("excel-google-sheets").build(),
+                Skill.builder().name("Python").slug("python").build(),
+                Skill.builder().name("Pandas / NumPy").slug("pandas-numpy").build(),
+                Skill.builder().name("Machine Learning").slug("machine-learning").build(),
+                Skill.builder().name("Deep Learning").slug("deep-learning").build(),
+                Skill.builder().name("Natural Language Processing").slug("nlp").build(),
+                Skill.builder().name("Computer Vision").slug("computer-vision").build(),
+                Skill.builder().name("Data Cleaning").slug("data-cleaning").build(),
+                Skill.builder().name("SQL for Analytics").slug("sql-for-analytics").build(),
+                Skill.builder().name("ETL Pipelines").slug("etl-pipelines").build(),
+                Skill.builder().name("Big Data").slug("big-data").build(),
+                Skill.builder().name("Spark").slug("spark").build(),
+                Skill.builder().name("TensorFlow / PyTorch").slug("tensorflow-pytorch").build(),
+                Skill.builder().name("Data Governance").slug("data-governance").build(),
+                Skill.builder().name("AI Ethics").slug("ai-ethics").build(),
+                Skill.builder().name("Predictive Analytics").slug("predictive-analytics").build(),
+
+                // ===== NETWORKING / SECURITY =====
+                Skill.builder().name("Networking Fundamentals").slug("networking-fundamentals").build(),
+                Skill.builder().name("CCNA").slug("ccna").build(),
+                Skill.builder().name("Network Security").slug("network-security").build(),
+                Skill.builder().name("Firewall Configuration").slug("firewall-configuration").build(),
+                Skill.builder().name("Routing & Switching").slug("routing-switching").build(),
+                Skill.builder().name("VPN Configuration").slug("vpn-configuration").build(),
+                Skill.builder().name("Penetration Testing").slug("penetration-testing").build(),
+                Skill.builder().name("Ethical Hacking").slug("ethical-hacking").build(),
+                Skill.builder().name("Cybersecurity").slug("cybersecurity").build(),
+                Skill.builder().name("Cloud Security").slug("cloud-security").build()
+        );
+
+
+        skillRepository.saveAll(skills);
+        log.info("✅ Seeded default skills");
     }
 }

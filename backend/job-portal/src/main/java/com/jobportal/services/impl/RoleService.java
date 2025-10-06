@@ -75,15 +75,7 @@ public class RoleService extends BaseService implements RoleServiceInterface {
         Role role = roleRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Nhóm thành viên không tồn tại với id: " + id));
 
-        if (request.getPriority() != null) {
-            role.setPriority(request.getPriority());
-        }
-        if (request.getName() != null && !request.getName().equals(role.getName())) {
-            if (roleRepository.existsByName(request.getName())) {
-                throw new DuplicateResourceException("Tên nhóm thành viên đã tồn tại");
-            }
-            role.setName(request.getName());
-        }
+        roleMapper.updateEntityFromRequest(request, role);
 
         return roleRepository.save(role);
     }

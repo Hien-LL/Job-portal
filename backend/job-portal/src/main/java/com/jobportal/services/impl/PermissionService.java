@@ -50,13 +50,7 @@ public class PermissionService extends BaseService implements PermissionServiceI
         Permission permission = permissionRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Quyền người dùng không tồn tại với id: " + id));
 
-        if (request.getName() != null) {
-            permission.setName(request.getName());
-        }
-
-        if (request.getDescription() != null) {
-            permission.setDescription(request.getDescription());
-        }
+        permissionMapper.updateEntityFromRequest(request, permission);
 
         return permissionRepository.save(permission);
     }

@@ -40,6 +40,7 @@ public class SecurityConfig {
             "/api/auth/login",
             "api/categories",
             "api/locations/list",
+            "api/skills/list",
             "/public/**",
             "/api/auth/refresh",
             "/api/auth/register",

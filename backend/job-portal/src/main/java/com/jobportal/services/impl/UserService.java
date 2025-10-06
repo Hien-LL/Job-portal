@@ -29,7 +29,7 @@ public class UserService extends BaseService implements UserServiceInterface {
     @Override
     public UserProfileResource update(Long id, UserUpdationRequest request) {
         User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found"));
-        userMapper.updateUserFromRequest(request, user);
+        userMapper.updateEntityFromRequest(request, user);
         userRepository.save(user);
         return userMapper.tProfileResource(user);
     }

@@ -38,8 +38,8 @@ public class UserController {
     public ResponseEntity<?> me() {
         try {
             String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            UserDetailsResource userDetailsResource = authService.getUserFromEmail(email);
-            ApiResource<UserDetailsResource> response = ApiResource.ok(userDetailsResource, "SUCCESS");
+            UserResource userResource = authService.getUserFromEmail(email);
+            ApiResource<UserResource> response = ApiResource.ok(userResource, "SUCCESS");
 
             return ResponseEntity.ok(response);
         } catch (EntityNotFoundException exception) {

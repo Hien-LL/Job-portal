@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class UserProfileResource {
+    private Long id;
     private String email;
     private String name;
     private String phone;

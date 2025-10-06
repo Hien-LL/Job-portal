@@ -1,4 +1,4 @@
-package com.jobportal.mappers;
+package com.jobportal.repositories;
 
 import com.jobportal.entities.Location;
 import org.springframework.data.jpa.repository.JpaRepository;
