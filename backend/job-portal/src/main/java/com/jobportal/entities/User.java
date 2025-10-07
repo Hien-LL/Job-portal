@@ -4,7 +4,6 @@ import com.jobportal.commons.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -34,6 +33,12 @@ public class User extends BaseEntity {
 
     @Column(name = "address")
     private String address;
+
+    private String headline;
+
+    private String summary;
+
+    private String avatarUrl;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

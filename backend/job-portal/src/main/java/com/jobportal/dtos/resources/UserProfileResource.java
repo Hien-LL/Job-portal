@@ -15,4 +15,7 @@ public class UserProfileResource {
     private String name;
     private String phone;
     private String address;
+    private String headline;
+    private String summary;
+    private String avatarUrl;
 }

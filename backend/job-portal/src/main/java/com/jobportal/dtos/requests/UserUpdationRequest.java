@@ -1,10 +1,12 @@
 package com.jobportal.dtos.requests;
 
-import lombok.Getter;
+import lombok.Data;
 
-@Getter
+@Data
 public class UserUpdationRequest {
     private String name;
     private String phone;
     private String address;
+    private String headline;
+    private String summary;
 }

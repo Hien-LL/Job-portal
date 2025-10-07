@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -33,6 +32,8 @@ public class DataSeeder implements ApplicationRunner {
     private final PasswordEncoder passwordEncoder;
     private final PermissionRepository permissionRepository;
     private final SkillRepository skillRepository;
+    private final CategoryRepository categoryRepository;
+
     @Override
     @Transactional // đảm bảo session mở suốt quá trình seed (fix LazyInitialization)
     public void run(ApplicationArguments args) {
@@ -40,6 +41,7 @@ public class DataSeeder implements ApplicationRunner {
         seedPermissions();
         seedAdminUser();
         seedSkills();
+        seedCategories();
     }
 
     /* ================================== Seed Roles ================================== */
@@ -92,40 +94,6 @@ public class DataSeeder implements ApplicationRunner {
     }
 
     /* =================== Assign all permissions to given role names =================== */
-
-    private void assignAllPermissionsToRoles(Set<String> roleNames) {
-        if (roleNames == null || roleNames.isEmpty()) return;
-
-        // Lấy tất cả quyền một lần
-        Set<Permission> allPermissions = new HashSet<>(permissionRepository.findAll());
-        if (allPermissions.isEmpty()) {
-            log.warn("⚠️ No permissions found. Skip assigning.");
-            return;
-        }
-
-        // Lấy các role theo tên
-        Map<String, Role> rolesByName = roleRepository.findAll().stream()
-                .filter(r -> roleNames.contains(r.getName()))
-                .collect(Collectors.toMap(Role::getName, r -> r));
-
-        // Kiểm tra thiếu role
-        Set<String> missing = new HashSet<>(roleNames);
-        missing.removeAll(rolesByName.keySet());
-        if (!missing.isEmpty()) {
-            throw new IllegalStateException("Missing roles: " + missing);
-        }
-
-        // Gán full quyền (idempotent)
-        rolesByName.values().forEach(role -> {
-            if (role.getPermissions() == null || role.getPermissions().isEmpty()) {
-                role.setPermissions(new HashSet<>(allPermissions));
-            } else {
-                role.getPermissions().addAll(allPermissions);
-            }
-            roleRepository.save(role);
-            log.info("✅ Assigned all permissions to {} role", role.getName());
-        });
-    }
 
     /* ================================ Seed Admin User ================================ */
 
@@ -271,5 +239,175 @@ public class DataSeeder implements ApplicationRunner {
 
         skillRepository.saveAll(skills);
         log.info("✅ Seeded default skills");
+    }
+
+    private void seedCategories() {
+        if (categoryRepository.count() > 0) {
+            log.info("➡️ Categories already exist, skip seeding.");
+            return;
+        }
+
+        log.info("Seeding default categories...");
+
+        List<Category> categories = List.of(
+                // ===== 1. IT & SOFTWARE DEVELOPMENT =====
+                Category.builder().name("Lập trình Backend").slug("lap-trinh-backend").build(),
+                Category.builder().name("Lập trình Frontend").slug("lap-trinh-frontend").build(),
+                Category.builder().name("Lập trình Fullstack").slug("lap-trinh-fullstack").build(),
+                Category.builder().name("Phát triển phần mềm").slug("phat-trien-phan-mem").build(),
+                Category.builder().name("Web Development").slug("web-development").build(),
+                Category.builder().name("Mobile Development").slug("mobile-development").build(),
+                Category.builder().name("Game Development").slug("game-development").build(),
+                Category.builder().name("Embedded Systems").slug("embedded-systems").build(),
+                Category.builder().name("Automation Testing").slug("automation-testing").build(),
+                Category.builder().name("Manual Testing").slug("manual-testing").build(),
+
+                // ===== 2. IT / DEVOPS & CLOUD =====
+                Category.builder().name("DevOps").slug("devops").build(),
+                Category.builder().name("Cloud Engineering").slug("cloud-engineering").build(),
+                Category.builder().name("System Administration").slug("system-administration").build(),
+                Category.builder().name("Database Administration").slug("database-administration").build(),
+                Category.builder().name("Site Reliability Engineering (SRE)").slug("site-reliability-engineering").build(),
+                Category.builder().name("Observability / Monitoring").slug("observability-monitoring").build(),
+                Category.builder().name("Containerization (Docker)").slug("containerization-docker").build(),
+                Category.builder().name("Orchestration (Kubernetes)").slug("orchestration-kubernetes").build(),
+                Category.builder().name("CI/CD Pipelines").slug("ci-cd-pipelines").build(),
+                Category.builder().name("Infrastructure as Code (IaC)").slug("infrastructure-as-code").build(),
+
+                // ===== 3. SOFTWARE PRACTICES =====
+                Category.builder().name("Software Architecture").slug("software-architecture").build(),
+                Category.builder().name("System Design").slug("system-design").build(),
+                Category.builder().name("Design Patterns").slug("design-patterns").build(),
+                Category.builder().name("Clean Code").slug("clean-code").build(),
+                Category.builder().name("Refactoring").slug("refactoring").build(),
+                Category.builder().name("Agile / Scrum").slug("agile-scrum").build(),
+                Category.builder().name("Kanban").slug("kanban").build(),
+                Category.builder().name("Product Management").slug("product-management").build(),
+                Category.builder().name("API Development").slug("api-development").build(),
+                Category.builder().name("API Documentation (Swagger)").slug("api-documentation-swagger").build(),
+
+                // ===== 4. DATA / AI / MACHINE LEARNING =====
+                Category.builder().name("Phân tích dữ liệu (Data Analysis)").slug("phan-tich-du-lieu").build(),
+                Category.builder().name("Khoa học dữ liệu (Data Science)").slug("khoa-hoc-du-lieu").build(),
+                Category.builder().name("Machine Learning").slug("machine-learning").build(),
+                Category.builder().name("Deep Learning").slug("deep-learning").build(),
+                Category.builder().name("AI Engineering").slug("ai-engineering").build(),
+                Category.builder().name("Data Engineering").slug("data-engineering").build(),
+                Category.builder().name("Big Data").slug("big-data").build(),
+                Category.builder().name("Business Intelligence").slug("business-intelligence").build(),
+                Category.builder().name("Data Visualization").slug("data-visualization").build(),
+                Category.builder().name("Data Governance").slug("data-governance").build(),
+
+                // ===== 5. DATA PLATFORM & ANALYTICS =====
+                Category.builder().name("ETL / ELT Pipelines").slug("etl-elt-pipelines").build(),
+                Category.builder().name("Data Warehousing").slug("data-warehousing").build(),
+                Category.builder().name("Data Lake / Lakehouse").slug("data-lake-lakehouse").build(),
+                Category.builder().name("Streaming Data (Kafka)").slug("streaming-data-kafka").build(),
+                Category.builder().name("Realtime Analytics").slug("realtime-analytics").build(),
+                Category.builder().name("MLOps").slug("mlops").build(),
+                Category.builder().name("Feature Engineering").slug("feature-engineering").build(),
+                Category.builder().name("A/B Testing & Experimentation").slug("ab-testing-experimentation").build(),
+                Category.builder().name("Forecasting / Predictive Analytics").slug("forecasting-predictive-analytics").build(),
+                Category.builder().name("NLP / Computer Vision").slug("nlp-computer-vision").build(),
+
+                // ===== 6. MARKETING =====
+                Category.builder().name("Digital Marketing").slug("digital-marketing").build(),
+                Category.builder().name("Content Marketing").slug("content-marketing").build(),
+                Category.builder().name("SEO / SEM").slug("seo-sem").build(),
+                Category.builder().name("Social Media Marketing").slug("social-media-marketing").build(),
+                Category.builder().name("Email Marketing").slug("email-marketing").build(),
+                Category.builder().name("Affiliate Marketing").slug("affiliate-marketing").build(),
+                Category.builder().name("Influencer Marketing").slug("influencer-marketing").build(),
+                Category.builder().name("Performance Marketing").slug("performance-marketing").build(),
+                Category.builder().name("Brand Management").slug("brand-management").build(),
+                Category.builder().name("Public Relations (PR)").slug("public-relations").build(),
+
+                // ===== 7. DESIGN / CREATIVE =====
+                Category.builder().name("UI/UX Design").slug("ui-ux-design").build(),
+                Category.builder().name("Graphic Design").slug("graphic-design").build(),
+                Category.builder().name("Product Design").slug("product-design").build(),
+                Category.builder().name("3D Modeling / Animation").slug("3d-modeling-animation").build(),
+                Category.builder().name("Video Editing").slug("video-editing").build(),
+                Category.builder().name("Motion Graphic Design").slug("motion-graphic-design").build(),
+                Category.builder().name("Game Art").slug("game-art").build(),
+                Category.builder().name("Typography").slug("typography").build(),
+                Category.builder().name("UX Research").slug("ux-research").build(),
+                Category.builder().name("Design System Management").slug("design-system-management").build(),
+
+                // ===== 8. NETWORKING / SYSTEM / HARDWARE =====
+                Category.builder().name("Mạng máy tính (Networking)").slug("mang-may-tinh").build(),
+                Category.builder().name("Bảo mật hệ thống (Network Security)").slug("bao-mat-he-thong").build(),
+                Category.builder().name("Routing & Switching").slug("routing-switching").build(),
+                Category.builder().name("Cloud Networking").slug("cloud-networking").build(),
+                Category.builder().name("Server Management").slug("server-management").build(),
+                Category.builder().name("Virtualization").slug("virtualization").build(),
+                Category.builder().name("Firewall Configuration").slug("firewall-configuration").build(),
+                Category.builder().name("IoT (Internet of Things)").slug("iot").build(),
+                Category.builder().name("Wireless Technology").slug("wireless-technology").build(),
+                Category.builder().name("IT Support / Helpdesk").slug("it-support-helpdesk").build(),
+
+                // ===== 9. BUSINESS / SALES / OPERATIONS =====
+                Category.builder().name("Quản trị kinh doanh").slug("quan-tri-kinh-doanh").build(),
+                Category.builder().name("Quản lý dự án (Project Management)").slug("quan-ly-du-an").build(),
+                Category.builder().name("Khởi nghiệp / Startup").slug("khoi-nghiep-startup").build(),
+                Category.builder().name("Phân tích kinh doanh (Business Analyst)").slug("phan-tich-kinh-doanh").build(),
+                Category.builder().name("Chăm sóc khách hàng").slug("cham-soc-khach-hang").build(),
+                Category.builder().name("Bán hàng (Sales)").slug("ban-hang").build(),
+                Category.builder().name("E-commerce").slug("ecommerce").build(),
+                Category.builder().name("Logistics / Supply Chain").slug("logistics-supply-chain").build(),
+                Category.builder().name("Procurement / Purchasing").slug("procurement-purchasing").build(),
+                Category.builder().name("Customer Success").slug("customer-success").build(),
+
+                // ===== 10. FINANCE / ACCOUNTING =====
+                Category.builder().name("Kế toán / Kiểm toán").slug("ke-toan-kiem-toan").build(),
+                Category.builder().name("Phân tích tài chính").slug("phan-tich-tai-chinh").build(),
+                Category.builder().name("Ngân hàng / Tín dụng").slug("ngan-hang-tin-dung").build(),
+                Category.builder().name("Đầu tư / Chứng khoán").slug("dau-tu-chung-khoan").build(),
+                Category.builder().name("Bảo hiểm / Tài sản").slug("bao-hiem-tai-san").build(),
+                Category.builder().name("Tài chính doanh nghiệp").slug("tai-chinh-doanh-nghiep").build(),
+                Category.builder().name("Thuế / Kiểm toán nội bộ").slug("thue-kiem-toan-noi-bo").build(),
+                Category.builder().name("Quản lý ngân sách").slug("quan-ly-ngan-sach").build(),
+                Category.builder().name("Tư vấn tài chính cá nhân").slug("tu-van-tai-chinh-ca-nhan").build(),
+                Category.builder().name("Phân tích rủi ro tài chính").slug("phan-tich-rui-ro-tai-chinh").build(),
+
+                // ===== 11. EDUCATION / TRAINING =====
+                Category.builder().name("Giảng dạy / Đào tạo").slug("giang-day-dao-tao").build(),
+                Category.builder().name("Phát triển chương trình học").slug("phat-trien-chuong-trinh-hoc").build(),
+                Category.builder().name("Tư vấn hướng nghiệp").slug("tu-van-huong-nghiep").build(),
+                Category.builder().name("Giáo dục trực tuyến (E-learning)").slug("giao-duc-truc-tuyen").build(),
+                Category.builder().name("Ngôn ngữ / Phiên dịch").slug("ngon-ngu-phien-dich").build(),
+                Category.builder().name("Kỹ năng mềm (Soft Skills)").slug("ky-nang-mem").build(),
+                Category.builder().name("Đào tạo doanh nghiệp").slug("dao-tao-doanh-nghiep").build(),
+                Category.builder().name("Nghiên cứu giáo dục").slug("nghien-cuu-giao-duc").build(),
+                Category.builder().name("Tâm lý học giáo dục").slug("tam-ly-hoc-giao-duc").build(),
+                Category.builder().name("Giáo viên ngoại ngữ").slug("giao-vien-ngoai-ngu").build(),
+
+                // ===== 12. ENGINEERING / MANUFACTURING =====
+                Category.builder().name("Kỹ thuật cơ khí").slug("ky-thuat-co-khi").build(),
+                Category.builder().name("Điện - Điện tử").slug("dien-dien-tu").build(),
+                Category.builder().name("Tự động hóa (Automation)").slug("tu-dong-hoa").build(),
+                Category.builder().name("Xây dựng / Kết cấu").slug("xay-dung-ket-cau").build(),
+                Category.builder().name("Kiến trúc / Thiết kế công trình").slug("kien-truc-thiet-ke-cong-trinh").build(),
+                Category.builder().name("Kỹ thuật ô tô").slug("ky-thuat-o-to").build(),
+                Category.builder().name("Kỹ thuật môi trường").slug("ky-thuat-moi-truong").build(),
+                Category.builder().name("Quản lý sản xuất").slug("quan-ly-san-xuat").build(),
+                Category.builder().name("Chất lượng / QA-QC").slug("chat-luong-qa-qc").build(),
+                Category.builder().name("Công nghệ vật liệu").slug("cong-nghe-vat-lieu").build(),
+
+                // ===== 13. HEALTHCARE / BIO =====
+                Category.builder().name("Y tế / Điều dưỡng").slug("y-te-dieu-duong").build(),
+                Category.builder().name("Dược phẩm / Hóa sinh").slug("duoc-pham-hoa-sinh").build(),
+                Category.builder().name("Chẩn đoán hình ảnh").slug("chan-doan-hinh-anh").build(),
+                Category.builder().name("Quản lý bệnh viện").slug("quan-ly-benh-vien").build(),
+                Category.builder().name("Thể dục / Dinh dưỡng").slug("the-duc-dinh-duong").build(),
+                Category.builder().name("Tư vấn sức khỏe").slug("tu-van-suc-khoe").build(),
+                Category.builder().name("Phòng thí nghiệm").slug("phong-thi-nghiem").build(),
+                Category.builder().name("Tâm lý học lâm sàng").slug("tam-ly-hoc-lam-sang").build(),
+                Category.builder().name("Chăm sóc sắc đẹp").slug("cham-soc-sac-dep").build(),
+                Category.builder().name("Dịch vụ cộng đồng").slug("dich-vu-cong-dong").build()
+        );
+
+        categoryRepository.saveAll(categories);
+        log.info("✅ Seeded default categories");
     }
 }

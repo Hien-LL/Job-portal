@@ -17,5 +17,8 @@ public class UserDetailsResource {
     private String name;
     private String phone;
     private String address;
+    private String headline;
+    private String summary;
+    private String avatarUrl;
     private Set<RoleResource> roles;
 }

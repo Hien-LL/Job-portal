@@ -3,14 +3,14 @@ package com.jobportal.services.interfaces;
 import com.jobportal.dtos.requests.LoginRequest;
 import com.jobportal.dtos.requests.RegisterRequest;
 import com.jobportal.dtos.resources.UserDetailsResource;
-import com.jobportal.dtos.resources.UserResource;
+import com.jobportal.dtos.resources.UserProfileResource;
 import jakarta.validation.Valid;
 
 import java.util.Set;
 
 public interface AuthServiceInterface {
     Object authenticate(LoginRequest request);
-    UserResource getUserFromEmail(String email);
+    UserProfileResource getUserFromEmail(String email);
     Object createUser(RegisterRequest request);
     UserDetailsResource updateRolesForUser(@Valid Set<Long> roleIds, Long id);
 }

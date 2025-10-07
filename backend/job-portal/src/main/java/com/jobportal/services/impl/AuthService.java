@@ -61,9 +61,9 @@ public class AuthService extends BaseService implements AuthServiceInterface {
     }
 
     @Override
-    public UserResource getUserFromEmail(String email) {
+    public UserProfileResource getUserFromEmail(String email) {
         User user = userRepository.findByEmailWithRolesAndPermissions(email).orElseThrow(() -> new EntityNotFoundException("User không tồn tại"));
-        return userMapper.tResource(user);
+        return userMapper.tProfileResource(user);
     }
 
     @Override

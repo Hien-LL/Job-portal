@@ -44,7 +44,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 || path.startsWith("/api/auth/register")
                 || path.startsWith("/api/categories")
                 || path.startsWith("/api/locations/list")
-                || path.startsWith("/api/skills/list");
+                || path.startsWith("/api/skills/list")
+                || path.startsWith("/avatars/**");
     }
 
     @Override
@@ -100,32 +101,30 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
 
         } catch (ExpiredJwtException e) {
-            sendErrorResponse(response, request, HttpStatus.UNAUTHORIZED, "Xác thực thất bại", "Token đã hết hạn");
+            sendErrorResponse(response, request, "Token đã hết hạn");
         } catch (BadCredentialsException e) {
-            sendErrorResponse(response, request, HttpStatus.UNAUTHORIZED, "Xác thực thất bại", e.getMessage());
+            sendErrorResponse(response, request, e.getMessage());
         } catch (RuntimeException e) {
             logger.error("JWT RuntimeException: {}", e.getMessage());
-            sendErrorResponse(response, request, HttpStatus.UNAUTHORIZED, "Xác thực thất bại", "Token không hợp lệ");
+            sendErrorResponse(response, request, "Token không hợp lệ");
         }
     }
 
     private void sendErrorResponse(
             @NotNull HttpServletResponse response,
             @NotNull HttpServletRequest request,
-            @NotNull HttpStatus status,
-            @NotNull String error,
             @NotNull String message
     ) throws IOException {
-        response.setStatus(status.value());
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType("application/json;charset=UTF-8");
 
         ApiResource<Object> apiResponse = ApiResource.builder()
                 .success(false)
-                .status(status)
-                .message(error)
+                .status(HttpStatus.UNAUTHORIZED)
+                .message("Xác thực thất bại")
                 .error(new ApiResource.ErrorResource(
-                        String.valueOf(status.value()),
-                        error,
+                        String.valueOf(HttpStatus.UNAUTHORIZED.value()),
+                        "Xác thực thất bại",
                         message + " - Path: " + request.getRequestURI()
                 ))
                 .build();
