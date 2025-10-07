@@ -10,6 +10,7 @@ import com.jobportal.entities.User;
 import com.jobportal.mappers.UserMapper;
 import com.jobportal.services.interfaces.AuthServiceInterface;
 import com.jobportal.services.interfaces.UserServiceInterface;
+import com.jobportal.services.interfaces.UserSkillServiceInterface;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -34,6 +35,7 @@ public class UserController {
     private final AuthServiceInterface authService;
     private final UserServiceInterface userService;
     private final UserMapper userMapper;
+    private final UserSkillServiceInterface userSkillService;
 
     @PreAuthorize("isAuthenticated()")
     @RequestMapping("/me")
@@ -166,6 +168,86 @@ public class UserController {
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
+        }
+    }
+
+    @PostMapping("/skills/{slug}")
+    ResponseEntity<?> addSkillToUser(@PathVariable String slug, @RequestParam int yearsExperience) {
+        try {
+            String email = SecurityContextHolder.getContext().getAuthentication().getName();
+            UserProfileResource user = authService.getUserFromEmail(email);
+
+            userSkillService.addSkillToUser(user.getId(), slug, yearsExperience);
+            return ResponseEntity.ok(ApiResource.ok(null, "Thêm kỹ năng cho người dùng thành công"));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResource.error("BAD_REQUEST", e.getMessage(), HttpStatus.BAD_REQUEST));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
+        }
+    }
+
+    @GetMapping("/skills")
+    ResponseEntity<?> getSkillsForUser() {
+        try {
+            String email = SecurityContextHolder.getContext().getAuthentication().getName();
+            UserProfileResource user = authService.getUserFromEmail(email);
+
+            var skills = userSkillService.getSkillsById(user.getId());
+            return ResponseEntity.ok(ApiResource.ok(skills, "Success"));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResource.error("BAD_REQUEST", e.getMessage(), HttpStatus.BAD_REQUEST));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
+        }
+    }
+
+    @PutMapping("/skills/{slug}")
+    ResponseEntity<?> updateSkillForUser(@PathVariable String slug, @RequestParam int yearsExperience) {
+        try {
+            String email = SecurityContextHolder.getContext().getAuthentication().getName();
+            UserProfileResource user = authService.getUserFromEmail(email);
+
+            userSkillService.updateYearsBySlug(user.getId(), slug, yearsExperience);
+            return ResponseEntity.ok(ApiResource.ok(null, "Cập nhật số năm kinh nghiệm cho kỹ năng thành công"));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResource.error("BAD_REQUEST", e.getMessage(), HttpStatus.BAD_REQUEST));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
+        }
+    }
+
+    @DeleteMapping("/skills/{slug}")
+    ResponseEntity<?> removeSkillFromUser(@PathVariable String slug) {
+        try {
+            String email = SecurityContextHolder.getContext().getAuthentication().getName();
+            UserProfileResource user = authService.getUserFromEmail(email);
+
+            userSkillService.removeSkillFromUser(user.getId(), slug);
+            return ResponseEntity.ok(ApiResource.ok(null, "Xóa kỹ năng khỏi người dùng thành công"));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResource.error("BAD_REQUEST", e.getMessage(), HttpStatus.BAD_REQUEST));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
