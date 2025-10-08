@@ -23,7 +23,7 @@ public class DataSeeder implements ApplicationRunner {
     private static final String ROLE_USER = "USER";
     private static final String ROLE_TESTER = "TESTER";
     private static final String ROLE_DEV = "DEV";
-    private static final String ROLE_BUSINESS = "BUSSINESS"; // giữ nguyên theo DB của bạn; nên sửa thành "BUSINESS" nếu có thể
+    private static final String ROLE_BUSINESS = "BUSINESS";
     private static final String ROLE_CANDIDATE = "CANDIDATE";
     private static final String ROLE_EMPLOYER = "EMPLOYER";
 
@@ -33,6 +33,7 @@ public class DataSeeder implements ApplicationRunner {
     private final PermissionRepository permissionRepository;
     private final SkillRepository skillRepository;
     private final CategoryRepository categoryRepository;
+    private final BenefitRepository benefitRepository;
 
     @Override
     @Transactional // đảm bảo session mở suốt quá trình seed (fix LazyInitialization)
@@ -42,6 +43,7 @@ public class DataSeeder implements ApplicationRunner {
         seedAdminUser();
         seedSkills();
         seedCategories();
+        seedBenefits();
     }
 
     /* ================================== Seed Roles ================================== */
@@ -409,5 +411,125 @@ public class DataSeeder implements ApplicationRunner {
 
         categoryRepository.saveAll(categories);
         log.info("✅ Seeded default categories");
+    }
+
+    private void seedBenefits() {
+        if (benefitRepository.count() > 0) {
+            log.info("➡️ Benefits already exist, skip seeding.");
+            return;
+        }
+
+        log.info("Seeding default benefits...");
+
+        List<Benefit> benefits = List.of(
+                Benefit.builder().name("Bảo hiểm sức khỏe").build(),
+                Benefit.builder().name("Bảo hiểm tai nạn").build(),
+                Benefit.builder().name("Bảo hiểm xã hội đầy đủ").build(),
+                Benefit.builder().name("Thưởng hiệu suất").build(),
+                Benefit.builder().name("Thưởng Tết").build(),
+                Benefit.builder().name("Thưởng tháng 13").build(),
+                Benefit.builder().name("Thưởng quý").build(),
+                Benefit.builder().name("Thưởng doanh số").build(),
+                Benefit.builder().name("Phụ cấp ăn trưa").build(),
+                Benefit.builder().name("Phụ cấp xăng xe").build(),
+                Benefit.builder().name("Phụ cấp điện thoại").build(),
+                Benefit.builder().name("Phụ cấp nhà ở").build(),
+                Benefit.builder().name("Phụ cấp công tác").build(),
+                Benefit.builder().name("Phụ cấp gửi xe").build(),
+                Benefit.builder().name("Phụ cấp Internet").build(),
+                Benefit.builder().name("Phụ cấp làm thêm giờ").build(),
+                Benefit.builder().name("Du lịch công ty hằng năm").build(),
+                Benefit.builder().name("Teambuilding định kỳ").build(),
+                Benefit.builder().name("Quà sinh nhật").build(),
+                Benefit.builder().name("Quà lễ tết").build(),
+                Benefit.builder().name("Khám sức khỏe định kỳ").build(),
+                Benefit.builder().name("Chế độ thai sản").build(),
+                Benefit.builder().name("Chế độ hiếu hỷ").build(),
+                Benefit.builder().name("Chế độ nghỉ phép năm").build(),
+                Benefit.builder().name("Làm việc từ xa").build(),
+                Benefit.builder().name("Giờ làm việc linh hoạt").build(),
+                Benefit.builder().name("Cơ hội thăng tiến").build(),
+                Benefit.builder().name("Đào tạo nội bộ").build(),
+                Benefit.builder().name("Học bổng đào tạo bên ngoài").build(),
+                Benefit.builder().name("Chương trình mentoring").build(),
+                Benefit.builder().name("Môi trường làm việc trẻ trung").build(),
+                Benefit.builder().name("Không gian làm việc hiện đại").build(),
+                Benefit.builder().name("Laptop cá nhân công ty cấp").build(),
+                Benefit.builder().name("Thiết bị làm việc hiện đại").build(),
+                Benefit.builder().name("Được cấp phần mềm bản quyền").build(),
+                Benefit.builder().name("Làm việc 5 ngày/tuần").build(),
+                Benefit.builder().name("Không yêu cầu tăng ca").build(),
+                Benefit.builder().name("Thưởng dự án hoàn thành").build(),
+                Benefit.builder().name("Thưởng sáng kiến").build(),
+                Benefit.builder().name("Thưởng KPI cá nhân").build(),
+                Benefit.builder().name("Thưởng nhóm xuất sắc").build(),
+                Benefit.builder().name("Cơ hội ra nước ngoài công tác").build(),
+                Benefit.builder().name("Hỗ trợ visa đi công tác").build(),
+                Benefit.builder().name("Du lịch nước ngoài").build(),
+                Benefit.builder().name("Nghỉ phép dài hạn sau 3 năm").build(),
+                Benefit.builder().name("Mua cổ phần ưu đãi").build(),
+                Benefit.builder().name("Tham gia quỹ đầu tư nhân viên").build(),
+                Benefit.builder().name("Chính sách thưởng cổ phiếu").build(),
+                Benefit.builder().name("Chỗ nghỉ ngơi trong văn phòng").build(),
+                Benefit.builder().name("Cung cấp đồ uống miễn phí").build(),
+                Benefit.builder().name("Cung cấp cà phê miễn phí").build(),
+                Benefit.builder().name("Có phòng gym trong công ty").build(),
+                Benefit.builder().name("Có khu vực giải trí").build(),
+                Benefit.builder().name("Câu lạc bộ nội bộ").build(),
+                Benefit.builder().name("Hoạt động thiện nguyện").build(),
+                Benefit.builder().name("Ngày hội gia đình công ty").build(),
+                Benefit.builder().name("Chương trình gắn kết nhân viên").build(),
+                Benefit.builder().name("Công ty tặng quà con nhân viên").build(),
+                Benefit.builder().name("Cấp đồng phục công ty").build(),
+                Benefit.builder().name("Cung cấp bảo hộ lao động").build(),
+                Benefit.builder().name("Phòng làm việc điều hòa 100%").build(),
+                Benefit.builder().name("Công ty hỗ trợ chỗ ở").build(),
+                Benefit.builder().name("Xe đưa đón nhân viên").build(),
+                Benefit.builder().name("Hỗ trợ gửi trẻ").build(),
+                Benefit.builder().name("Hỗ trợ học phí cho con nhân viên").build(),
+                Benefit.builder().name("Hỗ trợ chuyển nơi ở").build(),
+                Benefit.builder().name("Hỗ trợ vay lãi suất thấp").build(),
+                Benefit.builder().name("Hỗ trợ mua thiết bị làm việc").build(),
+                Benefit.builder().name("Hỗ trợ khám chữa bệnh").build(),
+                Benefit.builder().name("Công ty tài trợ thể thao").build(),
+                Benefit.builder().name("Tham gia giải thể thao nội bộ").build(),
+                Benefit.builder().name("Hỗ trợ tâm lý nhân viên").build(),
+                Benefit.builder().name("Chính sách khen thưởng đột xuất").build(),
+                Benefit.builder().name("Chính sách bảo mật thông tin").build(),
+                Benefit.builder().name("Công ty cung cấp bảo hiểm nhân thọ").build(),
+                Benefit.builder().name("Bảo hiểm nha khoa").build(),
+                Benefit.builder().name("Hỗ trợ nghỉ phép không lương dài hạn").build(),
+                Benefit.builder().name("Làm việc với công nghệ hiện đại").build(),
+                Benefit.builder().name("Chính sách thử việc hưởng 100% lương").build(),
+                Benefit.builder().name("Chính sách review lương định kỳ").build(),
+                Benefit.builder().name("Công ty minh bạch tài chính").build(),
+                Benefit.builder().name("Quản lý thân thiện").build(),
+                Benefit.builder().name("Đồng nghiệp hòa đồng").build(),
+                Benefit.builder().name("Không yêu cầu đồng phục").build(),
+                Benefit.builder().name("Làm việc tại trung tâm thành phố").build(),
+                Benefit.builder().name("Có chỗ để xe miễn phí").build(),
+                Benefit.builder().name("Công ty cung cấp nước uống miễn phí").build(),
+                Benefit.builder().name("Phòng họp tiện nghi").build(),
+                Benefit.builder().name("Phòng nghỉ trưa riêng").build(),
+                Benefit.builder().name("Hỗ trợ tài chính đám cưới").build(),
+                Benefit.builder().name("Hỗ trợ tài chính tang lễ").build(),
+                Benefit.builder().name("Tham gia chương trình phúc lợi nội bộ").build(),
+                Benefit.builder().name("Chính sách kỷ niệm thâm niên").build(),
+                Benefit.builder().name("Công ty tổ chức talkshow chia sẻ").build(),
+                Benefit.builder().name("Môi trường khuyến khích sáng tạo").build(),
+                Benefit.builder().name("Làm việc đa văn hóa").build(),
+                Benefit.builder().name("Cơ hội học hỏi từ chuyên gia").build(),
+                Benefit.builder().name("Cơ hội thử sức ở nhiều vị trí").build(),
+                Benefit.builder().name("Chính sách hỗ trợ startup nội bộ").build(),
+                Benefit.builder().name("Tham gia chương trình nội bộ đặc biệt").build(),
+                Benefit.builder().name("Công ty tài trợ học chứng chỉ").build(),
+                Benefit.builder().name("Tham gia sự kiện ngành").build(),
+                Benefit.builder().name("Chính sách đánh giá công bằng").build(),
+                Benefit.builder().name("Thưởng nhân viên xuất sắc tháng").build()
+        );
+
+
+        benefitRepository.saveAll(benefits);
+        log.info("✅ Seeded default benefits");
     }
 }

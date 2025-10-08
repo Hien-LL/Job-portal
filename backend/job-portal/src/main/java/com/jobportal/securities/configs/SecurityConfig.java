@@ -41,6 +41,7 @@ public class SecurityConfig {
             "api/categories",
             "api/locations/list",
             "api/skills/list",
+            "api/benefits/list",
             "/public/**",
             "/avatars/**",
             "/api/auth/refresh",
