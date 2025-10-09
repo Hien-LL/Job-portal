@@ -17,7 +17,7 @@ public class ResumeReq {
 
     private List<ExperienceDto> experiences;
     private List<EducationDto>  educations;
-    private List<FileDto>       files;
+    private List<FileDto> files;
 
     @Data
     public static class ExperienceDto {

@@ -61,4 +61,8 @@ public class Resume extends BaseEntity {
     @OrderBy("uploadedAt DESC")
     @JsonManagedReference(value = "resume-files")
     private Set<ResumeFile> files = new LinkedHashSet<>();
+
+    public boolean getIsDefault() {
+        return this.isDefault = isDefault;
+    }
 }

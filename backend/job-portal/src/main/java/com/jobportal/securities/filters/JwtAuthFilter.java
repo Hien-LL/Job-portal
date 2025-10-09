@@ -1,8 +1,8 @@
-package com.jobportal.securities.helps;
+package com.jobportal.securities.filters;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jobportal.dtos.resources.ApiResource;
-import com.jobportal.securities.details.CustomUserDetailsService;
+import com.jobportal.securities.helps.details.CustomUserDetailsService;
 import com.jobportal.services.impl.JwtService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
@@ -46,7 +46,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 || path.startsWith("/api/locations/list")
                 || path.startsWith("/api/skills/list")
                 || path.startsWith("/api/benefits/list")
-                || path.startsWith("/avatars/**");
+                || path.startsWith("/avatars/**")
+                || path.startsWith("/resumes/**");
     }
 
     @Override

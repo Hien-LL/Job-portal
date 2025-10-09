@@ -1,6 +1,6 @@
 package com.jobportal.commons;
 
-import com.jobportal.securities.helps.FilterParameter;
+import com.jobportal.securities.filters.FilterParameter;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;

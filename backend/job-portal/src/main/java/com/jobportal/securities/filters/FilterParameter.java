@@ -1,4 +1,4 @@
-package com.jobportal.securities.helps;
+package com.jobportal.securities.filters;
 
 import java.util.HashMap;
 import java.util.Map;

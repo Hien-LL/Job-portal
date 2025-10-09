@@ -1,4 +1,4 @@
-package com.jobportal.securities.details;
+package com.jobportal.securities.helps.details;
 
 import com.jobportal.entities.User;
 import lombok.extern.slf4j.Slf4j;

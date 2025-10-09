@@ -25,7 +25,7 @@ public class ResumeResource {
         dto.setId(r.getId());
         dto.setTitle(r.getTitle());
         dto.setSummary(r.getSummary());
-        dto.setDefault(r.isDefault());
+        dto.setDefault(r.getIsDefault());
         return dto;
     }
 
@@ -35,7 +35,7 @@ public class ResumeResource {
         dto.setId(r.getId());
         dto.setTitle(r.getTitle());
         dto.setSummary(r.getSummary());
-        dto.setDefault(r.isDefault());
+        dto.setDefault(r.getIsDefault());
         dto.setExperiences(r.getExperiences().stream().toList());
         dto.setEducations(r.getEducations().stream().toList());
         dto.setFiles(r.getFiles().stream().toList());

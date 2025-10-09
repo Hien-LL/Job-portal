@@ -1,4 +1,4 @@
-package com.jobportal.securities.details;
+package com.jobportal.securities.helps.details;
 
 import com.jobportal.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;

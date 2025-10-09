@@ -1,6 +1,6 @@
 package com.jobportal.securities.configs;
 
-import com.jobportal.securities.details.CustomPermissionEvaluator;
+import com.jobportal.securities.helps.details.CustomPermissionEvaluator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

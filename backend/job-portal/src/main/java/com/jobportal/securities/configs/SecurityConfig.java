@@ -1,7 +1,7 @@
 package com.jobportal.securities.configs;
 
-import com.jobportal.securities.details.CustomUserDetailsService;
-import com.jobportal.securities.helps.JwtAuthFilter;
+import com.jobportal.securities.helps.details.CustomUserDetailsService;
+import com.jobportal.securities.filters.JwtAuthFilter;
 import com.jobportal.securities.helps.RestAccessDeniedHandler;
 import com.jobportal.securities.helps.RestAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +44,7 @@ public class SecurityConfig {
             "api/benefits/list",
             "/public/**",
             "/avatars/**",
+            "/resumes/**",
             "/api/auth/refresh",
             "/api/auth/register",
             "/error",
