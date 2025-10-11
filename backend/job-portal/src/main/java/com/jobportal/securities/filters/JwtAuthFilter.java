@@ -2,6 +2,7 @@ package com.jobportal.securities.filters;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jobportal.dtos.resources.ApiResource;
+import com.jobportal.securities.configs.SecurityWhitelist;
 import com.jobportal.securities.helps.details.CustomUserDetailsService;
 import com.jobportal.services.impl.JwtService;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -21,6 +22,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -35,19 +37,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtAuthFilter.class);
 
+    private final SecurityWhitelist securityWhitelist;
+
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
-        return path.startsWith("/api/auth/login")
-                || path.startsWith("/api/auth/refresh")
-                || path.startsWith("/public/greeting")
-                || path.startsWith("/api/auth/register")
-                || path.startsWith("/api/categories")
-                || path.startsWith("/api/locations/list")
-                || path.startsWith("/api/skills/list")
-                || path.startsWith("/api/benefits/list")
-                || path.startsWith("/avatars/**")
-                || path.startsWith("/resumes/**");
+        AntPathMatcher matcher = new AntPathMatcher();
+        return securityWhitelist.getWhitelist().stream()
+                .anyMatch(pattern -> matcher.match(pattern, path));
     }
 
     @Override

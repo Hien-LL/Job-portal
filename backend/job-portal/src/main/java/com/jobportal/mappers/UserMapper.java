@@ -6,8 +6,6 @@ import com.jobportal.dtos.requests.UserUpdationRequest;
 import com.jobportal.dtos.resources.*;
 import com.jobportal.entities.User;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
 import org.springframework.data.domain.Page;
 
 import java.util.List;

@@ -95,7 +95,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiResource<Object>> handleBodyMissingOrBadJson(HttpMessageNotReadableException ex) {
         String hint = resolveReadableHint(ex);
-        return buildBadRequest("Yêu cầu không hợp lệ", Map.of("body", hint));
+        return buildBadRequest(Map.of("body", hint));
     }
 
     private String resolveReadableHint(HttpMessageNotReadableException ex) {
@@ -187,8 +187,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(body);
     }
 
-    private ResponseEntity<ApiResource<Object>> buildBadRequest(String message, Map<String, String> errors) {
-        var body = ApiResource.errorForObjectData(false, message, HttpStatus.BAD_REQUEST, null, errors);
+    private ResponseEntity<ApiResource<Object>> buildBadRequest(Map<String, String> errors) {
+        var body = ApiResource.errorForObjectData(false, "Yêu cầu không hợp lệ", HttpStatus.BAD_REQUEST, null, errors);
         return ResponseEntity.badRequest().body(body);
     }
 

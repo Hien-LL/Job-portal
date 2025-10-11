@@ -36,20 +36,8 @@ public class SecurityConfig {
     private final RestAccessDeniedHandler accessDeniedHandler;
     private final CustomUserDetailsService uds;
 
-    private static final String[] AUTH_WHITELIST = {
-            "/api/auth/login",
-            "api/categories",
-            "api/locations/list",
-            "api/skills/list",
-            "api/benefits/list",
-            "/public/**",
-            "/avatars/**",
-            "/resumes/**",
-            "/api/auth/refresh",
-            "/api/auth/register",
-            "/error",
-            "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html"
-    };
+    private final SecurityWhitelist whitelistProperties;
+
 
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
@@ -102,7 +90,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // CHO PHÉP preflight
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers(AUTH_WHITELIST).permitAll()
+                        .requestMatchers(whitelistProperties.getWhitelist().toArray(new String[0])).permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults());

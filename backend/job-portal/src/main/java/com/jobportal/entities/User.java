@@ -3,8 +3,8 @@ package com.jobportal.entities;
 import com.jobportal.commons.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -52,4 +52,6 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserSkill> userSkills = new HashSet<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<CompanyAdmin> companyAdmins = new LinkedHashSet<>();
 }

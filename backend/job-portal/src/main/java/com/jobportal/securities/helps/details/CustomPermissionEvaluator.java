@@ -30,8 +30,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
         boolean hasPerm = authorities.contains(need);
 
         if (target == null) {
-            boolean ok = isAdmin || hasPerm;
-            return ok;
+            return isAdmin || hasPerm;
         }
 
         boolean isOwner = false;
@@ -43,8 +42,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
             isOwner = principal.getUserId().equals(u.getId());
         }
 
-        boolean ok = isAdmin || (hasPerm && isOwner);
-        return ok;
+        return isAdmin || (hasPerm && isOwner);
     }
 
     @Override

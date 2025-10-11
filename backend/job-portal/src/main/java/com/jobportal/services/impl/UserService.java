@@ -19,15 +19,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -78,53 +74,20 @@ public class UserService extends BaseService implements UserServiceInterface {
     @Transactional
     public String uploadAvatar(Long userId, MultipartFile file) {
         // 0) Validate đầu vào
-        if (file == null || file.isEmpty()) throw new IllegalArgumentException("File rỗng");
-        String contentType = file.getContentType();
-        if (contentType == null || !contentType.toLowerCase().startsWith("image/")) {
-            throw new IllegalArgumentException("Chỉ cho phép file ảnh");
-        }
-        // Option: limit size 5MB
-        if (file.getSize() > 5 * 1024 * 1024) {
-            throw new IllegalArgumentException("Ảnh quá lớn (<= 5MB)");
-        }
+        validateFile(file);
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         // 1) Chuẩn bị thư mục
-        Path avatarDir = Paths.get("uploads", "avatars").toAbsolutePath().normalize();
-        try {
-            Files.createDirectories(avatarDir);
-        } catch (IOException e) {
-            throw new RuntimeException("Không tạo được thư mục upload", e);
-        }
+        Path avatarDir = readyDirectory("uploads", "avatars");
 
         // 2) Xác định tên file mới (UUID + ext whitelist)
-        String original = org.springframework.util.StringUtils.getFilename(file.getOriginalFilename());
-        String ext = (original != null && original.contains(".")) ? original.substring(original.lastIndexOf('.')) : "";
-        if (!ext.toLowerCase().matches("\\.(png|jpg|jpeg|gif|webp)$")) {
-            throw new IllegalArgumentException("Định dạng ảnh không hợp lệ (png/jpg/jpeg/gif/webp)");
-        }
-        String newName = UUID.randomUUID() + ext.toLowerCase();
-        Path newPath = avatarDir.resolve(newName).normalize();
+        Path newPath = generateFileName(file, avatarDir);
+        String newName = newPath.getFileName().toString();
 
         // 3) Ghi file tạm & xác thực là ảnh thật bằng ImageIO
-        try (var in = file.getInputStream()) {
-            Files.copy(in, newPath, StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            throw new RuntimeException("Lưu file thất bại", e);
-        }
-        // Decode thử để chống ảnh giả mạo content-type
-        try {
-            var img = javax.imageio.ImageIO.read(newPath.toFile());
-            if (img == null || img.getWidth() <= 0 || img.getHeight() <= 0) {
-                Files.deleteIfExists(newPath);
-                throw new IllegalArgumentException("File không phải ảnh hợp lệ");
-            }
-        } catch (IOException ex) {
-            try { Files.deleteIfExists(newPath); } catch (IOException ignore) {}
-            throw new RuntimeException("Không đọc được ảnh", ex);
-        }
+        saveAndValidateImage(file, newPath);
 
         // 4) Cập nhật DB trước (để nếu DB fail thì xoá ngay file mới)
         String oldUrl = user.getAvatarUrl(); // ví dụ: "/avatars/xxx.png"
@@ -138,12 +101,7 @@ public class UserService extends BaseService implements UserServiceInterface {
             throw ex;
         }
 
-        // 5) Xoá file cũ (chỉ local và trong /avatars/)
-        if (oldUrl != null && oldUrl.startsWith("/avatars/")) {
-            String oldName = oldUrl.replaceFirst("^/avatars/", "");
-            Path oldPath = avatarDir.resolve(oldName).normalize();
-            try { Files.deleteIfExists(oldPath); } catch (Exception ignore) {}
-        }
+        deleteFile(avatarDir, oldUrl, avatarDir);
 
         return newUrl;
     }

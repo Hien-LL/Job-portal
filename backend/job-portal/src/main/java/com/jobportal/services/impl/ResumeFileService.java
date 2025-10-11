@@ -52,18 +52,16 @@ public class ResumeFileService implements ResumeFileServiceInterface {
 
         String url = "/resumes/" + filename;
 
-        // 🔥 Không enum: chuẩn hoá từ parameter
         String fileType = normalizeFileType(fileTypeParam);
 
         ResumeFile resumeFile = ResumeFile.builder()
                 .resume(resume)
-                .fileType(fileType)   // chỉ là String
+                .fileType(fileType)
                 .fileUrl(url)
                 .build();
 
         resumeFile = resumeFileRepository.save(resumeFile);
 
-        // NOTE: chắc chắn mapper là toResource, đừng để tResource
         return resumeFileMapper.tResource(resumeFile);
     }
 
@@ -75,7 +73,6 @@ public class ResumeFileService implements ResumeFileServiceInterface {
 
         String key = s.toLowerCase();
 
-        // alias nhanh cho các case hay gặp
         switch (key) {
             case "cv":
             case "resume":
@@ -92,21 +89,16 @@ public class ResumeFileService implements ResumeFileServiceInterface {
             case "port": return "PORTFOLIO";
         }
 
-        // fallback: sanitize chuỗi tuỳ ý của user
-        // - chỉ giữ ký tự chữ/số/khoảng trắng/dấu gạch
-        // - upper case + collapse khoảng trắng
         String sanitized = key.replaceAll("[^a-z0-9\\- _]", " ").replaceAll("\\s+", " ").trim().toUpperCase();
 
-        // limit độ dài để bảo vệ DB/UI
         if (sanitized.length() > 32) sanitized = sanitized.substring(0, 32);
 
-        // default nếu rỗng sau sanitize
         return sanitized.isEmpty() ? "OTHER" : sanitized;
     }
 
 
     @Transactional
-    public void deleteFile(Long fileId) {
+    public void deleteFile(Long userId, Long fileId) {
         ResumeFile rf = resumeFileRepository.findById(fileId)
                 .orElseThrow(() -> new EntityNotFoundException("File không tồn tại"));
 

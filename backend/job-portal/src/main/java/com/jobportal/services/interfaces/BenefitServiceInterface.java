@@ -1,7 +1,6 @@
 package com.jobportal.services.interfaces;
 
 import com.jobportal.entities.Benefit;
-import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
 import java.util.Map;

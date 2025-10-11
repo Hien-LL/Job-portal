@@ -1,6 +1,5 @@
 package com.jobportal.services.interfaces;
 
-import com.jobportal.dtos.resources.CategoryResource;
 import com.jobportal.entities.Category;
 
 import java.util.List;

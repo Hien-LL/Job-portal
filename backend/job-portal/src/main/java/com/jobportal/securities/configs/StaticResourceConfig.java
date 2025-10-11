@@ -10,6 +10,12 @@ public class StaticResourceConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/avatars/**")
                 .addResourceLocations("file:uploads/avatars/");
+
+        registry.addResourceHandler("/resumes/**")
+                .addResourceLocations("file:uploads/resumes/");
+
+        registry.addResourceHandler("/company-logos/**")
+                .addResourceLocations("file:uploads/company-logos/");
     }
 }
 

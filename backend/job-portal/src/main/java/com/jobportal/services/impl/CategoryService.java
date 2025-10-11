@@ -1,9 +1,7 @@
 package com.jobportal.services.impl;
 
 import com.jobportal.commons.BaseService;
-import com.jobportal.dtos.resources.CategoryResource;
 import com.jobportal.entities.Category;
-import com.jobportal.mappers.CategoryMapper;
 import com.jobportal.repositories.CategoryRepository;
 import com.jobportal.services.interfaces.CategoryServiceInterface;
 import lombok.RequiredArgsConstructor;
