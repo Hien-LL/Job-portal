@@ -6,6 +6,6 @@ import lombok.Data;
 public class LocationResource {
     private Long id;
     private String city;
-    private String country_code;
-    private String display_name;
+    private String countryCode;
+    private String displayName;
 }

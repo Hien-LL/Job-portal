@@ -3,6 +3,9 @@ package com.jobportal.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "benefits")
 @Data
@@ -16,4 +19,7 @@ public class Benefit {
 
     @Column(nullable = false, unique = true)
     private String name;
+
+    @ManyToMany(mappedBy = "benefits")
+    private List<Job> jobs = new ArrayList<>();
 }

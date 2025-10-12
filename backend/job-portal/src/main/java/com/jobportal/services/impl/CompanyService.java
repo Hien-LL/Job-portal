@@ -88,9 +88,9 @@ public class CompanyService extends BaseService implements CompanyServiceInterfa
         saveAndValidateImage(file, newPath);
 
         // 4) Cập nhật DB trước (nếu DB fail thì xoá file mới)
-        String oldUrl = company.getLogo_url();          // ví dụ đang lưu: "/company-logos/xxx.png"
+        String oldUrl = company.getLogoUrl();          // ví dụ đang lưu: "/company-logos/xxx.png"
         String newUrl = "/company-logos/" + newName;    // public URL (giống style avatar)
-        company.setLogo_url(newUrl);
+        company.setLogoUrl(newUrl);
         try {
             companyRepository.saveAndFlush(company);
         } catch (RuntimeException ex) {

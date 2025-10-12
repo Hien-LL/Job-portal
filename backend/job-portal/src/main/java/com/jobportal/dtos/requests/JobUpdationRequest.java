@@ -1,30 +1,34 @@
 package com.jobportal.dtos.requests;
 
-import com.jobportal.dtos.resources.CategoryResource;
-import com.jobportal.dtos.resources.CompanyResource;
-import com.jobportal.dtos.resources.LocationResource;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 
-@Getter
-@Setter
+@Data
 public class JobUpdationRequest {
     private String title;
     private String description;
-    private boolean is_remote;
-    private int salary_max;
-    private int salary_min;
-    private LocalDateTime expires_at;
-    private boolean published;
-    private LocalDateTime published_at;
+    private Boolean remote;             // <— wrapper!
+    private Integer salaryMin;
+    private Integer salaryMax;
     private String seniority;
-    private String slug;
-    private String employment_type;
+    private String employmentType;
     private String currency;
+    private String slug;
+    private Boolean published;
 
-    private LocationResource location;
-    private CompanyResource company;
-    private CategoryResource category;
+    private Long categoryId;            // null: không đụng, có: đổi category
+    private String locationCountryCode; // null: không đụng, có: đổi location
+
+    // null  : không động tới benefits
+    // []    : clear hết benefits
+    // [ids] : set danh sách mới
+    private List<Long> benefitIds;
+
+    private String expiresAt;
+    private String publishedAt;
+
+    // (tuỳ chọn) clear fields có chủ đích
+    private Set<String> fieldsToNullify; // ví dụ: ["description"]
 }

@@ -48,6 +48,7 @@ public class BaseService {
                         .and(BaseSpecification.complexWhereSpec(filterComplex)));
     }
 
+
     // Validate file is image and size <= 5MB
     protected void validateFile(MultipartFile file) {
         if (file == null || file.isEmpty()) throw new IllegalArgumentException("File rỗng");

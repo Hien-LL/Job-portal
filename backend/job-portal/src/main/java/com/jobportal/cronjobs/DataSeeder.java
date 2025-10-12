@@ -34,6 +34,8 @@ public class DataSeeder implements ApplicationRunner {
     private final SkillRepository skillRepository;
     private final CategoryRepository categoryRepository;
     private final BenefitRepository benefitRepository;
+    private final LocationRepository locationRepository;
+
 
     @Override
     @Transactional // đảm bảo session mở suốt quá trình seed (fix LazyInitialization)
@@ -44,6 +46,7 @@ public class DataSeeder implements ApplicationRunner {
         seedSkills();
         seedCategories();
         seedBenefits();
+        seedLocations();
     }
 
     /* ================================== Seed Roles ================================== */
@@ -531,5 +534,55 @@ public class DataSeeder implements ApplicationRunner {
 
         benefitRepository.saveAll(benefits);
         log.info("✅ Seeded default benefits");
+    }
+
+    public void seedLocations() {
+        if (locationRepository.count() > 0) {
+            log.info("➡️ Locations already exist, skip seeding.");
+            return;
+        }
+
+        log.info("Seeding default locations...");
+
+        List<Location> locations = List.of(
+                Location.builder().city("Hà Nội").countryCode("100000").displayName("Thành phố Hà Nội").build(),
+                Location.builder().city("Hồ Chí Minh").countryCode("700000").displayName("Thành phố Hồ Chí Minh").build(),
+                Location.builder().city("Đà Nẵng").countryCode("550000").displayName("Thành phố Đà Nẵng").build(),
+                Location.builder().city("Hải Phòng").countryCode("180000").displayName("Thành phố Hải Phòng").build(),
+                Location.builder().city("Cần Thơ").countryCode("900000").displayName("Thành phố Cần Thơ").build(),
+                Location.builder().city("An Giang").countryCode("880000").displayName("Tỉnh An Giang").build(),
+                Location.builder().city("Bà Rịa - Vũng Tàu").countryCode("780000").displayName("Tỉnh Bà Rịa - Vũng Tàu").build(),
+                Location.builder().city("Bắc Giang").countryCode("260000").displayName("Tỉnh Bắc Giang").build(),
+                Location.builder().city("Bắc Kạn").countryCode("230000").displayName("Tỉnh Bắc Kạn").build(),
+                Location.builder().city("Bạc Liêu").countryCode("960000").displayName("Tỉnh Bạc Liêu").build(),
+                Location.builder().city("Bắc Ninh").countryCode("220000").displayName("Tỉnh Bắc Ninh").build(),
+                Location.builder().city("Bến Tre").countryCode("930000").displayName("Tỉnh Bến Tre").build(),
+                Location.builder().city("Bình Dương").countryCode("750000").displayName("Tỉnh Bình Dương").build(),
+                Location.builder().city("Bình Định").countryCode("550000").displayName("Tỉnh Bình Định").build(),
+                Location.builder().city("Bình Phước").countryCode("670000").displayName("Tỉnh Bình Phước").build(),
+                Location.builder().city("Bình Thuận").countryCode("770000").displayName("Tỉnh Bình Thuận").build(),
+                Location.builder().city("Cà Mau").countryCode("970000").displayName("Tỉnh Cà Mau").build(),
+                Location.builder().city("Cao Bằng").countryCode("210000").displayName("Tỉnh Cao Bằng").build(),
+                Location.builder().city("Đắk Lắk").countryCode("630000").displayName("Tỉnh Đắk Lắk").build(),
+                Location.builder().city("Đắk Nông").countryCode("650000").displayName("Tỉnh Đắk Nông").build(),
+                Location.builder().city("Điện Biên").countryCode("320000").displayName("Tỉnh Điện Biên").build(),
+                Location.builder().city("Đồng Nai").countryCode("760000").displayName("Tỉnh Đồng Nai").build(),
+                Location.builder().city("Đồng Tháp").countryCode("810000").displayName("Tỉnh Đồng Tháp").build(),
+                Location.builder().city("Gia Lai").countryCode("610000").displayName("Tỉnh Gia Lai").build(),
+                Location.builder().city("Hà Giang").countryCode("310000").displayName("Tỉnh Hà Giang").build(),
+                Location.builder().city("Hà Nam").countryCode("400000").displayName("Tỉnh Hà Nam").build(),
+                Location.builder().city("Hà Tĩnh").countryCode("480000").displayName("Tỉnh Hà Tĩnh").build(),
+                Location.builder().city("Hậu Giang").countryCode("940000").displayName("Tỉnh Hậu Giang").build(),
+                Location.builder().city("Hòa Bình").countryCode("350000").displayName("Tỉnh Hòa Bình").build(),
+                Location.builder().city("Hưng Yên").countryCode("160000").displayName("Tỉnh Hưng Yên").build(),
+                Location.builder().city("Khánh Hòa").countryCode("650000").displayName("Tỉnh Khánh Hòa").build(),
+                Location.builder().city("Kiên Giang").countryCode("920000").displayName("Tỉnh Kiên Giang").build(),
+                Location.builder().city("Kon Tum").countryCode("600000").displayName("Tỉnh Kon Tum").build(),
+                Location.builder().city("Lai Châu").countryCode("390000").displayName("Tỉnh Lai Châu").build()
+        );
+
+
+        locationRepository.saveAll(locations);
+        log.info("✅ Seeded default locations");
     }
 }

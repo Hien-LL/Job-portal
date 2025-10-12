@@ -2,14 +2,18 @@ package com.jobportal.entities;
 
 import com.jobportal.commons.BaseEntity;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
 @Table(name = "companies")
-@Data
+@Getter
+@Setter
 public class Company extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,7 +22,9 @@ public class Company extends BaseEntity {
     private String name;
     private String slug;
     private String website;
-    private String logo_url;
+
+    @Column(name = "logo_url")
+    private String logoUrl;
     private String description;
     private int size_min;
     private int size_max;
@@ -31,5 +37,6 @@ public class Company extends BaseEntity {
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<CompanyAdmin> companyAdmins = new LinkedHashSet<>();
 
-}
+    @OneToMany(mappedBy = "company")
+    private List<Job> jobs = new ArrayList<>();}
 

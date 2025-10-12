@@ -1,26 +1,28 @@
+// JobResource.java
 package com.jobportal.dtos.resources;
 
 import lombok.Data;
-
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class JobResource {
     private Long id;
     private String title;
     private String description;
-    private boolean is_remote;
-    private int salary_max;
-    private int salary_min;
-    private LocalDateTime expires_at;
+    private Boolean Remote;
+    private int salaryMax;
+    private int salaryMin;
+    private LocalDateTime expiresAt;
     private boolean published;
-    private LocalDateTime published_at;
+    private LocalDateTime publishedAt;
     private String seniority;
     private String slug;
-    private String employment_type;
+    private String employmentType;
     private String currency;
 
     private LocationResource location;
     private CompanyResource company;
     private CategoryResource category;
+    private List<BenefitResource> benefits;
 }
