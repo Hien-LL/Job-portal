@@ -15,4 +15,6 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
         order by c.name asc
     """)
     List<Company> findAllByMemberUserId(Long userId);
+
+    boolean existsBySlug(String slug);
 }

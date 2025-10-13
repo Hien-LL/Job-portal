@@ -32,11 +32,12 @@ public class CompanyService extends BaseService implements CompanyServiceInterfa
     @Override
     public Company createCompany(Long userId, CompanyCreationRequest request) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy user với id=" + userId));
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy user"));
 
         Company company = companyMapper.tEntity(request);
         company.setCreatedBy(user);
         company.setVerified(false);
+        company.setSlug(generateUniqueSlug(request.getName()));
 
         companyRepository.save(company);
         companyAdminService.linkUserToCompany(user.getId(), company.getId());
@@ -59,6 +60,11 @@ public class CompanyService extends BaseService implements CompanyServiceInterfa
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy company "));
 
         companyMapper.updateEntityFromRequest(request, company);
+
+        if (request.getName() != null && !request.getName().equals(company.getName())) {
+            company.setSlug(generateUniqueSlug(request.getName()));
+        }
+
         companyRepository.save(company);
         return company;
     }
@@ -88,8 +94,8 @@ public class CompanyService extends BaseService implements CompanyServiceInterfa
         saveAndValidateImage(file, newPath);
 
         // 4) Cập nhật DB trước (nếu DB fail thì xoá file mới)
-        String oldUrl = company.getLogoUrl();          // ví dụ đang lưu: "/company-logos/xxx.png"
-        String newUrl = "/company-logos/" + newName;    // public URL (giống style avatar)
+        String oldUrl = company.getLogoUrl();
+        String newUrl = "/company-logos/" + newName;
         company.setLogoUrl(newUrl);
         try {
             companyRepository.saveAndFlush(company);
@@ -102,6 +108,16 @@ public class CompanyService extends BaseService implements CompanyServiceInterfa
         deleteFile(logoDir, oldUrl, logoDir);
 
         return newUrl;
+    }
+
+    private String generateUniqueSlug(String baseSlug) {
+        String slug = baseSlug;
+        int suffix = 1;
+        while (companyRepository.existsBySlug(slug)) {
+            slug = baseSlug + "-" + suffix;
+            suffix++;
+        }
+        return slug;
     }
 }
 

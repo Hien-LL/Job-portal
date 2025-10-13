@@ -1,7 +1,9 @@
 package com.jobportal.dtos.requests;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -9,7 +11,9 @@ import java.util.Set;
 public class JobUpdationRequest {
     private String title;
     private String description;
-    private Boolean remote;             // <— wrapper!
+
+    @JsonProperty("isRemote")
+    private boolean isRemote;             // <— wrapper!
     private Integer salaryMin;
     private Integer salaryMax;
     private String seniority;
@@ -17,6 +21,7 @@ public class JobUpdationRequest {
     private String currency;
     private String slug;
     private Boolean published;
+    private LocalDateTime expiresAt;
 
     private Long categoryId;            // null: không đụng, có: đổi category
     private String locationCountryCode; // null: không đụng, có: đổi location
@@ -26,7 +31,6 @@ public class JobUpdationRequest {
     // [ids] : set danh sách mới
     private List<Long> benefitIds;
 
-    private String expiresAt;
     private String publishedAt;
 
     // (tuỳ chọn) clear fields có chủ đích

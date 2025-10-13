@@ -63,6 +63,9 @@ public class JobService extends BaseService implements JobServiceInterface {
         job.setLocation(location);
         job.setBenefits(benefits);
 
+        String unique = generateUniqueSlug(request.getTitle().toLowerCase());
+        job.setSlug(unique);
+
         jobRepository.save(job);
         return jobMapper.tResource(job);
     }
@@ -87,6 +90,10 @@ public class JobService extends BaseService implements JobServiceInterface {
 
         // 1) Map scalar fields — NULL -> IGNORE (giữ nguyên)
         jobMapper.updateEntityFromRequest(request, job);
+        if (request.getTitle() != null) {
+            String unique = generateUniqueSlug(request.getTitle().toLowerCase());
+            job.setSlug(unique);
+        }
 
         // 2) Quan hệ: chỉ set khi có truyền
         if (request.getCategoryId() != null) {
@@ -165,4 +172,25 @@ public class JobService extends BaseService implements JobServiceInterface {
         return jobRepository.findAll(spec, pageable);
     }
 
+    public void deleteJobForMyCompany(Long userId, Long companyId, Long jobId) {
+        assertCompanyAdmin(userId, companyId);
+
+        Job job = jobRepository.findById(jobId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy việc làm với id: " + jobId));
+        if (!job.getCompany().getId().equals(companyId)) {
+            throw new SecurityException("Việc làm không thuộc công ty của bạn");
+        }
+
+        jobRepository.delete(job);
+    }
+
+    private String generateUniqueSlug(String baseSlug) {
+        String slug = baseSlug;
+        int suffix = 1;
+        while (jobRepository.existsBySlug(slug)) {
+            slug = baseSlug + "-" + suffix;
+            suffix++;
+        }
+        return slug;
+    }
 }

@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class BaseSpecification<T> {
+public class BaseSpecification {
 
     /* ===================== Public APIs ===================== */
 
@@ -56,7 +56,7 @@ public class BaseSpecification<T> {
      * - lt, lte, gt, gte (so sánh theo Comparable)
      * - in (danh sách, tự ép kiểu từng phần tử)
      * - like (chuỗi, lower-case)
-     *
+     * <p>
      * Nhận Map<fieldPath, Map<operator, value>>, ví dụ:
      * company.slug -> {eq=cong-ti-bdee}
      * salary.min   -> {gte=20000000}
@@ -110,6 +110,7 @@ public class BaseSpecification<T> {
         return (root, cq, cb) -> {
             if (benefitIds == null || benefitIds.isEmpty()) return null;
             Join<Job, com.jobportal.entities.Benefit> benefits = root.join("benefits", JoinType.LEFT);
+            assert cq != null;
             cq.distinct(true);
             return benefits.get("id").in(benefitIds);
         };
@@ -175,6 +176,42 @@ public class BaseSpecification<T> {
 
         // Ép về kiểu Comparable phù hợp (wrapper cho primitive)
         Class<? extends Comparable> compType = toComparableType(type);
+
+        // ... đã có: Class<?> type, String raw, CompareOp op
+        if (type == LocalDateTime.class) {
+            Object parsed = parseTemporal(raw, type); // có thể là LocalDateTime hoặc String
+            if (parsed instanceof String str && isDateOnly(str)) {
+                LocalDate d = LocalDate.parse(str);
+                LocalDateTime right = (op == CompareOp.LT || op == CompareOp.LTE)
+                        ? d.atTime(23,59,59, 999_999_999)
+                        : d.atStartOfDay();
+                var left = path.as(LocalDateTime.class);
+                return switch (op) {
+                    case LT  -> cb.lessThan(left, right);
+                    case LTE -> cb.lessThanOrEqualTo(left, right);
+                    case GT  -> cb.greaterThan(left, right);
+                    case GTE -> cb.greaterThanOrEqualTo(left, right);
+                };
+            }
+        }
+        if (type == OffsetDateTime.class) {
+            Object parsed = parseTemporal(raw, type); // có thể là OffsetDateTime/LocalDateTime/String
+            if (parsed instanceof String str && isDateOnly(str)) {
+                LocalDate d = LocalDate.parse(str);
+                OffsetDateTime right = (op == CompareOp.LT || op == CompareOp.LTE)
+                        ? d.atTime(23,59,59, 999_999_999).atOffset(OffsetDateTime.now().getOffset())
+                        : d.atStartOfDay().atOffset(OffsetDateTime.now().getOffset());
+                var left = path.as(OffsetDateTime.class);
+                return switch (op) {
+                    case LT  -> cb.lessThan(left, right);
+                    case LTE -> cb.lessThanOrEqualTo(left, right);
+                    case GT  -> cb.greaterThan(left, right);
+                    case GTE -> cb.greaterThanOrEqualTo(left, right);
+                };
+            }
+        }
+
+
         Comparable right = (Comparable) convertValue(raw, compType);
 
         // Expression theo Comparable
@@ -240,10 +277,13 @@ public class BaseSpecification<T> {
         if (target == BigDecimal.class)                       return new BigDecimal(s);
 
         // Time
-        if (target == LocalDate.class)      return LocalDate.parse(s);
-        if (target == LocalDateTime.class)  return LocalDateTime.parse(s);
-        if (target == OffsetDateTime.class) return OffsetDateTime.parse(s);
-        if (target == Instant.class)        return Instant.parse(s);
+        if (target == LocalDate.class
+                || target == LocalDateTime.class
+                || target == OffsetDateTime.class
+                || target == Instant.class) {
+            return parseTemporal(s, target);
+        }
+
 
         // Enum
         if (Enum.class.isAssignableFrom(target)) {
@@ -255,4 +295,32 @@ public class BaseSpecification<T> {
         // String & mặc định
         return s;
     }
+
+
+    private static boolean isDateOnly(String s) {
+        return s != null && s.length() == 10 && s.chars().filter(ch -> ch=='-').count() == 2;
+    }
+
+    private static Object parseTemporal(String s, Class<?> target) {
+        // "now" / "today"
+        if ("now".equalsIgnoreCase(s)) {
+            if (target == java.time.OffsetDateTime.class) return java.time.OffsetDateTime.now();
+            if (target == java.time.LocalDateTime.class)  return java.time.LocalDateTime.now();
+            if (target == java.time.Instant.class)        return java.time.Instant.now();
+            if (target == java.time.LocalDate.class)      return java.time.LocalDate.now();
+        }
+        if ("today".equalsIgnoreCase(s)) {
+            return java.time.LocalDate.now();
+        }
+
+        // Thử parse theo thứ tự an toàn
+        try { if (target == java.time.OffsetDateTime.class) return java.time.OffsetDateTime.parse(s); } catch (Exception ignore) {}
+        try { if (target == java.time.LocalDateTime.class)  return java.time.LocalDateTime.parse(s); } catch (Exception ignore) {}
+        try { if (target == java.time.Instant.class)        return java.time.Instant.parse(s); } catch (Exception ignore) {}
+        try { if (target == java.time.LocalDate.class)      return java.time.LocalDate.parse(s); } catch (Exception ignore) {}
+
+        // Fallback: trả về String để caller tự xử lý
+        return s;
+    }
+
 }

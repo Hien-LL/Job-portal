@@ -27,4 +27,6 @@ public interface JobRepository extends JpaRepository<Job, Long>, JpaSpecificatio
 
     @EntityGraph(attributePaths = {"location", "company", "category", "benefits" })
     Page<Job> findAll(Specification<Job> spec, Pageable pageable);
+
+    boolean existsBySlug(String slug);
 }

@@ -101,20 +101,5 @@ public class FilterParameter {
     }
 
 
-    // theo ngay thang
-    public static Map<String, String> filterDateRange(Map<String, String[]> parameters) {
-        Map<String, String> dateRangeFilters = new HashMap<>();
-
-        if (parameters.containsKey("start_date"))
-        {
-            dateRangeFilters.put("start_date", parameters.get("start_date")[0]);
-        }
-
-        if (parameters.containsKey("end_date")) {
-            dateRangeFilters.put("end_date", parameters.get("end_date")[0]);
-        }
-
-        return dateRangeFilters;
-    }
 }
 

@@ -10,7 +10,7 @@ public class CompanyResource {
     private String name;
     private String slug;
     private String website;
-    private String logo_url;
+    private String logoUrl;
     private String description;
     private int size_min;
     private int size_max;

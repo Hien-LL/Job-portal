@@ -17,7 +17,7 @@ public class Job {
 
     private String title;
     private String description;
-    private boolean Remote;
+    private boolean isRemote;
     private int salaryMax;
     private int salaryMin;
     private LocalDateTime expiresAt;

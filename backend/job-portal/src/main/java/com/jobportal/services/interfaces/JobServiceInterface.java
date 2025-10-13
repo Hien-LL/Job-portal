@@ -13,4 +13,5 @@ public interface JobServiceInterface {
     JobResource getJobDetailById(Long jobId);
     Page<Job> paginationJob(Map<String, String[]> params);
     JobResource updateJobForMyCompany(Long userId, Long companyId, Long jobId, JobUpdationRequest request);
+    void deleteJobForMyCompany(Long userId, Long companyId, Long jobId);
 }

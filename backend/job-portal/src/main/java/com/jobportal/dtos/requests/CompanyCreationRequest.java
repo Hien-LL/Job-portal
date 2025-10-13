@@ -7,7 +7,6 @@ import lombok.Setter;
 @Setter
 public class CompanyCreationRequest {
     private String name;
-    private String slug;
     private String website;
     private String description;
     private int size_min;
