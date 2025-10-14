@@ -80,7 +80,7 @@ public class UserService extends BaseService implements UserServiceInterface {
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         // 1) Chuẩn bị thư mục
-        Path avatarDir = readyDirectory("uploads", "avatars");
+        Path avatarDir = readyDirectory("/app/uploads", "avatars");
 
         // 2) Xác định tên file mới (UUID + ext whitelist)
         Path newPath = generateFileName(file, avatarDir);

@@ -35,7 +35,7 @@ public class ResumeFileService implements ResumeFileServiceInterface {
         if (!resume.getUser().getId().equals(userId))
             throw new IllegalArgumentException("Không được phép upload file cho resume của người khác");
 
-        Path uploadDir = Paths.get("uploads", "resumes").toAbsolutePath().normalize();
+        Path uploadDir = Paths.get("/app/uploads", "resumes").toAbsolutePath().normalize();
         try { Files.createDirectories(uploadDir); }
         catch (IOException e) { throw new RuntimeException("Không tạo được thư mục lưu file", e); }
 
