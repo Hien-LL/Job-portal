@@ -10,7 +10,7 @@ import java.util.Map;
 
 public interface JobServiceInterface {
     JobResource createJobForMyCompany(Long userId, Long companyAdminId, JobCreationRequest request);
-    JobResource getJobDetailById(Long jobId);
+    JobResource getJobDetailBySlug(String slug);
     Page<Job> paginationJob(Map<String, String[]> params);
     JobResource updateJobForMyCompany(Long userId, Long companyId, Long jobId, JobUpdationRequest request);
     void deleteJobForMyCompany(Long userId, Long companyId, Long jobId);

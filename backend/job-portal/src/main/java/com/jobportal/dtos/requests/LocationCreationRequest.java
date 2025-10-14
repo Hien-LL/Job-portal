@@ -1,7 +1,12 @@
 package com.jobportal.dtos.requests;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class LocationCreationRequest {
+    @NotBlank(message = "city không được để trống")
     private String city;
-    private String country_code;
-    private String display_name;
+
+    @NotBlank(message = "countryCode không được để trống")
+    private String countryCode;
+    private String displayName;
 }

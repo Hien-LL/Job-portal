@@ -13,11 +13,15 @@ services:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./src/main/resources/db.sql:/docker-entrypoint-initdb.d/init.sql
-    networks:
-      - job-portal-network
-    restart: unless-stopped
+      - ./src/main/resources/db.sql:/docker-entrypoint-initdb.d/init.sql:ro
     command: --default-authentication-plugin=mysql_native_password
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-p123456"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks: [job-portal-network]
 
   job-portal-app:
     build:
@@ -26,18 +30,21 @@ services:
     container_name: job-portal-backend
     environment:
       SPRING_PROFILES_ACTIVE: docker
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/demodb
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: 123456
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/demodb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: jobportal
+      SPRING_DATASOURCE_PASSWORD: jobportal123
+      JWT_SECRET: w2c4k8H8tM2r7vC1yQ9m3P5s7U1a9L6n4b2X8f0J2q6R8t1Y3u5W7z9K1m3P5s7U9x1Z3c5V7y9
+      JWT_ISSUER: https://api.jobportal.dev
     ports:
       - "8080:8080"
     depends_on:
-      - mysql
-    networks:
-      - job-portal-network
-    restart: unless-stopped
+      mysql:
+        condition: service_healthy
     volumes:
       - ./logs:/app/logs
+      - ./uploads:/app/uploads
+    restart: unless-stopped
+    networks: [job-portal-network]
 
 volumes:
   mysql_data:

@@ -53,7 +53,6 @@ public class Job {
     @PrePersist
     protected void onCreate() {
         this.publishedAt = LocalDateTime.now();
-        this.expiresAt =LocalDateTime.now();
     }
 
     @PreUpdate

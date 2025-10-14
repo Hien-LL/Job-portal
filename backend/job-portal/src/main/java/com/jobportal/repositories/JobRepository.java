@@ -25,6 +25,16 @@ public interface JobRepository extends JpaRepository<Job, Long>, JpaSpecificatio
        """)
     Optional<Job> findDetailById(@Param("id") Long id);
 
+    @Query("""
+       select j from Job j
+       left join fetch j.location
+       left join fetch j.company
+       left join fetch j.category
+       left join fetch j.benefits
+       where j.slug = :slug
+       """)
+    Optional<Job> findDetailBySlug(@Param("slug") String slug);
+
     @EntityGraph(attributePaths = {"location", "company", "category", "benefits" })
     Page<Job> findAll(Specification<Job> spec, Pageable pageable);
 

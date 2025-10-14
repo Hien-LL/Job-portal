@@ -51,10 +51,10 @@ public class JobController {
         }
     }
 
-    @GetMapping("/{jobId}")
-    public ResponseEntity<?> getJobDetail(@Positive(message = "id phải lớn hơn 0") @PathVariable Long jobId) {
+    @GetMapping("/{slug}")
+    public ResponseEntity<?> getJobDetail(@PathVariable String slug) {
         try {
-            JobResource jobResource = jobService.getJobDetailById(jobId);
+            JobResource jobResource = jobService.getJobDetailBySlug(slug);
             return ResponseEntity.ok(ApiResource.ok(jobResource, "Success"));
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)

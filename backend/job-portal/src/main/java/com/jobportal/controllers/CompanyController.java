@@ -28,7 +28,7 @@ public class CompanyController {
     private final CompanyServiceInterface companyService;
     private final AuthServiceInterface authService;
     private final CompanyMapper companyMapper;
-    @PostMapping("/me")
+    @PostMapping("/my-company")
     public ResponseEntity<?> createCompany(@Valid @RequestBody CompanyCreationRequest request) {
         try {
             String email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -46,7 +46,7 @@ public class CompanyController {
         }
     }
 
-    @GetMapping("/me")
+    @GetMapping("/my-company")
     public ResponseEntity<?> getListCompany() {
         try {
             String email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -64,7 +64,7 @@ public class CompanyController {
         }
     }
 
-    @PutMapping(value = "/me/upload-logo/{companyId}" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/my-company/upload-logo/{companyId}" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadLogo(@PathVariable Long companyId, @RequestPart("logo") MultipartFile file) {
         try {
             if (file == null || file.isEmpty()) {
@@ -87,7 +87,7 @@ public class CompanyController {
         }
     }
 
-    @PutMapping("/me/{companyId}")
+    @PutMapping("/my-company/{companyId}")
     public ResponseEntity<?> updateCompany(@PathVariable Long companyId, @Valid @RequestBody CompanyUpdationRequest request) {
         try {
             String email = SecurityContextHolder.getContext().getAuthentication().getName();

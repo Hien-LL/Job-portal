@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -167,6 +168,11 @@ public class GlobalExceptionHandler {
         return buildError("Tham số không hợp lệ", errors);
     }
 
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ApiResource<Object>> handleNoResourceFound(HttpServletRequest req) {
+        String detail = "Không tìm thấy tài nguyên: " + req.getRequestURI();
+        return buildApiError(HttpStatus.NOT_FOUND, "NOT_FOUND", "Tài nguyên không tồn tại", detail);
+    }
     private String leafName(Path path) {
         Path.Node leaf = null;
         for (Path.Node n : path) leaf = n;

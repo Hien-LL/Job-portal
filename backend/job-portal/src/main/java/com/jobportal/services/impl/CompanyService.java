@@ -1,6 +1,7 @@
 package com.jobportal.services.impl;
 
 import com.jobportal.commons.BaseService;
+import com.jobportal.commons.Slugifier;
 import com.jobportal.dtos.requests.CompanyCreationRequest;
 import com.jobportal.dtos.requests.CompanyUpdationRequest;
 import com.jobportal.entities.Company;
@@ -61,7 +62,7 @@ public class CompanyService extends BaseService implements CompanyServiceInterfa
 
         companyMapper.updateEntityFromRequest(request, company);
 
-        if (request.getName() != null && !request.getName().equals(company.getName())) {
+        if (request.getName() != null) {
             company.setSlug(generateUniqueSlug(request.getName()));
         }
 
@@ -110,14 +111,21 @@ public class CompanyService extends BaseService implements CompanyServiceInterfa
         return newUrl;
     }
 
-    private String generateUniqueSlug(String baseSlug) {
-        String slug = baseSlug;
-        int suffix = 1;
-        while (companyRepository.existsBySlug(slug)) {
-            slug = baseSlug + "-" + suffix;
-            suffix++;
+    private String generateUniqueSlug(String base) {
+        String slug = Slugifier.slugify(base);
+
+        if (!companyRepository.existsBySlug(slug)) {
+            return slug;
+        } else {
+            int suffix = 2;
+            while (true) {
+                String newSlug = slug + "-" + suffix;
+                if (!companyRepository.existsBySlug(newSlug)) {
+                    return newSlug;
+                }
+                suffix++;
+            }
         }
-        return slug;
     }
 }
 

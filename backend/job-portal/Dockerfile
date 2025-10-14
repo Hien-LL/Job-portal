@@ -1,26 +1,24 @@
-FROM openjdk:21-jdk-slim
-
+# ===== build =====
+FROM maven:3.9-eclipse-temurin-21 AS build
 WORKDIR /app
+ENV LANG=C.UTF-8 LC_ALL=C.UTF-8 MAVEN_OPTS="-Dfile.encoding=UTF-8"
 
-# Copy Maven files
 COPY pom.xml .
-COPY mvnw .
-COPY .mvn .mvn
+RUN mvn -q -DskipTests dependency:go-offline
+COPY src ./src
+RUN mvn -q -DskipTests clean package
 
-# Download dependencies
-RUN ./mvnw dependency:go-offline -B
+# ===== run =====
+FROM eclipse-temurin:21-jre
+WORKDIR /app
+ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 
-# Copy source code
-COPY src src
+# non-root
+RUN useradd -ms /bin/bash appuser && \
+    mkdir -p /app/logs /app/uploads && chown -R appuser:appuser /app
+USER appuser
 
-# Build the application
-RUN ./mvnw clean package -DskipTests
+COPY --from=build /app/target/*.jar /app/app.jar
 
-# Copy the JAR file
-RUN cp target/*.jar app.jar
-
-# Expose port
 EXPOSE 8080
-
-# Run the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java","-jar","/app/app.jar"]

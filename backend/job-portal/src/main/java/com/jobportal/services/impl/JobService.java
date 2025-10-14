@@ -2,6 +2,7 @@ package com.jobportal.services.impl;
 
 import com.jobportal.commons.BaseService;
 import com.jobportal.commons.BaseSpecification;
+import com.jobportal.commons.Slugifier;
 import com.jobportal.dtos.requests.JobCreationRequest;
 import com.jobportal.dtos.requests.JobUpdationRequest;
 import com.jobportal.dtos.resources.JobResource;
@@ -71,9 +72,9 @@ public class JobService extends BaseService implements JobServiceInterface {
     }
 
     @Override
-    public JobResource getJobDetailById(Long jobId) {
-        Job job = jobRepository.findDetailById(jobId)
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy việc làm với id: " + jobId));
+    public JobResource getJobDetailBySlug(String slug) {
+        Job job = jobRepository.findDetailBySlug(slug)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy việc làm với slug: " + slug));
         return jobMapper.tResource(job);
     }
 
@@ -184,13 +185,20 @@ public class JobService extends BaseService implements JobServiceInterface {
         jobRepository.delete(job);
     }
 
-    private String generateUniqueSlug(String baseSlug) {
-        String slug = baseSlug;
-        int suffix = 1;
-        while (jobRepository.existsBySlug(slug)) {
-            slug = baseSlug + "-" + suffix;
-            suffix++;
+    private String generateUniqueSlug(String base) {
+        String slug = Slugifier.slugify(base);
+
+        if (!jobRepository.existsBySlug(slug)) {
+            return slug;
+        } else {
+            int suffix = 2;
+            while (true) {
+                String newSlug = slug + "-" + suffix;
+                if (!jobRepository.existsBySlug(newSlug)) {
+                    return newSlug;
+                }
+                suffix++;
+            }
         }
-        return slug;
     }
 }

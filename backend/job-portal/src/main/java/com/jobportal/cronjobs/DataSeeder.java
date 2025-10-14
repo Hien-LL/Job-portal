@@ -15,7 +15,6 @@ import java.util.*;
 
 @Slf4j
 @Component
-@Profile("dev") // chỉ chạy khi spring.profiles.active=dev
 @RequiredArgsConstructor
 public class DataSeeder implements ApplicationRunner {
 
