@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +33,7 @@ public class DataSeeder implements ApplicationRunner {
     private final CategoryRepository categoryRepository;
     private final BenefitRepository benefitRepository;
     private final LocationRepository locationRepository;
+    private final ApplicationStatusRepository applicationStatusRepository;
 
 
     @Override
@@ -46,6 +46,7 @@ public class DataSeeder implements ApplicationRunner {
         seedCategories();
         seedBenefits();
         seedLocations();
+        seedApplicationStatus();
     }
 
     /* ================================== Seed Roles ================================== */
@@ -583,5 +584,25 @@ public class DataSeeder implements ApplicationRunner {
 
         locationRepository.saveAll(locations);
         log.info("✅ Seeded default locations");
+    }
+
+    private void seedApplicationStatus() {
+        if (applicationStatusRepository.count() > 0) {
+            log.info("➡️ Application statuses already exist, skip seeding.");
+            return;
+        }
+
+        log.info("Seeding default application statuses...");
+
+        List<ApplicationStatus> statuses = List.of(
+                ApplicationStatus.builder().name("Đã ứng tuyển").code("APPLIED").build(),
+                ApplicationStatus.builder().name("Đang xem xét").code("REVIEWED").build(),
+                ApplicationStatus.builder().name("Phỏng vấn").code("INTERVIEWED").build(),
+                ApplicationStatus.builder().name("Đề nghị nhận việc").code("OFFERED").build(),
+                ApplicationStatus.builder().name("Từ chối").code("REJECTED").build()
+        );
+
+        applicationStatusRepository.saveAll(statuses);
+        log.info("✅ Seeded default application statuses");
     }
 }

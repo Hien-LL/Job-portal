@@ -85,7 +85,7 @@ public class CompanyService extends BaseService implements CompanyServiceInterfa
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy company"));
 
         // 1) Chuẩn bị thư mục
-        Path logoDir =  readyDirectory("/app/uploads", "company-logos");
+        Path logoDir =  readyDirectory("uploads", "company-logos");
 
         // 2) Tên file mới (UUID + ext whitelist)
         Path newPath = generateFileName(file, logoDir);
