@@ -39,4 +39,6 @@ public interface JobRepository extends JpaRepository<Job, Long>, JpaSpecificatio
     Page<Job> findAll(Specification<Job> spec, Pageable pageable);
 
     boolean existsBySlug(String slug);
+
+    Optional<Job> findBySlug(String slug);
 }

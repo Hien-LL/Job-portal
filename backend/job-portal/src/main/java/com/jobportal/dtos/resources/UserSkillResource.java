@@ -14,5 +14,4 @@ public class UserSkillResource {
     private String name;
     private String slug;
     private int yearsExperience;
-
 }

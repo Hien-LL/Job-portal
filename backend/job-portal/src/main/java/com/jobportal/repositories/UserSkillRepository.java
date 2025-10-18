@@ -21,5 +21,4 @@ public interface UserSkillRepository extends JpaRepository<UserSkill, UserSkillI
     order by us.skill.name asc
 """)
     List<UserSkillResource> findSkillViewsByUserId(Long userId);
-
 }

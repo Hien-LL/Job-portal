@@ -2,14 +2,12 @@ package com.jobportal.controllers;
 
 import com.jobportal.dtos.requests.JobCreationRequest;
 import com.jobportal.dtos.requests.JobUpdationRequest;
-import com.jobportal.dtos.resources.ApiResource;
-import com.jobportal.dtos.resources.JobListItemResource;
-import com.jobportal.dtos.resources.JobResource;
-import com.jobportal.dtos.resources.UserProfileResource;
+import com.jobportal.dtos.resources.*;
 import com.jobportal.entities.Job;
 import com.jobportal.mappers.JobMapper;
 import com.jobportal.services.impl.JobService;
 import com.jobportal.services.interfaces.AuthServiceInterface;
+import com.jobportal.services.interfaces.SavedJobServiceInterface;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -18,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +28,7 @@ import java.util.Map;
 public class JobController {
     private final JobService jobService;
     private final AuthServiceInterface authService;
+    private final SavedJobServiceInterface savedJobService;
     private final JobMapper jobMapper;
 
     @PostMapping("/my-company/{companyId}")
@@ -109,6 +109,62 @@ public class JobController {
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
+        }
+    }
+
+    @PostMapping("/{jobSlug}/save")
+    public ResponseEntity<?> saveJob(@PathVariable String jobSlug) {
+        try {
+            String email = SecurityContextHolder.getContext().getAuthentication().getName();
+            UserProfileResource user = authService.getUserFromEmail(email);
+            savedJobService.saveJob(user.getId(), jobSlug);
+            return ResponseEntity.ok(ApiResource.ok(null, "Lưu thành công job"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResource.error("BAD_REQUEST", e.getMessage(), HttpStatus.BAD_REQUEST));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
+        }
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @RequestMapping("saved-jobs/list")
+    public ResponseEntity<?> me(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        try {
+            String email = SecurityContextHolder.getContext().getAuthentication().getName();
+            UserProfileResource userResource =  authService.getUserFromEmail(email);
+             Page<SavedJobResource> resourcePage = savedJobService.getSavedJobsByUserId(userResource.getId(), page, size);
+
+            ApiResource<Page<SavedJobResource>> response = ApiResource.ok(resourcePage, "Lấy danh sách công việc đã lưu thành công");
+
+            return ResponseEntity.ok(response);
+        } catch (EntityNotFoundException exception) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    ApiResource.error("NOT_FOUND", exception.getMessage(), HttpStatus.NOT_FOUND)
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
+        }
+    }
+
+    @DeleteMapping("/{jobSlug}/unsave")
+    public ResponseEntity<?> unsaveJob(@PathVariable String jobSlug) {
+        try {
+            String email = SecurityContextHolder.getContext().getAuthentication().getName();
+            UserProfileResource user = authService.getUserFromEmail(email);
+            savedJobService.removeSavedJob(user.getId(), jobSlug);
+            return ResponseEntity.ok(ApiResource.ok(null, "Bỏ lưu thành công job"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResource.error("BAD_REQUEST", e.getMessage(), HttpStatus.BAD_REQUEST));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));

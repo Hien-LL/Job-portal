@@ -4,12 +4,14 @@ import com.jobportal.commons.BaseService;
 import com.jobportal.commons.Slugifier;
 import com.jobportal.dtos.requests.CompanyCreationRequest;
 import com.jobportal.dtos.requests.CompanyUpdationRequest;
+import com.jobportal.dtos.resources.CompanyResource;
 import com.jobportal.entities.Company;
 import com.jobportal.entities.CompanyAdminId;
 import com.jobportal.entities.User;
 import com.jobportal.mappers.CompanyMapper;
 import com.jobportal.repositories.CompanyAdminRepository;
 import com.jobportal.repositories.CompanyRepository;
+import com.jobportal.repositories.FollowCompanyRepository;
 import com.jobportal.repositories.UserRepository;
 import com.jobportal.services.interfaces.CompanyServiceInterface;
 import jakarta.persistence.EntityNotFoundException;
@@ -29,6 +31,17 @@ public class CompanyService extends BaseService implements CompanyServiceInterfa
     private final CompanyMapper companyMapper;
     private final CompanyAdminService companyAdminService;
     private final CompanyAdminRepository companyAdminRepository;
+    private final FollowCompanyRepository followCompanyRepository;
+
+    @Override
+    public CompanyResource getCompanyBySlug(String companySlug) {
+        Company company = companyRepository.findBySlug(companySlug)
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy company"));
+
+        CompanyResource companyResource = companyMapper.tResource(company);
+        companyResource.setFollowerCount((int) followCompanyRepository.countByCompany_Id(company.getId()));
+        return companyResource;
+    }
 
     @Override
     public Company createCompany(Long userId, CompanyCreationRequest request) {

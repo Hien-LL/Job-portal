@@ -1,5 +1,6 @@
 package com.jobportal.repositories;
 
+import aj.org.objectweb.asm.commons.InstructionAdapter;
 import com.jobportal.entities.User;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;

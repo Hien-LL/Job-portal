@@ -5,10 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "companies")
@@ -38,5 +35,8 @@ public class Company extends BaseEntity {
     private Set<CompanyAdmin> companyAdmins = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "company")
-    private List<Job> jobs = new ArrayList<>();}
+    private List<Job> jobs = new ArrayList<>();
+}
+
+
 

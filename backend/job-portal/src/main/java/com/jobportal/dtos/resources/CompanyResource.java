@@ -15,4 +15,5 @@ public class CompanyResource {
     private int size_min;
     private int size_max;
     private boolean verified;
+    private int followerCount;
 }

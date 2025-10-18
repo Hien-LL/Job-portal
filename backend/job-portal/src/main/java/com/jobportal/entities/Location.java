@@ -1,10 +1,8 @@
 package com.jobportal.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
+
 import java.util.ArrayList;
 import java.util.List;
 

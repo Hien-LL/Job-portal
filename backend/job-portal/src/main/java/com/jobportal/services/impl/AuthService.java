@@ -66,6 +66,7 @@ public class AuthService extends BaseService implements AuthServiceInterface {
         return userMapper.tProfileResource(user);
     }
 
+
     @Override
     public RegisterResource createUser(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -113,4 +114,5 @@ public class AuthService extends BaseService implements AuthServiceInterface {
 
         return userMapper.tResourceDetails(user);
     }
+
 }

@@ -28,6 +28,7 @@ public class CompanyController {
     private final CompanyServiceInterface companyService;
     private final AuthServiceInterface authService;
     private final CompanyMapper companyMapper;
+
     @PostMapping("/my-company")
     public ResponseEntity<?> createCompany(@Valid @RequestBody CompanyCreationRequest request) {
         try {
@@ -46,7 +47,7 @@ public class CompanyController {
         }
     }
 
-    @GetMapping("/my-company")
+    @GetMapping("/my-company/list")
     public ResponseEntity<?> getListCompany() {
         try {
             String email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -54,7 +55,7 @@ public class CompanyController {
 
             List<Company> companies = companyService.getListCompany(user.getId());
             List<CompanyResource> companyResource = companyMapper.tResourceList(companies);
-            return ResponseEntity.ok(ApiResource.ok(companyResource, "Tạo công ty thành công"));
+            return ResponseEntity.ok(ApiResource.ok(companyResource, "Lấy danh sách công ty thành công"));
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND));
@@ -99,6 +100,20 @@ public class CompanyController {
         } catch (SecurityException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(ApiResource.error("FORBIDDEN", e.getMessage(), HttpStatus.FORBIDDEN));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
+        }
+    }
+
+    @GetMapping("/{companySlug}" )
+    public ResponseEntity<?> getCompanyBySlug(@PathVariable String companySlug) {
+        try {
+            CompanyResource companyResource = companyService.getCompanyBySlug(companySlug);
+            return ResponseEntity.ok(ApiResource.ok(companyResource, "Lấy thông tin công ty thành công"));
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND));

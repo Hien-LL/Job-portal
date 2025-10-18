@@ -53,5 +53,8 @@ public class User extends BaseEntity {
     private Set<UserSkill> userSkills = new HashSet<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<SavedJob> savedJobs = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<CompanyAdmin> companyAdmins = new LinkedHashSet<>();
 }
