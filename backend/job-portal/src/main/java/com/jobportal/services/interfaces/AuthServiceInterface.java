@@ -13,4 +13,6 @@ public interface AuthServiceInterface {
     UserProfileResource getUserFromEmail(String email);
     Object createUser(RegisterRequest request);
     UserDetailsResource updateRolesForUser(@Valid Set<Long> roleIds, Long id);
+    void verifyEmail(String email, String otp);
+    void resendOtp(String email);
 }

@@ -1,5 +1,6 @@
 package com.jobportal.controllers;
 
+import com.jobportal.dtos.requests.NotificationRequest;
 import com.jobportal.dtos.requests.RolesForUserUpdationRequest;
 import com.jobportal.dtos.requests.UserUpdationRequest;
 import com.jobportal.dtos.resources.ApiResource;
@@ -9,6 +10,7 @@ import com.jobportal.dtos.resources.UserResource;
 import com.jobportal.entities.User;
 import com.jobportal.mappers.UserMapper;
 import com.jobportal.services.interfaces.AuthServiceInterface;
+import com.jobportal.services.interfaces.NotificationServiceInterface;
 import com.jobportal.services.interfaces.UserServiceInterface;
 import com.jobportal.services.interfaces.UserSkillServiceInterface;
 import jakarta.persistence.EntityNotFoundException;
@@ -36,6 +38,7 @@ public class UserController {
     private final UserServiceInterface userService;
     private final UserMapper userMapper;
     private final UserSkillServiceInterface userSkillService;
+    private final NotificationServiceInterface notificationService;
 
     @PreAuthorize("isAuthenticated()")
     @RequestMapping("/me")

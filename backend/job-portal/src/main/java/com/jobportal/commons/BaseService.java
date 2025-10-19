@@ -17,6 +17,10 @@ import java.util.UUID;
 
 @Service
 public class BaseService {
+    protected <T> Specification<T> hasUser(Long userId) {
+        return (root, query, cb) ->
+                cb.equal(root.get("user").get("id"), userId);
+    }
     protected Sort createSort(String sortParam) {
         if (sortParam == null || sortParam.isEmpty()) {
             return Sort.by(Sort.Order.asc("id"));

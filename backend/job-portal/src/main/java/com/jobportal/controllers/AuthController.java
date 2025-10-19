@@ -1,9 +1,6 @@
 package com.jobportal.controllers;
 
-import com.jobportal.dtos.requests.BlacklistTokenRequest;
-import com.jobportal.dtos.requests.LoginRequest;
-import com.jobportal.dtos.requests.RefreshTokenRequest;
-import com.jobportal.dtos.requests.RegisterRequest;
+import com.jobportal.dtos.requests.*;
 import com.jobportal.dtos.resources.ApiResource;
 import com.jobportal.dtos.resources.LoginResource;
 import com.jobportal.dtos.resources.RefreshTokenResource;
@@ -13,6 +10,7 @@ import com.jobportal.repositories.RefreshTokenRepository;
 import com.jobportal.services.impl.BlacklistedService;
 import com.jobportal.services.impl.JwtService;
 import com.jobportal.services.interfaces.AuthServiceInterface;
+import com.jobportal.services.interfaces.NotificationServiceInterface;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +31,7 @@ public class AuthController {
     private final BlacklistedService blacklistedService;
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtService jwtService;
+    private final NotificationServiceInterface notificationService;
 
     @PostMapping("register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
@@ -56,11 +55,54 @@ public class AuthController {
         return ResponseEntity.internalServerError().body(errorResponse);
     }
 
+    @PostMapping("/verify-email")
+    public ResponseEntity<?> verify(@RequestBody @Valid VerifyEmailRequest req){
+        try {
+            userService.verifyEmail(req.getEmail(), req.getOtp());
+            ApiResource<Void> response = ApiResource.ok(null, "Xác thực email thành công");
+            return ResponseEntity.ok(response);
+        } catch (IllegalStateException e) {
+            ApiResource<Void> errorResponse = ApiResource.error("400",
+                    e.getMessage(),
+                    HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest().body(errorResponse);
+        } catch (Exception e) {
+            ApiResource<Void> errorResponse = ApiResource.error("500",
+                    "Network Error",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.internalServerError().body(errorResponse);
+        }
+    }
+
+    @PostMapping("/resend-otp")
+    public ResponseEntity<?> resend(@RequestBody @Valid VerifyEmailRequest req){
+        try {
+            userService.resendOtp(req.getEmail());
+            ApiResource<Void> response = ApiResource.ok(null, "Gửi lại mã OTP thành công");
+            return ResponseEntity.ok(response);
+        } catch (IllegalStateException e) {
+            ApiResource<Void> errorResponse = ApiResource.error("400",
+                    e.getMessage(),
+                    HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest().body(errorResponse);
+        } catch (Exception e) {
+            ApiResource<Void> errorResponse = ApiResource.error("500",
+                    "Network Error",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.internalServerError().body(errorResponse);
+        }
+    }
+
     @PostMapping("login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
         Object result = userService.authenticate(request);
         if (result instanceof LoginResource loginResource) {
             ApiResource<LoginResource> response = ApiResource.ok(loginResource, "SUCCESS");
+            NotificationRequest notificationRequest = NotificationRequest.builder()
+                    .title("Welcome Back!")
+                    .body("Chào mừng bạn đã quay trở lại trang JobPortal.")
+                    .build();
+            notificationService.sendNotification(((LoginResource) result).getUser().getId(), notificationRequest);
             return ResponseEntity.ok(response);
         }
 

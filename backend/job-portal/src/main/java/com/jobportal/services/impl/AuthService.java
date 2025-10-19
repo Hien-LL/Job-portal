@@ -36,12 +36,16 @@ public class AuthService extends BaseService implements AuthServiceInterface {
     @Value("${jwt.defaultExpiration}")
     private long defaultExpiration;
     private final UserMapper userMapper;
+    private final OtpService otpService;
+    private final MailService mailService;
 
     @Override
     public Object authenticate(LoginRequest request) {
         try {
             User user = userRepository.findByEmailWithRolesAndPermissions(
                     request.getEmail()).orElseThrow(() -> new BadCredentialsException("Email hoac mat khau khong dung"));
+
+            if (!user.isEmailVerified()) throw new IllegalStateException("Email chưa đuợc xác thực");
 
             if (!passwordEncoder.matches(request.getPassword(), user.getPassword()))
             {
@@ -79,6 +83,9 @@ public class AuthService extends BaseService implements AuthServiceInterface {
         User user = userMapper.tEntity(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRoles(Set.of(role));
+        user.setEmailVerified(false);
+        String otp = otpService.generateAndStore(user.getEmail());
+        mailService.sendOtp(user.getEmail(), otp);
 
         userRepository.save(user);
         return userMapper.tRegisterResource(user);
@@ -115,4 +122,27 @@ public class AuthService extends BaseService implements AuthServiceInterface {
         return userMapper.tResourceDetails(user);
     }
 
+    @Override
+    public void resendOtp(String email) {
+        var user = userRepository.findByEmailWithRolesAndPermissions(email.toLowerCase())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        if (user.isEmailVerified()) throw new IllegalStateException("Already verified");
+        if (!otpService.canResend(email)) throw new IllegalStateException("Too many requests");
+        String otp = otpService.generateAndStore(email);
+        mailService.sendOtp(email, otp);
+    }
+
+    @Override
+    @Transactional
+    public void verifyEmail(String email, String otp) {
+        var user = userRepository.findByEmailWithRolesAndPermissions(email.toLowerCase())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        if (user.isEmailVerified()) {
+            throw new IllegalStateException("Already verified");
+        }
+        boolean ok = otpService.verify(email, otp);
+        if (!ok) throw new IllegalArgumentException("Invalid or expired OTP");
+        user.setEmailVerified(true);
+        userRepository.save(user);
+    }
 }
