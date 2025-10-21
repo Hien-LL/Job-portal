@@ -62,7 +62,11 @@ public class Resume extends BaseEntity {
     @JsonManagedReference(value = "resume-files")
     private Set<ResumeFile> files = new LinkedHashSet<>();
 
-    public boolean getIsDefault() {
-        return this.isDefault = isDefault;
+    public boolean isDefault() {
+        return this.isDefault;
+    }
+    // nếu có setter:
+    public void setDefault(boolean val) {
+        this.isDefault = val;
     }
 }

@@ -1,7 +1,7 @@
 package com.jobportal.controllers;
 
-import com.jobportal.dtos.requests.ResumeCreationRequest;
-import com.jobportal.dtos.requests.ResumeUpdationRequest;
+import com.jobportal.dtos.requests.creation.ResumeCreationRequest;
+import com.jobportal.dtos.requests.updation.ResumeUpdationRequest;
 import com.jobportal.dtos.resources.ApiResource;
 import com.jobportal.dtos.resources.ResumeFileResource;
 import com.jobportal.dtos.resources.ResumeResource;
@@ -119,9 +119,19 @@ public class ResumeController {
         }
     }
 
-//    public ResponseEntity<?> deleteFile(@PathVariable Long resumeId) {
-//        try {
-//            String
-//        }
-//    }
+    @DeleteMapping("/me/files/{resumeId}")
+    public ResponseEntity<?> deleteFile(@PathVariable Long resumeId) {
+        try {
+            String email = SecurityContextHolder.getContext().getAuthentication().getName();
+            UserProfileResource user = authService.getUserFromEmail(email);
+            resumeFileService.deleteFile(user.getId(), resumeId);
+            return ResponseEntity.ok(ApiResource.ok(null, "Xoá File thành công"));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
+        }
+    }
 }

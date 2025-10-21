@@ -1,8 +1,8 @@
 package com.jobportal.mappers;
 
 import com.jobportal.commons.BaseMapper;
-import com.jobportal.dtos.requests.JobCreationRequest;
-import com.jobportal.dtos.requests.JobUpdationRequest;
+import com.jobportal.dtos.requests.creation.JobCreationRequest;
+import com.jobportal.dtos.requests.updation.JobUpdationRequest;
 import com.jobportal.dtos.resources.JobListItemResource;
 import com.jobportal.dtos.resources.JobResource;
 import com.jobportal.entities.*;

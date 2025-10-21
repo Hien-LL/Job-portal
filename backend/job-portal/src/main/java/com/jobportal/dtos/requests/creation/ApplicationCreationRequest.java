@@ -1,4 +1,4 @@
-package com.jobportal.dtos.requests;
+package com.jobportal.dtos.requests.creation;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import jakarta.validation.constraints.NotBlank;

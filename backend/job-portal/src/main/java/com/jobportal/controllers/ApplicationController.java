@@ -1,7 +1,7 @@
 package com.jobportal.controllers;
 
-import com.jobportal.dtos.requests.ApplicationCreationRequest;
-import com.jobportal.dtos.requests.ApplicationUpdateStatusRequest;
+import com.jobportal.dtos.requests.creation.ApplicationCreationRequest;
+import com.jobportal.dtos.requests.creation.ApplicationUpdateStatusRequest;
 import com.jobportal.dtos.resources.*;
 import com.jobportal.services.interfaces.ApplicationServiceInterface;
 import com.jobportal.services.interfaces.ApplicationWorkflowServiceInterface;
@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +28,7 @@ public class ApplicationController {
     private final AuthServiceInterface authService;
     private final ApplicationWorkflowServiceInterface applicationWorkflowService;
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("{jobId}/apply")
     public ResponseEntity<?> applyToJob(@Positive @PathVariable Long jobId,@Valid @RequestBody ApplicationCreationRequest request) {
         try {
@@ -44,6 +46,7 @@ public class ApplicationController {
         }
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("my-applications")
     public ResponseEntity<?> getMyApplications(
             @RequestParam(required = false) String status,
@@ -91,6 +94,7 @@ public class ApplicationController {
         }
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{applicationId}")
     public ResponseEntity<?> getDetail(@PathVariable Long applicationId) {
         try {

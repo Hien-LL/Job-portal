@@ -2,7 +2,7 @@ package com.jobportal.mappers;
 
 import com.jobportal.commons.BaseMapper;
 import com.jobportal.dtos.requests.RegisterRequest;
-import com.jobportal.dtos.requests.UserUpdationRequest;
+import com.jobportal.dtos.requests.updation.UserUpdationRequest;
 import com.jobportal.dtos.resources.*;
 import com.jobportal.entities.User;
 import org.mapstruct.Mapper;

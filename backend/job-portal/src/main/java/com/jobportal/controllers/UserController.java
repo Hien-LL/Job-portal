@@ -1,8 +1,7 @@
 package com.jobportal.controllers;
 
-import com.jobportal.dtos.requests.NotificationRequest;
-import com.jobportal.dtos.requests.RolesForUserUpdationRequest;
-import com.jobportal.dtos.requests.UserUpdationRequest;
+import com.jobportal.dtos.requests.updation.RolesForUserUpdationRequest;
+import com.jobportal.dtos.requests.updation.UserUpdationRequest;
 import com.jobportal.dtos.resources.ApiResource;
 import com.jobportal.dtos.resources.UserDetailsResource;
 import com.jobportal.dtos.resources.UserProfileResource;
@@ -123,6 +122,26 @@ public class UserController {
     public ResponseEntity<?> updateProfile(@Valid @RequestBody UserUpdationRequest request, @PathVariable @Positive(message = "id phải lớn hơn 0") Long id) {
         try {
             UserProfileResource resource = userService.update(id, request);
+            ApiResource<UserProfileResource> response = ApiResource.ok(resource, "Cập nhật bản ghi thành công");
+            return ResponseEntity.ok(response);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND)
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+                    ));
+        }
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PutMapping("/profile/me")
+    public ResponseEntity<?> updateMyProfile(@Valid @RequestBody UserUpdationRequest request) {
+        try {
+            String email = SecurityContextHolder.getContext().getAuthentication().getName();
+            UserProfileResource user = authService.getUserFromEmail(email);
+            UserProfileResource resource = userService.update(user.getId(), request);
             ApiResource<UserProfileResource> response = ApiResource.ok(resource, "Cập nhật bản ghi thành công");
             return ResponseEntity.ok(response);
         } catch (EntityNotFoundException e) {

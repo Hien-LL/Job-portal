@@ -2,8 +2,8 @@ package com.jobportal.services.impl;
 
 import com.jobportal.commons.BaseService;
 import com.jobportal.commons.Slugifier;
-import com.jobportal.dtos.requests.CompanyCreationRequest;
-import com.jobportal.dtos.requests.CompanyUpdationRequest;
+import com.jobportal.dtos.requests.creation.CompanyCreationRequest;
+import com.jobportal.dtos.requests.updation.CompanyUpdationRequest;
 import com.jobportal.dtos.resources.CompanyResource;
 import com.jobportal.entities.Company;
 import com.jobportal.entities.CompanyAdminId;
@@ -13,15 +13,20 @@ import com.jobportal.repositories.CompanyAdminRepository;
 import com.jobportal.repositories.CompanyRepository;
 import com.jobportal.repositories.FollowCompanyRepository;
 import com.jobportal.repositories.UserRepository;
+import com.jobportal.securities.configs.UploadConfig;
 import com.jobportal.services.interfaces.CompanyServiceInterface;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +37,7 @@ public class CompanyService extends BaseService implements CompanyServiceInterfa
     private final CompanyAdminService companyAdminService;
     private final CompanyAdminRepository companyAdminRepository;
     private final FollowCompanyRepository followCompanyRepository;
+    private final UploadConfig uploadConfig;
 
     @Override
     public CompanyResource getCompanyBySlug(String companySlug) {
@@ -64,6 +70,7 @@ public class CompanyService extends BaseService implements CompanyServiceInterfa
         return companyRepository.findAllByMemberUserId(userId);
     }
 
+    @Transactional
     @Override
     public Company updateCompany(Long userId, Long companyId, CompanyUpdationRequest request) {
         if (!companyAdminRepository.existsById(new CompanyAdminId(userId, companyId))) {
@@ -79,37 +86,43 @@ public class CompanyService extends BaseService implements CompanyServiceInterfa
             company.setSlug(generateUniqueSlug(request.getName()));
         }
 
+        if (request.getSize_min() > request.getSize_max()) {
+            throw new IllegalArgumentException("size_min không được lớn hơn size_max");
+        }
+
+        if (request.getSize_max() > request.getSize_min()) {
+            company.setSize_min(request.getSize_min());
+            company.setSize_max(request.getSize_max());
+        }
+
         companyRepository.save(company);
         return company;
     }
 
+    @Transactional
     @Override
     public String uploadCompanyLogo(Long userId, Long companyId, MultipartFile file) {
-        // 0) Validate đầu vào
-        validateFile(file);
+        validateFileSize(file, uploadConfig.getMaxSize());
+        validateExt(file, uploadConfig.getAllowedImageExt()); // chỉ ảnh
 
-        // 0.1) Kiểm tra quyền: user phải thuộc company (bảng nối CompanyAdmin)
         if (!companyAdminRepository.existsById(new CompanyAdminId(userId, companyId))) {
             throw new SecurityException("Bạn không có quyền upload logo cho công ty này");
         }
 
-        // 0.2) Lấy company
         Company company = companyRepository.findById(companyId)
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy company"));
 
-        // 1) Chuẩn bị thư mục
-        Path logoDir =  readyDirectory("uploads", "company-logos");
+        Path logoDir = ensureDir(uploadConfig.getBaseDir(), uploadConfig.getCompanyLogoDir());
 
-        // 2) Tên file mới (UUID + ext whitelist)
-        Path newPath = generateFileName(file, logoDir);
-        String newName = newPath.getFileName().toString();
+        String ext = extOf(file);
+        String newName = UUID.randomUUID() + ext;
+        Path newPath = logoDir.resolve(newName);
 
-        // 3) Ghi file & xác thực ảnh thật bằng ImageIO
-        saveAndValidateImage(file, newPath);
+        write(file, newPath);
+        assertRealImageOrRollback(newPath);
 
-        // 4) Cập nhật DB trước (nếu DB fail thì xoá file mới)
         String oldUrl = company.getLogoUrl();
-        String newUrl = "/company-logos/" + newName;
+        String newUrl = "/" + uploadConfig.getCompanyLogoDir() + "/" + newName;
         company.setLogoUrl(newUrl);
         try {
             companyRepository.saveAndFlush(company);
@@ -118,9 +131,7 @@ public class CompanyService extends BaseService implements CompanyServiceInterfa
             throw ex;
         }
 
-        // 5) Xoá file cũ (chỉ local và trong /company-logos/)
-        deleteFile(logoDir, oldUrl, logoDir);
-
+        deleteByPublicUrl("/" + uploadConfig.getCompanyLogoDir() + "/", oldUrl, uploadConfig.getBaseDir());
         return newUrl;
     }
 
@@ -140,5 +151,58 @@ public class CompanyService extends BaseService implements CompanyServiceInterfa
             }
         }
     }
+
+    // ===== helpers dùng chung =====
+    private Path ensureDir(String... parts) {
+        Path p = Paths.get("", parts).toAbsolutePath().normalize();
+        try { Files.createDirectories(p); } catch (IOException e) { throw new RuntimeException("Không tạo được thư mục: " + p, e); }
+        return p;
+    }
+
+    private void write(MultipartFile file, Path target) {
+        try { Files.copy(file.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING); }
+        catch (IOException e) { throw new RuntimeException("Lưu file thất bại", e); }
+    }
+
+    private void assertRealImageOrRollback(Path path) {
+        try {
+            if (javax.imageio.ImageIO.read(path.toFile()) == null) {
+                Files.deleteIfExists(path);
+                throw new IllegalArgumentException("File không phải ảnh hợp lệ");
+            }
+        } catch (IOException e) {
+            try { Files.deleteIfExists(path); } catch (IOException ignore) {}
+            throw new RuntimeException("Không đọc được ảnh", e);
+        }
+    }
+
+    private void validateFileSize(MultipartFile f, String max) {
+        if (f == null || f.isEmpty()) throw new IllegalArgumentException("File rỗng");
+        long maxBytes = org.springframework.util.unit.DataSize.parse(max).toBytes();
+        if (f.getSize() > maxBytes) throw new IllegalArgumentException("Dung lượng vượt quá " + max);
+    }
+
+    private void validateExt(MultipartFile f, String allowedCsv) {
+        String ext = extOf(f).replace(".", "");
+        var allowed = java.util.Arrays.stream(allowedCsv.split(",")).map(String::trim).map(String::toLowerCase).toList();
+        if (!allowed.contains(ext.toLowerCase())) {
+            throw new IllegalArgumentException("Định dạng không hợp lệ: ." + ext + " (cho phép: " + allowedCsv + ")");
+        }
+    }
+
+    private String extOf(MultipartFile f) {
+        String name = org.springframework.util.StringUtils.getFilename(f.getOriginalFilename());
+        String ext = (name != null && name.contains(".")) ? name.substring(name.lastIndexOf('.')).toLowerCase() : "";
+        if (ext.isBlank()) throw new IllegalArgumentException("Thiếu đuôi file");
+        return ext;
+    }
+
+    private void deleteByPublicUrl(String urlPrefix, String oldUrl, String baseDir) {
+        if (oldUrl == null || !oldUrl.startsWith(urlPrefix)) return;
+        String filename = oldUrl.substring(urlPrefix.length());
+        Path p = Paths.get(baseDir).resolve(urlPrefix.substring(1)).resolve(filename).normalize();
+        try { Files.deleteIfExists(p); } catch (IOException ignore) {}
+    }
+
 }
 

@@ -1,10 +1,7 @@
 package com.jobportal.controllers;
 
 import com.jobportal.dtos.requests.*;
-import com.jobportal.dtos.resources.ApiResource;
-import com.jobportal.dtos.resources.LoginResource;
-import com.jobportal.dtos.resources.RefreshTokenResource;
-import com.jobportal.dtos.resources.RegisterResource;
+import com.jobportal.dtos.resources.*;
 import com.jobportal.entities.RefreshToken;
 import com.jobportal.repositories.RefreshTokenRepository;
 import com.jobportal.services.impl.BlacklistedService;
@@ -42,17 +39,13 @@ public class AuthController {
                 return ResponseEntity.ok(response);
             }
         } catch (EntityNotFoundException e) {
-            ApiResource<Void> errorResponse = ApiResource.error("404",
-                    e.getMessage(),
-                    HttpStatus.NOT_FOUND);
-
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND));
         }
 
-        ApiResource<Void> errorResponse = ApiResource.error("500",
-                "Network Error",
-                HttpStatus.INTERNAL_SERVER_ERROR);
-        return ResponseEntity.internalServerError().body(errorResponse);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                ApiResource.error("INTERNAL_SERVER_ERROR", "Network Error", HttpStatus.INTERNAL_SERVER_ERROR
+                ));
     }
 
     @PostMapping("/verify-email")
@@ -60,17 +53,22 @@ public class AuthController {
         try {
             userService.verifyEmail(req.getEmail(), req.getOtp());
             ApiResource<Void> response = ApiResource.ok(null, "Xác thực email thành công");
+            NotificationRequest notificationRequest = NotificationRequest.builder()
+                    .title("Welcome Back!")
+                    .body("Chào mừng bạn đã quay trở lại trang JobPortal.")
+                    .build();
+
+            String email = req.getEmail();
+            Long userId = userService.getUserFromEmail(email).getId();
+            notificationService.sendNotification(userId, notificationRequest);
             return ResponseEntity.ok(response);
         } catch (IllegalStateException e) {
-            ApiResource<Void> errorResponse = ApiResource.error("400",
-                    e.getMessage(),
-                    HttpStatus.BAD_REQUEST);
-            return ResponseEntity.badRequest().body(errorResponse);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResource.error("BAD_REQUEST", e.getMessage(), HttpStatus.BAD_REQUEST));
         } catch (Exception e) {
-            ApiResource<Void> errorResponse = ApiResource.error("500",
-                    "Network Error",
-                    HttpStatus.INTERNAL_SERVER_ERROR);
-            return ResponseEntity.internalServerError().body(errorResponse);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+                    ));
         }
     }
 
@@ -81,15 +79,12 @@ public class AuthController {
             ApiResource<Void> response = ApiResource.ok(null, "Gửi lại mã OTP thành công");
             return ResponseEntity.ok(response);
         } catch (IllegalStateException e) {
-            ApiResource<Void> errorResponse = ApiResource.error("400",
-                    e.getMessage(),
-                    HttpStatus.BAD_REQUEST);
-            return ResponseEntity.badRequest().body(errorResponse);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResource.error("BAD_REQUEST", e.getMessage(), HttpStatus.BAD_REQUEST));
         } catch (Exception e) {
-            ApiResource<Void> errorResponse = ApiResource.error("500",
-                    "Network Error",
-                    HttpStatus.INTERNAL_SERVER_ERROR);
-            return ResponseEntity.internalServerError().body(errorResponse);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+                    ));
         }
     }
 
@@ -98,11 +93,6 @@ public class AuthController {
         Object result = userService.authenticate(request);
         if (result instanceof LoginResource loginResource) {
             ApiResource<LoginResource> response = ApiResource.ok(loginResource, "SUCCESS");
-            NotificationRequest notificationRequest = NotificationRequest.builder()
-                    .title("Welcome Back!")
-                    .body("Chào mừng bạn đã quay trở lại trang JobPortal.")
-                    .build();
-            notificationService.sendNotification(((LoginResource) result).getUser().getId(), notificationRequest);
             return ResponseEntity.ok(response);
         }
 
@@ -110,7 +100,9 @@ public class AuthController {
             return ResponseEntity.unprocessableEntity().body(errorResource);
         }
 
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResource.ErrorResource("Network Error"));
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                ApiResource.error("INTERNAL_SERVER_ERROR", "Network Error", HttpStatus.INTERNAL_SERVER_ERROR
+                ));
     }
 
     @PostMapping("blacklisted_tokens")
@@ -119,10 +111,9 @@ public class AuthController {
             Object result = blacklistedService.create(request);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
-            ApiResource<Void> errorResponse = ApiResource.error("500",
-                    "Network Error",
-                    HttpStatus.INTERNAL_SERVER_ERROR);
-            return ResponseEntity.internalServerError().body(errorResponse);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+                    ));
         }
     }
 
@@ -133,28 +124,23 @@ public class AuthController {
             BlacklistTokenRequest request = new BlacklistTokenRequest();
             request.setToken(token);
             blacklistedService.create(request);
-
             ApiResource<Void> response = ApiResource.ok(null, "Đăng xuất thành công");
-
             return ResponseEntity.ok(response);
-
         } catch (Exception e) {
-
-            ApiResource<Void> errorResponse = ApiResource.error("500",
-                    "Network Error",
-                    HttpStatus.INTERNAL_SERVER_ERROR);
-            return ResponseEntity.internalServerError().body(errorResponse);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+                    ));
         }
     }
+
+
 
     @PostMapping("refresh")
     public ResponseEntity<?> refresh(@Valid @RequestBody RefreshTokenRequest request) {
         String refreshToken = request.getRefreshToken();
         if (!jwtService.isRefreshTokenValid(refreshToken)) {
-            ApiResource<Void> errorResponse = ApiResource.error("500",
-                    "Refresh token không hợp lệ",
-                    HttpStatus.BAD_REQUEST);
-            return ResponseEntity.internalServerError().body(errorResponse);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResource.error("BAD_REQUEST", "RefreshToken không hợp lệ", HttpStatus.BAD_REQUEST));
 
         }
 
@@ -169,11 +155,9 @@ public class AuthController {
 
             return ResponseEntity.ok(new RefreshTokenResource(newToken, newRefreshToken));
         }
-
-        ApiResource<Void> errorResponse = ApiResource.error("500",
-                "INTERNAL_SERVER_ERROR",
-                HttpStatus.INTERNAL_SERVER_ERROR);
-        return ResponseEntity.internalServerError().body(errorResponse);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                ApiResource.error("INTERNAL_SERVER_ERROR", "Có lỗi gì đó xảy ra ", HttpStatus.INTERNAL_SERVER_ERROR
+                ));
     }
 }
 

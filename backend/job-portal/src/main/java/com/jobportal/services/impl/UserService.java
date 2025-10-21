@@ -1,12 +1,13 @@
 package com.jobportal.services.impl;
 
 import com.jobportal.commons.BaseService;
-import com.jobportal.dtos.requests.UserUpdationRequest;
+import com.jobportal.dtos.requests.updation.UserUpdationRequest;
 import com.jobportal.dtos.resources.UserDetailsResource;
 import com.jobportal.dtos.resources.UserProfileResource;
 import com.jobportal.entities.User;
 import com.jobportal.mappers.UserMapper;
 import com.jobportal.repositories.UserRepository;
+import com.jobportal.securities.configs.UploadConfig;
 import com.jobportal.services.interfaces.UserServiceInterface;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -22,14 +23,18 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
 public class UserService extends BaseService implements UserServiceInterface {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final UploadConfig uploadConfig;
 
     @Override
     public UserProfileResource update(Long id, UserUpdationRequest request) {
@@ -73,38 +78,91 @@ public class UserService extends BaseService implements UserServiceInterface {
     @Override
     @Transactional
     public String uploadAvatar(Long userId, MultipartFile file) {
-        // 0) Validate đầu vào
-        validateFile(file);
+        validateFileSize(file, uploadConfig.getMaxSize());
+        validateExt(file, uploadConfig.getAllowedImageExt()); // chỉ ảnh
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-        // 1) Chuẩn bị thư mục
-        Path avatarDir = readyDirectory("uploads", "avatars");
+        // dirs
+        Path avatarDir = ensureDir(uploadConfig.getBaseDir(), uploadConfig.getAvatarDir());
 
-        // 2) Xác định tên file mới (UUID + ext whitelist)
-        Path newPath = generateFileName(file, avatarDir);
-        String newName = newPath.getFileName().toString();
+        // tên file mới
+        String ext = extOf(file);
+        String newName = UUID.randomUUID() + ext;
+        Path newPath = avatarDir.resolve(newName);
 
-        // 3) Ghi file tạm & xác thực là ảnh thật bằng ImageIO
-        saveAndValidateImage(file, newPath);
+        // ghi + xác thực ảnh thật
+        write(file, newPath);
+        assertRealImageOrRollback(newPath);
 
-        // 4) Cập nhật DB trước (để nếu DB fail thì xoá ngay file mới)
-        String oldUrl = user.getAvatarUrl(); // ví dụ: "/avatars/xxx.png"
-        String newUrl = "/avatars/" + newName;
+        // cập nhật DB trước
+        String oldUrl = user.getAvatarUrl(); // "/avatars/xxx.png"
+        String newUrl = "/" + uploadConfig.getAvatarDir() + "/" + newName;
+
         user.setAvatarUrl(newUrl);
         try {
             userRepository.saveAndFlush(user);
         } catch (RuntimeException ex) {
-            // rollback file mới nếu DB lỗi
             try { Files.deleteIfExists(newPath); } catch (IOException ignore) {}
             throw ex;
         }
 
-        deleteFile(avatarDir, oldUrl, avatarDir);
+        // xoá file cũ (nếu cùng prefix)
+        deleteByPublicUrl("/" + uploadConfig.getAvatarDir() + "/", oldUrl, uploadConfig.getBaseDir());
 
         return newUrl;
     }
 
+    // ===== helpers dùng chung =====
+    private Path ensureDir(String... parts) {
+        Path p = Paths.get("", parts).toAbsolutePath().normalize();
+        try { Files.createDirectories(p); } catch (IOException e) { throw new RuntimeException("Không tạo được thư mục: " + p, e); }
+        return p;
+    }
 
+    private void write(MultipartFile file, Path target) {
+        try { Files.copy(file.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING); }
+        catch (IOException e) { throw new RuntimeException("Lưu file thất bại", e); }
+    }
+
+    private void assertRealImageOrRollback(Path path) {
+        try {
+            if (javax.imageio.ImageIO.read(path.toFile()) == null) {
+                Files.deleteIfExists(path);
+                throw new IllegalArgumentException("File không phải ảnh hợp lệ");
+            }
+        } catch (IOException e) {
+            try { Files.deleteIfExists(path); } catch (IOException ignore) {}
+            throw new RuntimeException("Không đọc được ảnh", e);
+        }
+    }
+
+    private void validateFileSize(MultipartFile f, String max) {
+        if (f == null || f.isEmpty()) throw new IllegalArgumentException("File rỗng");
+        long maxBytes = org.springframework.util.unit.DataSize.parse(max).toBytes();
+        if (f.getSize() > maxBytes) throw new IllegalArgumentException("Dung lượng vượt quá " + max);
+    }
+
+    private void validateExt(MultipartFile f, String allowedCsv) {
+        String ext = extOf(f).replace(".", "");
+        var allowed = java.util.Arrays.stream(allowedCsv.split(",")).map(String::trim).map(String::toLowerCase).toList();
+        if (!allowed.contains(ext.toLowerCase())) {
+            throw new IllegalArgumentException("Định dạng không hợp lệ: ." + ext + " (cho phép: " + allowedCsv + ")");
+        }
+    }
+
+    private String extOf(MultipartFile f) {
+        String name = org.springframework.util.StringUtils.getFilename(f.getOriginalFilename());
+        String ext = (name != null && name.contains(".")) ? name.substring(name.lastIndexOf('.')).toLowerCase() : "";
+        if (ext.isBlank()) throw new IllegalArgumentException("Thiếu đuôi file");
+        return ext;
+    }
+
+    private void deleteByPublicUrl(String urlPrefix, String oldUrl, String baseDir) {
+        if (oldUrl == null || !oldUrl.startsWith(urlPrefix)) return;
+        String filename = oldUrl.substring(urlPrefix.length());
+        Path p = Paths.get(baseDir).resolve(urlPrefix.substring(1)).resolve(filename).normalize();
+        try { Files.deleteIfExists(p); } catch (IOException ignore) {}
+    }
 }

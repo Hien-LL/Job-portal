@@ -1,7 +1,7 @@
 package com.jobportal.controllers;
 
-import com.jobportal.dtos.requests.PermissionCreationRequest;
-import com.jobportal.dtos.requests.PermissionUpdationRequest;
+import com.jobportal.dtos.requests.creation.PermissionCreationRequest;
+import com.jobportal.dtos.requests.updation.PermissionUpdationRequest;
 import com.jobportal.dtos.resources.ApiResource;
 import com.jobportal.dtos.resources.PermissionResource;
 import com.jobportal.entities.Permission;

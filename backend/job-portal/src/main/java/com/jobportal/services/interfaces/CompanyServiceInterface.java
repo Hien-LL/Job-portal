@@ -1,7 +1,7 @@
 package com.jobportal.services.interfaces;
 
-import com.jobportal.dtos.requests.CompanyCreationRequest;
-import com.jobportal.dtos.requests.CompanyUpdationRequest;
+import com.jobportal.dtos.requests.creation.CompanyCreationRequest;
+import com.jobportal.dtos.requests.updation.CompanyUpdationRequest;
 import com.jobportal.dtos.resources.CompanyResource;
 import com.jobportal.entities.Company;
 import org.springframework.web.multipart.MultipartFile;

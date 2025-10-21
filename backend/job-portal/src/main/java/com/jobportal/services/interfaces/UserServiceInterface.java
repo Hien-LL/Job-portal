@@ -1,6 +1,6 @@
 package com.jobportal.services.interfaces;
 
-import com.jobportal.dtos.requests.UserUpdationRequest;
+import com.jobportal.dtos.requests.updation.UserUpdationRequest;
 import com.jobportal.dtos.resources.UserDetailsResource;
 import com.jobportal.dtos.resources.UserProfileResource;
 import com.jobportal.entities.User;

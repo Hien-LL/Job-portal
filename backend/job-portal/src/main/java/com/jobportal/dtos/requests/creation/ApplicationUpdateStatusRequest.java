@@ -1,4 +1,4 @@
-package com.jobportal.dtos.requests;
+package com.jobportal.dtos.requests.creation;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;

@@ -1,7 +1,7 @@
 package com.jobportal.services.impl;
 
 import com.jobportal.commons.BaseService;
-import com.jobportal.dtos.requests.ApplicationUpdateStatusRequest;
+import com.jobportal.dtos.requests.creation.ApplicationUpdateStatusRequest;
 import com.jobportal.dtos.resources.ApplicationStatusChangeResource;
 import com.jobportal.dtos.resources.ApplicationStatusHistoryResource;
 import com.jobportal.entities.Application;

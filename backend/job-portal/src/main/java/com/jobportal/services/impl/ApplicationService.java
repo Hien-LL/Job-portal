@@ -1,6 +1,6 @@
 package com.jobportal.services.impl;
 
-import com.jobportal.dtos.requests.ApplicationCreationRequest;
+import com.jobportal.dtos.requests.creation.ApplicationCreationRequest;
 import com.jobportal.dtos.resources.ApplicationDetailResource;
 import com.jobportal.dtos.resources.ApplicationListItemForCompanyResource;
 import com.jobportal.dtos.resources.ApplicationResource;

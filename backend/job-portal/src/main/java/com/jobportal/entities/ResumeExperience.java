@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 @Table(name = "resume_experiences")
+@EqualsAndHashCode(of = "id")
 public class ResumeExperience {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

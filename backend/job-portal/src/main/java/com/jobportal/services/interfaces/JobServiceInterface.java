@@ -1,7 +1,7 @@
 package com.jobportal.services.interfaces;
 
-import com.jobportal.dtos.requests.JobCreationRequest;
-import com.jobportal.dtos.requests.JobUpdationRequest;
+import com.jobportal.dtos.requests.creation.JobCreationRequest;
+import com.jobportal.dtos.requests.updation.JobUpdationRequest;
 import com.jobportal.dtos.resources.JobResource;
 import com.jobportal.entities.Job;
 import org.springframework.data.domain.Page;

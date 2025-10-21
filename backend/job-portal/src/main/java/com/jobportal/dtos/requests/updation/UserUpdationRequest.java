@@ -1,4 +1,4 @@
-package com.jobportal.dtos.requests;
+package com.jobportal.dtos.requests.updation;
 
 import lombok.Data;
 

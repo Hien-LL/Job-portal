@@ -1,7 +1,7 @@
 package com.jobportal.services.interfaces;
 
-import com.jobportal.dtos.requests.RoleCreationRequest;
-import com.jobportal.dtos.requests.RoleUpdationRequest;
+import com.jobportal.dtos.requests.creation.RoleCreationRequest;
+import com.jobportal.dtos.requests.updation.RoleUpdationRequest;
 import com.jobportal.dtos.resources.RoleDetailsResource;
 import com.jobportal.dtos.resources.RoleResource;
 import com.jobportal.entities.Role;

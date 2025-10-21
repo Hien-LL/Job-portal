@@ -1,7 +1,7 @@
 package com.jobportal.controllers;
 
-import com.jobportal.dtos.requests.CompanyCreationRequest;
-import com.jobportal.dtos.requests.CompanyUpdationRequest;
+import com.jobportal.dtos.requests.creation.CompanyCreationRequest;
+import com.jobportal.dtos.requests.updation.CompanyUpdationRequest;
 import com.jobportal.dtos.resources.ApiResource;
 import com.jobportal.dtos.resources.CompanyResource;
 import com.jobportal.dtos.resources.UserProfileResource;
@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,13 +30,13 @@ public class CompanyController {
     private final AuthServiceInterface authService;
     private final CompanyMapper companyMapper;
 
-    @PostMapping("/my-company")
+    @PostMapping
     public ResponseEntity<?> createCompany(@Valid @RequestBody CompanyCreationRequest request) {
         try {
             String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            UserProfileResource user = authService.getUserFromEmail(email);
+            UserProfileResource userId = authService.getUserFromEmail(email);
 
-            Company company = companyService.createCompany(user.getId(),  request);
+            Company company = companyService.createCompany(userId.getId(),  request);
             CompanyResource companyResource = companyMapper.tResource(company);
             return ResponseEntity.ok(ApiResource.ok(companyResource, "Tạo công ty thành công"));
         } catch (EntityNotFoundException e) {
@@ -51,9 +52,9 @@ public class CompanyController {
     public ResponseEntity<?> getListCompany() {
         try {
             String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            UserProfileResource user = authService.getUserFromEmail(email);
+            Long userId = authService.getUserFromEmail(email).getId();
 
-            List<Company> companies = companyService.getListCompany(user.getId());
+            List<Company> companies = companyService.getListCompany(userId);
             List<CompanyResource> companyResource = companyMapper.tResourceList(companies);
             return ResponseEntity.ok(ApiResource.ok(companyResource, "Lấy danh sách công ty thành công"));
         } catch (EntityNotFoundException e) {
@@ -75,9 +76,9 @@ public class CompanyController {
             }
 
             String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            UserProfileResource user = authService.getUserFromEmail(email);
+            Long userId = authService.getUserFromEmail(email).getId();
 
-            String avatarUrl = companyService.uploadCompanyLogo(user.getId(),companyId, file);
+            String avatarUrl = companyService.uploadCompanyLogo(userId,companyId, file);
             return ResponseEntity.ok(ApiResource.ok(avatarUrl, "Upload avatar thành công"));
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -92,9 +93,9 @@ public class CompanyController {
     public ResponseEntity<?> updateCompany(@PathVariable Long companyId, @Valid @RequestBody CompanyUpdationRequest request) {
         try {
             String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            UserProfileResource user = authService.getUserFromEmail(email);
+            Long userId = authService.getUserFromEmail(email).getId();
 
-            Company company = companyService.updateCompany(user.getId(), companyId, request);
+            Company company = companyService.updateCompany(userId, companyId, request);
             CompanyResource companyResource = companyMapper.tResource(company);
             return ResponseEntity.ok(ApiResource.ok(companyResource, "Cập nhật công ty thành công"));
         } catch (SecurityException e) {

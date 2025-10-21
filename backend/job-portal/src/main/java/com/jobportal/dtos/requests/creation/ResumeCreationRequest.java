@@ -1,4 +1,4 @@
-package com.jobportal.dtos.requests;
+package com.jobportal.dtos.requests.creation;
 
 import com.jobportal.entities.ResumeEducation;
 import com.jobportal.entities.ResumeExperience;

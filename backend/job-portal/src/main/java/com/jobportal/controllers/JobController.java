@@ -1,12 +1,14 @@
 package com.jobportal.controllers;
 
-import com.jobportal.dtos.requests.JobCreationRequest;
-import com.jobportal.dtos.requests.JobUpdationRequest;
+import com.jobportal.dtos.requests.creation.JobCreationRequest;
+import com.jobportal.dtos.requests.updation.JobUpdationRequest;
+import com.jobportal.dtos.requests.NotificationRequest;
 import com.jobportal.dtos.resources.*;
 import com.jobportal.entities.Job;
 import com.jobportal.mappers.JobMapper;
 import com.jobportal.services.impl.JobService;
 import com.jobportal.services.interfaces.AuthServiceInterface;
+import com.jobportal.services.interfaces.NotificationServiceInterface;
 import com.jobportal.services.interfaces.SavedJobServiceInterface;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,7 +21,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.Map;
 
 @RequiredArgsConstructor
@@ -30,14 +31,19 @@ public class JobController {
     private final AuthServiceInterface authService;
     private final SavedJobServiceInterface savedJobService;
     private final JobMapper jobMapper;
+    private final NotificationServiceInterface notificationService;
 
     @PostMapping("/my-company/{companyId}")
     public ResponseEntity<?> createJob(@Valid @RequestBody JobCreationRequest request,@Positive(message = "id phải lơn hơn 0") @PathVariable Long companyId) {
         try {
             String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            UserProfileResource user = authService.getUserFromEmail(email);
-
-            JobResource jobResource = jobService.createJobForMyCompany(user.getId(), companyId, request);
+            Long userId = authService.getUserFromEmail(email).getId();
+            NotificationRequest notificationRequest = NotificationRequest.builder()
+                    .title("Tạo mới công việc")
+                    .body("Công việc " + request.getTitle() + " đã được tạo thành công.")
+                    .build();
+            JobResource jobResource = jobService.createJobForMyCompany(userId, companyId, request);
+            notificationService.sendNotification(userId, notificationRequest);
             return ResponseEntity.ok(ApiResource.ok(jobResource, "Create job"));
         } catch (SecurityException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
@@ -79,9 +85,9 @@ public class JobController {
                                         @RequestBody JobUpdationRequest request) {
         try {
             String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            UserProfileResource user = authService.getUserFromEmail(email);
+            Long userId = authService.getUserFromEmail(email).getId();
 
-            JobResource jobResource = jobService.updateJobForMyCompany(user.getId(), companyId, jobId, request);
+            JobResource jobResource = jobService.updateJobForMyCompany(userId, companyId, jobId, request);
             return ResponseEntity.ok(ApiResource.ok(jobResource, "Update job"));
         } catch (SecurityException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
@@ -99,9 +105,9 @@ public class JobController {
     public ResponseEntity<?> deleteJob(@Positive(message = "id phải lớn hơn 0") @PathVariable Long companyId,@Positive(message = "id phải lớn 0") @PathVariable Long jobId) {
         try {
             String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            UserProfileResource user = authService.getUserFromEmail(email);
+            Long userId = authService.getUserFromEmail(email).getId();
 
-            jobService.deleteJobForMyCompany(user.getId(), companyId, jobId);
+            jobService.deleteJobForMyCompany(userId, companyId, jobId);
             return ResponseEntity.ok(ApiResource.ok(null, "Xóa thành công job"));
         } catch (SecurityException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
@@ -119,8 +125,8 @@ public class JobController {
     public ResponseEntity<?> saveJob(@PathVariable String jobSlug) {
         try {
             String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            UserProfileResource user = authService.getUserFromEmail(email);
-            savedJobService.saveJob(user.getId(), jobSlug);
+            Long userId = authService.getUserFromEmail(email).getId();
+            savedJobService.saveJob(userId, jobSlug);
             return ResponseEntity.ok(ApiResource.ok(null, "Lưu thành công job"));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -139,8 +145,8 @@ public class JobController {
     ) {
         try {
             String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            UserProfileResource userResource =  authService.getUserFromEmail(email);
-             Page<SavedJobResource> resourcePage = savedJobService.getSavedJobsByUserId(userResource.getId(), page, size);
+            Long userId = authService.getUserFromEmail(email).getId();
+             Page<SavedJobResource> resourcePage = savedJobService.getSavedJobsByUserId(userId, page, size);
 
             ApiResource<Page<SavedJobResource>> response = ApiResource.ok(resourcePage, "Lấy danh sách công việc đã lưu thành công");
 
@@ -159,8 +165,8 @@ public class JobController {
     public ResponseEntity<?> unsaveJob(@PathVariable String jobSlug) {
         try {
             String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            UserProfileResource user = authService.getUserFromEmail(email);
-            savedJobService.removeSavedJob(user.getId(), jobSlug);
+            Long userId = authService.getUserFromEmail(email).getId();
+            savedJobService.removeSavedJob(userId, jobSlug);
             return ResponseEntity.ok(ApiResource.ok(null, "Bỏ lưu thành công job"));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

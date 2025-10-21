@@ -1,7 +1,6 @@
 package com.jobportal.controllers;
 
 import com.jobportal.dtos.resources.ApiResource;
-import com.jobportal.dtos.resources.UserProfileResource;
 import com.jobportal.services.impl.FollowCompanyService;
 import com.jobportal.services.interfaces.AuthServiceInterface;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +20,8 @@ public class FollowCompanyController {
     public ResponseEntity<?> followCompany(@PathVariable Long companyId) {
         try {
             String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            UserProfileResource user = authService.getUserFromEmail(email);
-            followCompanyService.followCompany(user.getId(), companyId);
+            Long userId = authService.getUserFromEmail(email).getId();
+            followCompanyService.followCompany(userId, companyId);
             return ResponseEntity.ok(ApiResource.ok(null, "theo dõi công ty thành công"));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -37,9 +36,8 @@ public class FollowCompanyController {
     public ResponseEntity<?> unfollowCompany(@PathVariable Long companyId) {
         try {
             String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            UserProfileResource user = authService.getUserFromEmail(email);
-            System.out.println(user.getId());
-            followCompanyService.unfollowCompany(user.getId(), companyId);
+            Long userId = authService.getUserFromEmail(email).getId();
+            followCompanyService.unfollowCompany(userId, companyId);
             return ResponseEntity.ok(ApiResource.ok(null, "bỏ theo dõi công ty thành công"));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

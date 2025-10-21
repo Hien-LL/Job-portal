@@ -1,7 +1,7 @@
 package com.jobportal.services.impl;
 
-import com.jobportal.dtos.requests.ResumeCreationRequest;
-import com.jobportal.dtos.requests.ResumeUpdationRequest;
+import com.jobportal.dtos.requests.creation.ResumeCreationRequest;
+import com.jobportal.dtos.requests.updation.ResumeUpdationRequest;
 import com.jobportal.dtos.resources.ResumeResource;
 import com.jobportal.entities.*;
 import com.jobportal.mappers.ResumeMapper;
@@ -12,7 +12,10 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
+
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,10 +38,7 @@ public class ResumeService implements ResumeServiceInterface {
     public ResumeResource getDetail(Long userId, Long resumeId) {
         Resume resume = resumeRepository.fetchDetailWithExperiences(resumeId, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Resume không tồn tại"));
-        // kích hoạt SUBSELECT cho 2 collection còn lại
-        resume.getEducations().size();
-        resume.getFiles().size();
-        return ResumeResource.ofDetail(resume);
+        return resumeMapper.tResource(resume);
     }
 
     // ========== CREATE ==========
@@ -74,20 +74,94 @@ public class ResumeService implements ResumeServiceInterface {
         Resume resume = resumeRepository.fetchDetailWithExperiences(resumeId, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Resume không tồn tại"));
 
+        // map field đơn
         resumeMapper.updateEntityFromRequest(request, resume);
 
-        if (resume.getEducations() != null) {
-            resume.getEducations().forEach(e -> e.setResume(resume));
-        }
-        if (resume.getExperiences() != null) {
-            resume.getExperiences().forEach(e -> e.setResume(resume));
+        // =========== EXPERIENCES ===========
+        if (request.getExperiences() != null) {
+            // map hiện có theo id
+            Map<Long, ResumeExperience> existById = resume.getExperiences().stream()
+                    .filter(x -> x.getId() != null)
+                    .collect(Collectors.toMap(ResumeExperience::getId, Function.identity()));
+
+            // id có trong request để giữ lại
+            Set<Long> incomingIds = new HashSet<>();
+
+            for (var up : request.getExperiences()) {
+                Long key = up.getId(); // DTO class @Data => getId()
+                if (key != null && existById.containsKey(key)) {
+                    // update in-place
+                    ResumeExperience e = existById.get(key);
+                    e.setCompany(up.getCompany());
+                    e.setPosition(up.getPosition());
+                    e.setCurrent(up.isCurrent());
+                    e.setDescription(up.getDescription());
+                    e.setStartDate(up.getStartDate());
+                    e.setEndDate(up.getEndDate());
+                    incomingIds.add(key);
+                } else {
+                    // new
+                    ResumeExperience neo = new ResumeExperience();
+                    neo.setCompany(up.getCompany());
+                    neo.setPosition(up.getPosition());
+                    neo.setCurrent(up.isCurrent());
+                    neo.setDescription(up.getDescription());
+                    neo.setStartDate(up.getStartDate());
+                    neo.setEndDate(up.getEndDate());
+                    neo.setResume(resume);
+                    resume.getExperiences().add(neo);
+                }
+            }
+
+            // remove thừa (không có trong request)
+            resume.getExperiences().removeIf(e -> e.getId() != null && !incomingIds.contains(e.getId()));
         }
 
-        boolean setDefault = Boolean.TRUE.equals(request.getIsDefault());
-        if (setDefault) unsetDefault(userId);
+        // =========== EDUCATIONS ===========
+        if (request.getEducations() != null) {
+            Map<Long, ResumeEducation> existById = resume.getEducations().stream()
+                    .filter(x -> x.getId() != null)
+                    .collect(Collectors.toMap(ResumeEducation::getId, Function.identity()));
 
-        return resumeMapper.tResource(resume);
+            Set<Long> incomingIds = new HashSet<>();
+
+            for (var up : request.getEducations()) {
+                Long key = up.getId();
+                if (key != null && existById.containsKey(key)) {
+                    ResumeEducation e = existById.get(key);
+                    e.setDegree(up.getDegree());
+                    e.setMajor(up.getMajor());
+                    e.setSchool(up.getSchool());
+                    e.setStartDate(up.getStartDate());
+                    e.setEndDate(up.getEndDate());
+                    incomingIds.add(key);
+                } else {
+                    ResumeEducation neo = new ResumeEducation();
+                    neo.setDegree(up.getDegree());
+                    neo.setMajor(up.getMajor());
+                    neo.setSchool(up.getSchool());
+                    neo.setStartDate(up.getStartDate());
+                    neo.setEndDate(up.getEndDate());
+                    neo.setResume(resume);
+                    resume.getEducations().add(neo);
+                }
+            }
+
+            resume.getEducations().removeIf(e -> e.getId() != null && !incomingIds.contains(e.getId()));
+        }
+
+        // default flag
+        if (request.isDefault()) {
+            unsetDefault(userId);
+            resume.setDefault(true);
+        }
+
+        // flush để gán id cho NEW
+        Resume saved = resumeRepository.saveAndFlush(resume);
+        return resumeMapper.tResource(saved);
     }
+
+
 
     // ===== helpers =====
     private void unsetDefault(Long userId) {

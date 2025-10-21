@@ -1,4 +1,4 @@
-package com.jobportal.dtos.requests;
+package com.jobportal.dtos.requests.updation;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

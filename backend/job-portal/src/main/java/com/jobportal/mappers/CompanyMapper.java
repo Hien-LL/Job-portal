@@ -1,8 +1,8 @@
 package com.jobportal.mappers;
 
 import com.jobportal.commons.BaseMapper;
-import com.jobportal.dtos.requests.CompanyCreationRequest;
-import com.jobportal.dtos.requests.CompanyUpdationRequest;
+import com.jobportal.dtos.requests.creation.CompanyCreationRequest;
+import com.jobportal.dtos.requests.updation.CompanyUpdationRequest;
 import com.jobportal.dtos.resources.CompanyResource;
 import com.jobportal.entities.Company;
 import org.mapstruct.Mapper;

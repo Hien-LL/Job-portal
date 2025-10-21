@@ -32,8 +32,8 @@ public class NotificationController {
     public ResponseEntity<?> getAllNotifications() {
         try {
             String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            UserProfileResource userResource =  authService.getUserFromEmail(email);
-            List<Notification> notifications = notificationService.findByUserId(userResource.getId());
+            Long userId =  authService.getUserFromEmail(email).getId();
+            List<Notification> notifications = notificationService.findByUserId(userId);
             List<NotificationResource> notificationResources = notificationMapper.tResourceList(notifications);
             ApiResource<List<NotificationResource>> response = ApiResource.ok(notificationResources, "Lấy danh sách thông báo thành công");
             return ResponseEntity.ok(response);
