@@ -57,6 +57,23 @@ public class JobController {
         }
     }
 
+    @GetMapping("list/{companyId}")
+    public ResponseEntity<?> getJobsByCompanyId(@Positive(message = "id phải lớn hơn 0") @PathVariable Long companyId, HttpServletRequest request) {
+        try {
+            Map<String, String[]> params = request.getParameterMap();
+            Page<Job> jobs =  jobService.getJobsByCompanyId(companyId, params);
+            Page<JobListItemResource> jobResources = jobMapper.tListResourcePage(jobs);
+            ApiResource<Page<JobListItemResource>> resource = ApiResource.ok(jobResources, "Success");
+            return ResponseEntity.ok(resource);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
+        }
+    }
+
     @GetMapping("/{slug}")
     public ResponseEntity<?> getJobDetail(@PathVariable String slug) {
         try {

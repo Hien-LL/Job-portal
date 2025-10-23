@@ -64,15 +64,20 @@ function setupUserMenu() {
     const logoutBtn = document.getElementById('logout-btn');
 
     if (userMenuTrigger && userDropdown) {
+        // Remove existing event listeners by cloning elements
+        const newUserMenuTrigger = userMenuTrigger.cloneNode(true);
+        userMenuTrigger.parentNode.replaceChild(newUserMenuTrigger, userMenuTrigger);
+        
         // Toggle dropdown
-        userMenuTrigger.addEventListener('click', function(e) {
+        newUserMenuTrigger.addEventListener('click', function(e) {
             e.preventDefault();
+            e.stopPropagation();
             userDropdown.classList.toggle('hidden');
         });
 
         // Close dropdown when clicking outside
         document.addEventListener('click', function(e) {
-            if (!userMenuTrigger.contains(e.target) && !userDropdown.contains(e.target)) {
+            if (!newUserMenuTrigger.contains(e.target) && !userDropdown.contains(e.target)) {
                 userDropdown.classList.add('hidden');
             }
         });
@@ -80,7 +85,11 @@ function setupUserMenu() {
 
     // Logout functionality
     if (logoutBtn) {
-        logoutBtn.addEventListener('click', function(e) {
+        // Remove existing event listeners by cloning element
+        const newLogoutBtn = logoutBtn.cloneNode(true);
+        logoutBtn.parentNode.replaceChild(newLogoutBtn, logoutBtn);
+        
+        newLogoutBtn.addEventListener('click', function(e) {
             e.preventDefault();
             logout();
         });
@@ -92,16 +101,24 @@ async function logout() {
     try {
         const token = localStorage.getItem('access_token');
         if (token) {
-            // Call logout API
-            await fetch('http://localhost:8080/api/auth/logout', {
+            // Call logout API to blacklist token
+            const response = await fetch('http://localhost:8080/api/auth/logout', {
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
                 }
             });
+            
+            if (response.ok) {
+                console.log('Token blacklisted successfully');
+            } else {
+                console.warn('Logout API failed, but continuing with logout');
+            }
         }
     } catch (error) {
         console.error('Logout API error:', error);
+        // Continue with logout even if API fails
     }
     
     // Clear all auth data regardless of API response
@@ -202,7 +219,7 @@ async function handleRefreshToken() {
             
             if (result.success && result.data) {
                 // Update tokens
-                localStorage.setItem('access_token', result.data.accessToken);
+                localStorage.setItem('access_token', result.data.token);
                 if (result.data.refreshToken) {
                     localStorage.setItem('refresh_token', result.data.refreshToken);
                 }
@@ -316,14 +333,14 @@ async function apiRequest(endpoint, options = {}) {
                         
                         if (refreshResult.success && refreshResult.data) {
                             // Update tokens
-                            localStorage.setItem('access_token', refreshResult.data.accessToken);
+                            localStorage.setItem('access_token', refreshResult.data.token);
                             if (refreshResult.data.refreshToken) {
                                 localStorage.setItem('refresh_token', refreshResult.data.refreshToken);
                             }
                             localStorage.setItem('login_time', Date.now().toString());
                             
                             // Retry original request with new token
-                            finalOptions.headers['Authorization'] = `Bearer ${refreshResult.data.accessToken}`;
+                            finalOptions.headers['Authorization'] = `Bearer ${refreshResult.data.token}`;
                             return await fetch(`http://localhost:8080/api${endpoint}`, finalOptions);
                         }
                     }

@@ -192,9 +192,14 @@
                                 ''
                             }
                         </div>
-                        <button class="w-full btn-primary text-sm py-2" onclick="applyToJob('${job.slug}', ${job.id})">
-                            Ứng tuyển ngay
-                        </button>
+                        <div class="flex gap-2">
+                            <a href="job-detail.html?slug=${job.slug}" class="flex-1 btn-outline text-sm py-2 text-center">
+                                Chi tiết
+                            </a>
+                            <button class="flex-1 btn-primary text-sm py-2" onclick="applyToJob('${job.slug}', ${job.id})">
+                                Ứng tuyển
+                            </button>
+                        </div>
                     </div>
                 `;
             }).join('');

@@ -30,6 +30,7 @@ public class Job {
     private String employmentType;
     private String currency;
     private LocalDateTime updatedAt;
+    private int yearsOfExperience;
 
     // --- RELATIONSHIPS ---
     @ManyToOne

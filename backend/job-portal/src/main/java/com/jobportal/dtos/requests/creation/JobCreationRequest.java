@@ -52,6 +52,7 @@ public class JobCreationRequest {
     @Size(min = 1, message = "benefitIds phải có ít nhất một phần tử")
     private List<@NotNull Long> benefitIds;
 
+    private int yearsOfExperience;
     // cross-field validation
     @AssertTrue(message = "salaryMin phải lớn hơn hoặc bằng salaryMax")
     public boolean isSalaryRangeValid() {

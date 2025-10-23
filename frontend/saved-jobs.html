@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Việc làm đã lưu - JobPortal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Header Fragment -->
+    <div data-fragment="fragments/header.html"></div>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Breadcrumb -->
+        <nav class="flex items-center space-x-2 text-sm text-gray-500 mb-6">
+            <a href="index.html" class="hover:text-blue-600">Trang chủ</a>
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <a href="profile.html" class="hover:text-blue-600">Dashboard ứng viên</a>
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-gray-900">Việc làm đã lưu</span>
+        </nav>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <!-- Sidebar -->
+            <div class="lg:col-span-1">
+                <!-- User Info Card -->
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+                    <div class="text-center">
+                        <img id="user-avatar" src="" alt="Avatar" class="w-20 h-20 rounded-full mx-auto mb-4 object-cover">
+                        <h2 id="user-name" class="text-lg font-semibold text-gray-900 mb-1"></h2>
+                        <p id="user-email" class="text-sm text-gray-600 mb-4"></p>
+                    </div>
+                </div>
+
+                <!-- Navigation Menu -->
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                    <nav class="p-4">
+                        <ul class="space-y-2">
+                            <li>
+                                <a href="profile.html" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-gray-50 p-3 rounded-lg text-sm transition">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"></path>
+                                    </svg>
+                                    Dashboard
+                                </a>
+                            </li>
+                            <li>
+                                <a href="profile.html" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-gray-50 p-3 rounded-lg text-sm transition">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    Hồ sơ cá nhân
+                                </a>
+                            </li>
+                            <li>
+                                <a href="cv-management.html" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-gray-50 p-3 rounded-lg text-sm transition">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 0v12h8V4H6z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    Quản lý CV
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-gray-50 p-3 rounded-lg text-sm transition">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    Đơn ứng tuyển
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="flex items-center gap-3 text-blue-600 bg-blue-50 p-3 rounded-lg text-sm font-medium">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path>
+                                    </svg>
+                                    Việc làm đã lưu
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-gray-50 p-3 rounded-lg text-sm transition">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    Công ty theo dõi
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-gray-50 p-3 rounded-lg text-sm transition">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    Cài đặt tài khoản
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" onclick="window.authUtils.logout(); return false;" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-gray-50 p-3 rounded-lg text-sm transition">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"></path>
+                                    </svg>
+                                    Đăng xuất
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="lg:col-span-3">
+                <!-- Header Section -->
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h1 class="text-2xl font-bold text-gray-900 mb-2">Việc làm đã lưu</h1>
+                            <p class="text-gray-600">Quản lý các việc làm bạn đã lưu để ứng tuyển sau</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm text-gray-500">Tổng cộng</p>
+                            <p id="total-saved-jobs" class="text-2xl font-bold text-blue-600">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter Section -->
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tìm kiếm</label>
+                            <input type="text" id="search-keyword" placeholder="Nhập từ khóa..." class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Vị trí</label>
+                            <input type="text" id="search-location" placeholder="Vị trí..." class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Công ty</label>
+                            <input type="text" id="search-company" placeholder="Tên công ty..." class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div class="flex items-end">
+                            <button onclick="searchSavedJobs()" class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">
+                                Tìm kiếm
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex items-center gap-4">
+                        <label class="flex items-center text-sm">
+                            <input type="checkbox" id="filter-remote" class="mr-2 rounded">
+                            Remote
+                        </label>
+                        <label class="flex items-center text-sm">
+                            <input type="checkbox" id="filter-expired" class="mr-2 rounded">
+                            Bao gồm việc làm đã hết hạn
+                        </label>
+                        <button onclick="clearFilters()" class="text-blue-600 text-sm hover:underline">
+                            Xóa bộ lọc
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Loading State -->
+                <div id="loading" class="flex justify-center items-center py-20">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                </div>
+
+                <!-- Saved Jobs List -->
+                <div id="saved-jobs-list" class="hidden space-y-4">
+                    <!-- Saved jobs will be loaded here -->
+                </div>
+
+                <!-- Empty State -->
+                <div id="empty-state" class="hidden bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+                    <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path>
+                    </svg>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">Chưa có việc làm đã lưu</h3>
+                    <p class="text-gray-600 mb-4">Hãy lưu những việc làm yêu thích để xem lại sau</p>
+                    <a href="job.html" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition">
+                        Tìm việc làm
+                    </a>
+                </div>
+
+                <!-- Pagination -->
+                <div id="pagination" class="mt-8 flex justify-center items-center gap-2" style="display: none;">
+                    <!-- Dynamic pagination will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Fragment -->
+    <div data-fragment="fragments/footer.html"></div>
+
+    <!-- Scripts -->
+    <script src="js/fragments-loader.js"></script>
+    <script>
+        let currentPage = 1;
+        let totalPages = 1;
+        let isLoading = false;
+        let currentFilters = {
+            keyword: '',
+            location: '',
+            companyName: '',
+            remote: false,
+            includeExpired: false
+        };
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFragments().then(() => {
+                initializePage();
+            });
+        });
+
+        async function initializePage() {
+            if (!window.authUtils.isLoggedIn()) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            await loadUserInfo();
+            await loadSavedJobs();
+        }
+
+        // Load user info for sidebar
+        async function loadUserInfo() {
+            try {
+                const response = await window.authUtils.apiRequest('/users/me', {
+                    method: 'GET'
+                });
+
+                if (response && response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        const user = result.data;
+                        document.getElementById('user-name').textContent = user.name || 'Chưa cập nhật';
+                        document.getElementById('user-email').textContent = user.email || '';
+                        
+                        const avatarElement = document.getElementById('user-avatar');
+                        if (user.avatarUrl) {
+                            avatarElement.src = `http://localhost:8080${user.avatarUrl}`;
+                        } else {
+                            avatarElement.src = 'https://via.placeholder.com/80/6B7280/FFFFFF?text=' + (user.name ? user.name.charAt(0) : 'U');
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading user info:', error);
+            }
+        }
+
+        // Load saved jobs
+        async function loadSavedJobs(page = 1) {
+            if (isLoading) return;
+            
+            isLoading = true;
+            currentPage = page;
+            showLoading();
+
+            try {
+                const params = new URLSearchParams();
+                params.append('page', page - 1); // API uses 0-based pagination
+                params.append('size', 10);
+
+                // Add filters
+                if (currentFilters.keyword) {
+                    params.append('keyword', currentFilters.keyword);
+                }
+                if (currentFilters.location) {
+                    params.append('location', currentFilters.location);
+                }
+                if (currentFilters.companyName) {
+                    params.append('companyName', currentFilters.companyName);
+                }
+                if (currentFilters.remote) {
+                    params.append('remote', 'true');
+                }
+                if (!currentFilters.includeExpired) {
+                    params.append('expiresAt', 'today');
+                }
+
+                const response = await window.authUtils.apiRequest(`/jobs/saved-jobs/list?${params.toString()}`, {
+                    method: 'GET'
+                });
+
+                if (response && response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        displaySavedJobs(result.data.content);
+                        displayPagination(result.data);
+                        updateJobCount(result.data.totalElements);
+                        hideLoading();
+                    } else {
+                        showEmpty();
+                    }
+                } else {
+                    showError();
+                }
+            } catch (error) {
+                console.error('Error loading saved jobs:', error);
+                showError();
+            } finally {
+                isLoading = false;
+            }
+        }
+
+        // Display saved jobs
+        function displaySavedJobs(jobs) {
+            const container = document.getElementById('saved-jobs-list');
+            const emptyState = document.getElementById('empty-state');
+
+            if (!jobs || jobs.length === 0) {
+                container.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            container.classList.remove('hidden');
+
+            container.innerHTML = jobs.map(job => {
+                const salaryText = formatSalary(job.salaryMin, job.salaryMax, job.currency);
+                const locationText = job.remote ? 'Remote' : job.location;
+                const savedDate = formatSavedDate(job.savedAt);
+                const isExpired = job.expired || (job.expiresAt && new Date(job.expiresAt) < new Date());
+
+                return `
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 ${isExpired ? 'opacity-75' : ''}">
+                        <div class="flex gap-4">
+                            <div class="w-16 h-16 bg-gray-100 rounded flex-shrink-0 flex items-center justify-center">
+                                ${job.companyLogoUrl ? 
+                                    `<img src="http://localhost:8080${job.companyLogoUrl}" alt="${job.companyName}" class="w-full h-full object-contain rounded">` :
+                                    `<span class="text-2xl">🏢</span>`
+                                }
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <h3 class="font-bold text-gray-900 ${isExpired ? 'line-through' : ''}">${job.title}</h3>
+                                        <p class="text-gray-600 text-sm">${job.companyName}</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-gray-500 text-xs">Đã lưu ${savedDate}</p>
+                                        ${isExpired ? 
+                                            '<span class="text-red-500 text-xs font-medium">Đã hết hạn</span>' :
+                                            '<span class="text-green-500 text-xs font-medium">Còn hiệu lực</span>'
+                                        }
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center gap-4 mb-3 text-sm text-gray-600">
+                                    <span>📍 ${locationText}</span>
+                                    <span>💰 ${salaryText}</span>
+                                    <span>👤 ${job.employmentType || 'Toàn thời gian'}</span>
+                                </div>
+
+                                ${isExpired ? 
+                                    '<p class="text-red-600 text-sm mb-3">⚠️ Tin tuyển dụng này đã hết hạn</p>' : 
+                                    job.expiresAt ? `<p class="text-gray-600 text-sm mb-3">📅 Hết hạn: ${formatDate(job.expiresAt)}</p>` : ''
+                                }
+
+                                <div class="flex gap-3">
+                                    <a href="job-detail.html?slug=${job.slug}" class="text-blue-600 text-sm font-medium hover:underline">
+                                        Xem chi tiết
+                                    </a>
+                                    ${!isExpired ? 
+                                        `<button onclick="applyToJob('${job.slug}', ${job.jobId})" class="text-green-600 text-sm font-medium hover:underline">
+                                            Ứng tuyển ngay
+                                        </button>` : ''
+                                    }
+                                    <button onclick="unsaveJob('${job.slug}', this)" class="text-red-600 text-sm font-medium hover:underline">
+                                        Bỏ lưu
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Search saved jobs with filters
+        function searchSavedJobs() {
+            currentFilters.keyword = document.getElementById('search-keyword').value;
+            currentFilters.location = document.getElementById('search-location').value;
+            currentFilters.companyName = document.getElementById('search-company').value;
+            currentFilters.remote = document.getElementById('filter-remote').checked;
+            currentFilters.includeExpired = document.getElementById('filter-expired').checked;
+
+            loadSavedJobs(1);
+        }
+
+        // Clear all filters
+        function clearFilters() {
+            document.getElementById('search-keyword').value = '';
+            document.getElementById('search-location').value = '';
+            document.getElementById('search-company').value = '';
+            document.getElementById('filter-remote').checked = false;
+            document.getElementById('filter-expired').checked = false;
+
+            currentFilters = {
+                keyword: '',
+                location: '',
+                companyName: '',
+                remote: false,
+                includeExpired: false
+            };
+
+            loadSavedJobs(1);
+        }
+
+        // Unsave job
+        async function unsaveJob(slug, buttonElement) {
+            if (!confirm('Bạn có chắc chắn muốn bỏ lưu việc làm này?')) return;
+
+            try {
+                const response = await window.authUtils.apiRequest(`/jobs/${slug}/unsave`, {
+                    method: 'DELETE'
+                });
+
+                if (response && response.ok) {
+                    // Remove job card from UI
+                    const jobCard = buttonElement.closest('.bg-white');
+                    jobCard.remove();
+                    
+                    // Reload if no jobs left on current page
+                    const remainingJobs = document.querySelectorAll('#saved-jobs-list .bg-white').length;
+                    if (remainingJobs === 0) {
+                        loadSavedJobs(currentPage);
+                    } else {
+                        // Update job count
+                        const totalElement = document.getElementById('total-saved-jobs');
+                        const currentTotal = parseInt(totalElement.textContent);
+                        totalElement.textContent = currentTotal - 1;
+                    }
+                } else {
+                    throw new Error('Failed to unsave job');
+                }
+            } catch (error) {
+                console.error('Error unsaving job:', error);
+                alert('Có lỗi xảy ra khi bỏ lưu việc làm');
+            }
+        }
+
+        // Apply to job
+        function applyToJob(slug, jobId) {
+            console.log(`Apply to job: ${slug} (ID: ${jobId})`);
+            alert(`Tính năng ứng tuyển cho "${slug}" sẽ được triển khai soon!`);
+        }
+
+        // Display pagination
+        function displayPagination(data) {
+            const container = document.getElementById('pagination');
+            totalPages = data.totalPages;
+            
+            if (totalPages <= 1) {
+                container.style.display = 'none';
+                return;
+            }
+
+            let html = '';
+            
+            // Previous button
+            if (currentPage > 1) {
+                html += `<button onclick="loadSavedJobs(${currentPage - 1})" class="px-3 py-2 border border-gray-300 rounded text-sm text-gray-700 hover:bg-gray-50">Trước</button>`;
+            }
+
+            // Page numbers
+            for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+                if (i === currentPage) {
+                    html += `<button class="px-3 py-2 bg-blue-600 text-white rounded text-sm">${i}</button>`;
+                } else {
+                    html += `<button onclick="loadSavedJobs(${i})" class="px-3 py-2 border border-gray-300 rounded text-sm text-gray-700 hover:bg-gray-50">${i}</button>`;
+                }
+            }
+
+            // Next button
+            if (currentPage < totalPages) {
+                html += `<button onclick="loadSavedJobs(${currentPage + 1})" class="px-3 py-2 border border-gray-300 rounded text-sm text-gray-700 hover:bg-gray-50">Tiếp</button>`;
+            }
+
+            container.innerHTML = html;
+            container.style.display = 'flex';
+        }
+
+        // Utility functions
+        function formatSalary(min, max, currency = 'VND') {
+            if (!min && !max) return 'Thỏa thuận';
+            
+            const formatAmount = (amount) => {
+                if (amount >= 1000000) {
+                    return (amount / 1000000).toFixed(0) + ' triệu';
+                }
+                return amount.toLocaleString('vi-VN');
+            };
+
+            if (min && max) {
+                return `${formatAmount(min)} - ${formatAmount(max)} ${currency}`;
+            } else if (min) {
+                return `Từ ${formatAmount(min)} ${currency}`;
+            } else {
+                return `Lên đến ${formatAmount(max)} ${currency}`;
+            }
+        }
+
+        function formatSavedDate(dateString) {
+            if (!dateString) return 'Không xác định';
+            
+            const savedDate = new Date(dateString);
+            const now = new Date();
+            const diffTime = Math.abs(now - savedDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays === 1) return 'hôm qua';
+            if (diffDays < 7) return `${diffDays} ngày trước`;
+            if (diffDays < 30) return `${Math.ceil(diffDays / 7)} tuần trước`;
+            return `${Math.ceil(diffDays / 30)} tháng trước`;
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'Không xác định';
+            
+            const date = new Date(dateString);
+            return date.toLocaleDateString('vi-VN', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+        }
+
+        function updateJobCount(total) {
+            document.getElementById('total-saved-jobs').textContent = total;
+        }
+
+        function showLoading() {
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('saved-jobs-list').classList.add('hidden');
+            document.getElementById('empty-state').classList.add('hidden');
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').classList.add('hidden');
+        }
+
+        function showEmpty() {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('saved-jobs-list').classList.add('hidden');
+            document.getElementById('empty-state').classList.remove('hidden');
+        }
+
+        function showError() {
+            document.getElementById('loading').classList.add('hidden');
+            const container = document.getElementById('saved-jobs-list');
+            container.classList.remove('hidden');
+            container.innerHTML = `
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+                    <div class="text-red-500 mb-4">
+                        <svg class="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">Lỗi khi tải dữ liệu</h3>
+                    <p class="text-gray-600 mb-4">Vui lòng thử lại sau</p>
+                    <button onclick="loadSavedJobs()" class="bg-blue-600 text-white px-4 py-2 rounded font-medium hover:bg-blue-700 transition">
+                        Thử lại
+                    </button>
+                </div>
+            `;
+        }
+
+        // Add enter key search functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInputs = ['search-keyword', 'search-location', 'search-company'];
+            searchInputs.forEach(id => {
+                const input = document.getElementById(id);
+                if (input) {
+                    input.addEventListener('keypress', function(e) {
+                        if (e.key === 'Enter') {
+                            searchSavedJobs();
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

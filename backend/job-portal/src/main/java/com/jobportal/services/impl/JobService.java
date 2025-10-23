@@ -185,6 +185,29 @@ public class JobService extends BaseService implements JobServiceInterface {
         jobRepository.delete(job);
     }
 
+    @Override
+    public Page<Job> getJobsByCompanyId(Long companyId, Map<String, String[]> params) {
+        int page = params.containsKey("page") ? Integer.parseInt(params.get("page")[0]) - 1 : 0;
+        int size = params.containsKey("size") ? Integer.parseInt(params.get("size")[0]) : 10;
+        Sort sort = sortParam(params);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        String keyword = FilterParameter.filtertKeyword(params);
+        Map<String, String> filterSimple = FilterParameter.filterSimple(params);
+        Map<String, Map<String, String>> filterComplex = FilterParameter.filterComplex(params);
+
+        Specification<Job> spec = Specification.where(
+                        BaseSpecification.<Job>keyword(
+                                keyword,
+                                "title", "description", "seniority", "employmentType", "currency", "remote"
+                        )
+                )
+                .and(BaseSpecification.whereSpec(filterSimple))
+                .and(BaseSpecification.complexWhereSpec(filterComplex))
+                .and(BaseSpecification.equalLong("company.id", companyId));
+        return jobRepository.findAll(spec, pageable);
+    }
+
     private String generateUniqueSlug(String base) {
         String slug = Slugifier.slugify(base);
 

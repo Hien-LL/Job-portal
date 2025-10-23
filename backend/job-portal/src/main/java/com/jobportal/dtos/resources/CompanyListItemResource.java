@@ -8,5 +8,6 @@ public class CompanyListItemResource {
     private String name;
     private String slug;
     private String logoUrl;
+
     private boolean verified;
 }

@@ -23,6 +23,7 @@ public class JobResource {
     private String slug;
     private String employmentType;
     private String currency;
+    private int yearsOfExperience;
 
     private LocationResource location;
     private CompanyResource company;

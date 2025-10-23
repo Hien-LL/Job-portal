@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách công ty - JobPortal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/components.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-white">
+    <!-- Header Fragment -->
+    <div data-fragment="fragments/header.html"></div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Page Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Danh sách công ty</h1>
+            <p class="text-gray-600">Khám phá các công ty hàng đầu và cơ hội nghề nghiệp tuyệt vời</p>
+        </div>
+
+        <!-- Search and Filter -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Tìm kiếm công ty</label>
+                    <input type="text" id="search-company" placeholder="Tên công ty..." class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Quy mô</label>
+                    <select id="filter-size" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">Tất cả quy mô</option>
+                        <option value="1-10">1-10 nhân viên</option>
+                        <option value="11-50">11-50 nhân viên</option>
+                        <option value="51-200">51-200 nhân viên</option>
+                        <option value="201-500">201-500 nhân viên</option>
+                        <option value="500+">500+ nhân viên</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Sắp xếp</label>
+                    <select id="sort-companies" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="followerCount,desc">Nhiều người theo dõi nhất</option>
+                        <option value="name,asc">Tên A-Z</option>
+                        <option value="name,desc">Tên Z-A</option>
+                    </select>
+                </div>
+                <div class="flex items-end">
+                    <button onclick="searchCompanies()" class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">
+                        Tìm kiếm
+                    </button>
+                </div>
+            </div>
+            <div class="mt-4 flex items-center gap-4">
+                <label class="flex items-center text-sm">
+                    <input type="checkbox" id="filter-verified" class="mr-2 rounded">
+                    Chỉ hiển thị công ty đã xác thực
+                </label>
+                <button onclick="clearFilters()" class="text-blue-600 text-sm hover:underline">
+                    Xóa bộ lọc
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Summary -->
+        <div class="flex items-center justify-between mb-6">
+            <p class="text-gray-600 text-sm">
+                <span id="total-companies">0</span> công ty được tìm thấy
+            </p>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading" class="flex justify-center items-center py-20">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+
+        <!-- Companies Grid -->
+        <div id="companies-grid" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Companies will be loaded here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="hidden text-center py-20">
+            <div class="text-6xl mb-4">🏢</div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">Không tìm thấy công ty</h3>
+            <p class="text-gray-600 mb-4">Thử điều chỉnh bộ lọc hoặc từ khóa tìm kiếm</p>
+            <button onclick="clearFilters()" class="bg-blue-600 text-white px-4 py-2 rounded font-medium hover:bg-blue-700 transition">
+                Xóa bộ lọc
+            </button>
+        </div>
+
+        <!-- Error State -->
+        <div id="error-state" class="hidden text-center py-20">
+            <div class="text-red-500 mb-4">
+                <svg class="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                </svg>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">Lỗi khi tải dữ liệu</h3>
+            <p class="text-gray-600 mb-4">Vui lòng thử lại sau</p>
+            <button onclick="loadCompanies()" class="bg-blue-600 text-white px-4 py-2 rounded font-medium hover:bg-blue-700 transition">
+                Thử lại
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer Fragment -->
+    <div data-fragment="fragments/footer.html"></div>
+
+    <!-- Scripts -->
+    <script src="js/fragments-loader.js"></script>
+    <script>
+        let isLoading = false;
+        let currentFilters = {
+            search: '',
+            size: '',
+            verified: false,
+            sort: 'followerCount,desc'
+        };
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFragments().then(() => {
+                loadCompanies();
+                setupEventListeners();
+            });
+        });
+
+        function setupEventListeners() {
+            // Search input
+            document.getElementById('search-company').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchCompanies();
+                }
+            });
+
+            // Sort change
+            document.getElementById('sort-companies').addEventListener('change', function() {
+                currentFilters.sort = this.value;
+                loadCompanies();
+            });
+
+            // Filter change
+            document.getElementById('filter-verified').addEventListener('change', function() {
+                currentFilters.verified = this.checked;
+                loadCompanies();
+            });
+        }
+
+        // Load companies
+        async function loadCompanies() {
+            if (isLoading) return;
+            
+            isLoading = true;
+            showLoading();
+
+            try {
+                const params = new URLSearchParams();
+                params.append('sort', currentFilters.sort);
+
+                if (currentFilters.search) {
+                    params.append('search', currentFilters.search);
+                }
+
+                if (currentFilters.verified) {
+                    params.append('verified', 'true');
+                }
+
+                const response = await fetch(`http://localhost:8080/api/companies/list?${params.toString()}`);
+                const result = await response.json();
+
+                if (result.success && result.data) {
+                    displayCompanies(result.data);
+                    updateCompanyCount(result.data.length);
+                    hideLoading();
+                } else {
+                    showError();
+                }
+            } catch (error) {
+                console.error('Error loading companies:', error);
+                showError();
+            } finally {
+                isLoading = false;
+            }
+        }
+
+        // Display companies
+        function displayCompanies(companies) {
+            const grid = document.getElementById('companies-grid');
+            const emptyState = document.getElementById('empty-state');
+
+            // Filter by size if selected
+            let filteredCompanies = companies;
+            if (currentFilters.size) {
+                filteredCompanies = filterCompaniesBySize(companies, currentFilters.size);
+            }
+
+            if (!filteredCompanies || filteredCompanies.length === 0) {
+                grid.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            grid.classList.remove('hidden');
+
+            grid.innerHTML = filteredCompanies.map(company => {
+                const logoUrl = company.logoUrl ? 
+                    `http://localhost:8080${company.logoUrl}` : null;
+                const companySizeText = formatCompanySize(company.size_min, company.size_max);
+
+                return `
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition cursor-pointer" 
+                         onclick="viewCompany('${company.slug}')">
+                        <div class="flex items-start gap-4 mb-4">
+                            <div class="w-16 h-16 bg-gray-100 rounded flex-shrink-0 flex items-center justify-center">
+                                ${logoUrl ? 
+                                    `<img src="${logoUrl}" alt="${company.name}" class="w-full h-full object-contain rounded">` :
+                                    `<span class="text-2xl">🏢</span>`
+                                }
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h3 class="font-bold text-gray-900">${company.name}</h3>
+                                    ${company.verified ? 
+                                        '<span class="inline-block w-3 h-3 bg-blue-500 rounded-full" title="Công ty đã xác thực"></span>' : 
+                                        ''
+                                    }
+                                </div>
+                                <p class="text-gray-600 text-sm mb-2">${companySizeText}</p>
+                                <p class="text-gray-600 text-sm">👥 ${company.followerCount} người theo dõi</p>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <p class="text-gray-600 text-sm line-clamp-3">${company.description || 'Chưa có mô tả công ty'}</p>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2 text-sm text-gray-500">
+                                ${company.website ? 
+                                    `<span>🌐 ${company.website}</span>` : 
+                                    ''
+                                }
+                            </div>
+                            <span class="text-blue-600 text-sm font-medium">Xem chi tiết →</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            updateCompanyCount(filteredCompanies.length);
+        }
+
+        // Search companies
+        function searchCompanies() {
+            currentFilters.search = document.getElementById('search-company').value;
+            currentFilters.size = document.getElementById('filter-size').value;
+            currentFilters.verified = document.getElementById('filter-verified').checked;
+            loadCompanies();
+        }
+
+        // Clear filters
+        function clearFilters() {
+            document.getElementById('search-company').value = '';
+            document.getElementById('filter-size').selectedIndex = 0;
+            document.getElementById('filter-verified').checked = false;
+            document.getElementById('sort-companies').selectedIndex = 0;
+
+            currentFilters = {
+                search: '',
+                size: '',
+                verified: false,
+                sort: 'followerCount,desc'
+            };
+
+            loadCompanies();
+        }
+
+        // Filter companies by size
+        function filterCompaniesBySize(companies, sizeRange) {
+            if (!sizeRange) return companies;
+
+            return companies.filter(company => {
+                const min = company.size_min || 0;
+                const max = company.size_max || 0;
+                
+                switch (sizeRange) {
+                    case '1-10':
+                        return (min >= 1 && max <= 10) || (min <= 10 && max >= 1);
+                    case '11-50':
+                        return (min >= 11 && max <= 50) || (min <= 50 && max >= 11);
+                    case '51-200':
+                        return (min >= 51 && max <= 200) || (min <= 200 && max >= 51);
+                    case '201-500':
+                        return (min >= 201 && max <= 500) || (min <= 500 && max >= 201);
+                    case '500+':
+                        return min >= 500 || max >= 500;
+                    default:    
+                        return true;
+                }
+            });
+        }
+
+        // View company detail
+        function viewCompany(slug) {
+            window.location.href = `company-detail.html?slug=${slug}`;
+        }
+
+        // Utility functions
+        function formatCompanySize(sizeMin, sizeMax) {
+            if (!sizeMin && !sizeMax) return 'Quy mô không xác định';
+            if (sizeMin === 0 && sizeMax === 0) return 'Quy mô không xác định';
+            
+            if (sizeMin && sizeMax) {
+                if (sizeMin === sizeMax) {
+                    return `${sizeMin} nhân viên`;
+                }
+                return `${sizeMin} - ${sizeMax} nhân viên`;
+            } else if (sizeMin) {
+                return `Từ ${sizeMin} nhân viên`;
+            } else {
+                return `Lên đến ${sizeMax} nhân viên`;
+            }
+        }
+
+        function updateCompanyCount(count) {
+            document.getElementById('total-companies').textContent = count;
+        }
+
+        function showLoading() {
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('companies-grid').classList.add('hidden');
+            document.getElementById('empty-state').classList.add('hidden');
+            document.getElementById('error-state').classList.add('hidden');
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').classList.add('hidden');
+        }
+
+        function showError() {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('companies-grid').classList.add('hidden');
+            document.getElementById('empty-state').classList.add('hidden');
+            document.getElementById('error-state').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>

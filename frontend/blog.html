@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - JobPortal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/components.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+        }
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .blog-card {
+            transition: all 0.3s ease;
+        }
+        .blog-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header Fragment -->
+    <div data-fragment="fragments/header.html"></div>
+
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h1 class="text-4xl md:text-5xl font-bold mb-4">
+                    Blog Tuyển Dụng
+                </h1>
+                <p class="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
+                    Cập nhật tin tức mới nhất về thị trường việc làm, xu hướng tuyển dụng và lời khuyên nghề nghiệp
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <div class="relative max-w-md mx-auto sm:mx-0">
+                        <input id="search-input" type="text" placeholder="Tìm kiếm bài viết..." 
+                               class="w-full pl-4 pr-12 py-3 rounded-lg text-gray-900 border-0 focus:ring-2 focus:ring-blue-300">
+                        <button onclick="searchBlogs()" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-blue-600">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <!-- Main Blog Content -->
+            <main class="lg:col-span-3">
+                <!-- Category Filter -->
+                <div class="flex flex-wrap gap-3 mb-8">
+                    <button onclick="filterByCategory('all')" class="category-filter active bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-700 transition">
+                        Tất cả
+                    </button>
+                    <button onclick="filterByCategory('career-tips')" class="category-filter bg-gray-200 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-300 transition">
+                        Lời khuyên nghề nghiệp
+                    </button>
+                    <button onclick="filterByCategory('market-trends')" class="category-filter bg-gray-200 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-300 transition">
+                        Xu hướng thị trường
+                    </button>
+                    <button onclick="filterByCategory('interview-tips')" class="category-filter bg-gray-200 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-300 transition">
+                        Phỏng vấn
+                    </button>
+                    <button onclick="filterByCategory('salary-guide')" class="category-filter bg-gray-200 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-300 transition">
+                        Hướng dẫn lương
+                    </button>
+                </div>
+
+                <!-- Loading State -->
+                <div id="loading-container" class="text-center py-12">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                    <p class="text-gray-600 text-sm mt-4">Đang tải bài viết...</p>
+                </div>
+
+                <!-- Blog Posts Grid -->
+                <div id="blog-posts" class="grid grid-cols-1 md:grid-cols-2 gap-8 hidden">
+                    <!-- Blog posts will be loaded here -->
+                </div>
+
+                <!-- No Results -->
+                <div id="no-results" class="text-center py-12 hidden">
+                    <div class="text-gray-400 mb-4">
+                        <svg class="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">Không tìm thấy bài viết</h3>
+                    <p class="text-gray-600">Thử thay đổi từ khóa tìm kiếm hoặc danh mục</p>
+                </div>
+
+                <!-- Pagination -->
+                <div id="pagination" class="flex justify-center mt-12 hidden">
+                    <div class="flex items-center gap-2">
+                        <button id="prev-btn" onclick="changePage(-1)" class="px-3 py-2 text-gray-500 hover:text-blue-600 disabled:opacity-50" disabled>
+                            ← Trước
+                        </button>
+                        <div id="page-numbers" class="flex gap-1">
+                            <!-- Page numbers will be inserted here -->
+                        </div>
+                        <button id="next-btn" onclick="changePage(1)" class="px-3 py-2 text-gray-500 hover:text-blue-600 disabled:opacity-50">
+                            Sau →
+                        </button>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Sidebar -->
+            <aside class="lg:col-span-1">
+                <!-- Popular Posts -->
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+                    <h3 class="font-bold text-gray-900 mb-4">Bài viết nổi bật</h3>
+                    <div id="popular-posts" class="space-y-4">
+                        <!-- Popular posts will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Categories -->
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+                    <h3 class="font-bold text-gray-900 mb-4">Danh mục</h3>
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                            <span class="text-gray-700">Lời khuyên nghề nghiệp</span>
+                            <span class="text-gray-500 text-sm">12</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                            <span class="text-gray-700">Xu hướng thị trường</span>
+                            <span class="text-gray-500 text-sm">8</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                            <span class="text-gray-700">Phỏng vấn</span>
+                            <span class="text-gray-500 text-sm">15</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                            <span class="text-gray-700">Hướng dẫn lương</span>
+                            <span class="text-gray-500 text-sm">6</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Newsletter -->
+                <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6">
+                    <h3 class="font-bold text-gray-900 mb-2">Đăng ký nhận tin</h3>
+                    <p class="text-gray-600 text-sm mb-4">Nhận những bài viết mới nhất về tuyển dụng qua email</p>
+                    <div class="space-y-3">
+                        <input type="email" placeholder="Email của bạn" 
+                               class="w-full px-3 py-2 rounded border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <button class="w-full bg-blue-600 text-white py-2 rounded font-medium hover:bg-blue-700 transition">
+                            Đăng ký
+                        </button>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- Footer Fragment -->
+    <div data-fragment="fragments/footer.html"></div>
+
+    <!-- Scripts -->
+    <script src="js/fragments-loader.js"></script>
+    <script>
+        let currentPage = 1;
+        let currentCategory = 'all';
+        let currentSearch = '';
+        let totalPages = 1;
+        
+        // Sample blog data (replace with API calls)
+        const blogPosts = [
+            {
+                id: 1,
+                title: "10 Kỹ năng IT được săn đón nhất năm 2024",
+                excerpt: "Khám phá những kỹ năng công nghệ thông tin được các nhà tuyển dụng tìm kiếm nhiều nhất trong năm 2024, từ AI/ML đến cloud computing.",
+                category: "market-trends",
+                categoryName: "Xu hướng thị trường",
+                author: "Nguyễn Văn A",
+                publishedAt: "2024-01-15",
+                readTime: "5 phút",
+                imageUrl: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&h=400&fit=crop",
+                tags: ["IT", "Kỹ năng", "2024"],
+                isPopular: true
+            },
+            {
+                id: 2,
+                title: "Cách viết CV gây ấn tượng với nhà tuyển dụng",
+                excerpt: "Hướng dẫn chi tiết cách viết CV chuyên nghiệp, nổi bật và thu hút sự chú ý của nhà tuyển dụng trong vòng 30 giây đầu tiên.",
+                category: "career-tips",
+                categoryName: "Lời khuyên nghề nghiệp",
+                author: "Trần Thị B",
+                publishedAt: "2024-01-12",
+                readTime: "7 phút",
+                imageUrl: "https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=600&h=400&fit=crop",
+                tags: ["CV", "Tuyển dụng", "Nghề nghiệp"],
+                isPopular: true
+            },
+            {
+                id: 3,
+                title: "5 Câu hỏi phỏng vấn thường gặp và cách trả lời",
+                excerpt: "Tổng hợp những câu hỏi phỏng vấn phổ biến nhất và gợi ý cách trả lời thông minh, thuyết phục để ghi điểm với nhà tuyển dụng.",
+                category: "interview-tips",
+                categoryName: "Phỏng vấn",
+                author: "Lê Văn C",
+                publishedAt: "2024-01-10",
+                readTime: "6 phút",
+                imageUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=400&fit=crop",
+                tags: ["Phỏng vấn", "Tuyển dụng", "Kỹ năng"],
+                isPopular: false
+            },
+            {
+                id: 4,
+                title: "Bảng lương IT Việt Nam 2024: Cập nhật mới nhất",
+                excerpt: "Khảo sát mức lương của các vị trí IT tại Việt Nam năm 2024, từ junior đến senior, giúp bạn đàm phán lương hiệu quả.",
+                category: "salary-guide",
+                categoryName: "Hướng dẫn lương",
+                author: "Phạm Thị D",
+                publishedAt: "2024-01-08",
+                readTime: "10 phút",
+                imageUrl: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600&h=400&fit=crop",
+                tags: ["Lương", "IT", "Việt Nam"],
+                isPopular: true
+            },
+            {
+                id: 5,
+                title: "Remote Work: Xu hướng làm việc từ xa sau đại dịch",
+                excerpt: "Phân tích xu hướng làm việc từ xa, những lợi ích và thách thức, cũng như cách thích ứng với môi trường làm việc mới.",
+                category: "market-trends",
+                categoryName: "Xu hướng thị trường",
+                author: "Hoàng Văn E",
+                publishedAt: "2024-01-05",
+                readTime: "8 phút",
+                imageUrl: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600&h=400&fit=crop",
+                tags: ["Remote", "Làm việc", "Xu hướng"],
+                isPopular: false
+            },
+            {
+                id: 6,
+                title: "Chuyển đổi ngành nghề: Bí quyết thành công",
+                excerpt: "Hướng dẫn chi tiết cách chuyển đổi ngành nghề một cách hiệu quả, từ việc chuẩn bị kỹ năng đến tìm kiếm cơ hội mới.",
+                category: "career-tips",
+                categoryName: "Lời khuyên nghề nghiệp",
+                author: "Ngô Thị F",
+                publishedAt: "2024-01-03",
+                readTime: "9 phút",
+                imageUrl: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&h=400&fit=crop",
+                tags: ["Chuyển nghề", "Nghề nghiệp", "Phát triển"],
+                isPopular: false
+            }
+        ];
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFragments().then(() => {
+                loadBlogPosts();
+                loadPopularPosts();
+            });
+        });
+
+        // Load blog posts
+        function loadBlogPosts() {
+            showLoading();
+            
+            // Simulate API call delay
+            setTimeout(() => {
+                const filteredPosts = filterPosts();
+                displayBlogPosts(filteredPosts);
+                updatePagination(filteredPosts.length);
+                hideLoading();
+            }, 500);
+        }
+
+        // Filter posts based on category and search
+        function filterPosts() {
+            let filtered = [...blogPosts];
+            
+            // Filter by category
+            if (currentCategory !== 'all') {
+                filtered = filtered.filter(post => post.category === currentCategory);
+            }
+            
+            // Filter by search
+            if (currentSearch) {
+                filtered = filtered.filter(post => 
+                    post.title.toLowerCase().includes(currentSearch.toLowerCase()) ||
+                    post.excerpt.toLowerCase().includes(currentSearch.toLowerCase()) ||
+                    post.tags.some(tag => tag.toLowerCase().includes(currentSearch.toLowerCase()))
+                );
+            }
+            
+            return filtered;
+        }
+
+        // Display blog posts
+        function displayBlogPosts(posts) {
+            const container = document.getElementById('blog-posts');
+            const noResults = document.getElementById('no-results');
+            
+            if (posts.length === 0) {
+                container.classList.add('hidden');
+                noResults.classList.remove('hidden');
+                return;
+            }
+            
+            noResults.classList.add('hidden');
+            container.classList.remove('hidden');
+            
+            // Pagination
+            const startIndex = (currentPage - 1) * 6;
+            const endIndex = startIndex + 6;
+            const paginatedPosts = posts.slice(startIndex, endIndex);
+            
+            container.innerHTML = paginatedPosts.map(post => {
+                const publishedDate = formatDate(post.publishedAt);
+                
+                return `
+                    <article class="blog-card bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                        <div class="aspect-video bg-gray-200 overflow-hidden">
+                            <img src="${post.imageUrl}" alt="${post.title}" 
+                                 class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center gap-3 mb-3">
+                                <span class="inline-block bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">
+                                    ${post.categoryName}
+                                </span>
+                                <span class="text-gray-500 text-xs">${post.readTime} đọc</span>
+                            </div>
+                            
+                            <h2 class="text-xl font-bold text-gray-900 mb-3 hover:text-blue-600 transition cursor-pointer" 
+                                onclick="openBlogPost(${post.id})">
+                                ${post.title}
+                            </h2>
+                            
+                            <p class="text-gray-600 text-sm mb-4 line-clamp-3">
+                                ${post.excerpt}
+                            </p>
+                            
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                                        ${post.author.charAt(0)}
+                                    </div>
+                                    <div>
+                                        <p class="text-gray-900 text-sm font-medium">${post.author}</p>
+                                        <p class="text-gray-500 text-xs">${publishedDate}</p>
+                                    </div>
+                                </div>
+                                
+                                <button onclick="openBlogPost(${post.id})" 
+                                        class="text-blue-600 text-sm font-medium hover:underline">
+                                    Đọc thêm →
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+        }
+
+        // Load popular posts for sidebar
+        function loadPopularPosts() {
+            const popularContainer = document.getElementById('popular-posts');
+            const popularPosts = blogPosts.filter(post => post.isPopular).slice(0, 3);
+            
+            popularContainer.innerHTML = popularPosts.map(post => {
+                const publishedDate = formatDate(post.publishedAt);
+                
+                return `
+                    <div class="cursor-pointer hover:bg-gray-50 p-2 rounded transition" onclick="openBlogPost(${post.id})">
+                        <h4 class="font-medium text-gray-900 text-sm mb-1 line-clamp-2">${post.title}</h4>
+                        <p class="text-gray-500 text-xs">${publishedDate} • ${post.readTime}</p>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Filter by category
+        function filterByCategory(category) {
+            currentCategory = category;
+            currentPage = 1;
+            
+            // Update active button
+            document.querySelectorAll('.category-filter').forEach(btn => {
+                btn.classList.remove('active', 'bg-blue-600', 'text-white');
+                btn.classList.add('bg-gray-200', 'text-gray-700');
+            });
+            
+            event.target.classList.add('active', 'bg-blue-600', 'text-white');
+            event.target.classList.remove('bg-gray-200', 'text-gray-700');
+            
+            loadBlogPosts();
+        }
+
+        // Search blogs
+        function searchBlogs() {
+            currentSearch = document.getElementById('search-input').value.trim();
+            currentPage = 1;
+            loadBlogPosts();
+        }
+
+        // Handle enter key in search
+        document.getElementById('search-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchBlogs();
+            }
+        });
+
+        // Pagination
+        function changePage(direction) {
+            const newPage = currentPage + direction;
+            if (newPage >= 1 && newPage <= totalPages) {
+                currentPage = newPage;
+                loadBlogPosts();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function updatePagination(totalItems) {
+            totalPages = Math.ceil(totalItems / 6);
+            const pagination = document.getElementById('pagination');
+            
+            if (totalPages <= 1) {
+                pagination.classList.add('hidden');
+                return;
+            }
+            
+            pagination.classList.remove('hidden');
+            
+            // Update buttons
+            document.getElementById('prev-btn').disabled = currentPage === 1;
+            document.getElementById('next-btn').disabled = currentPage === totalPages;
+            
+            // Update page numbers
+            const pageNumbers = document.getElementById('page-numbers');
+            pageNumbers.innerHTML = '';
+            
+            for (let i = 1; i <= totalPages; i++) {
+                const button = document.createElement('button');
+                button.textContent = i;
+                button.className = `px-3 py-2 rounded ${i === currentPage ? 'bg-blue-600 text-white' : 'text-gray-500 hover:text-blue-600'}`;
+                button.onclick = () => {
+                    currentPage = i;
+                    loadBlogPosts();
+                };
+                pageNumbers.appendChild(button);
+            }
+        }
+
+        // Open blog post detail
+        function openBlogPost(postId) {
+            window.location.href = `blog-detail.html?id=${postId}`;
+        }
+
+        // Utility functions
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffTime = Math.abs(now - date);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays === 1) return 'Hôm qua';
+            if (diffDays < 7) return `${diffDays} ngày trước`;
+            if (diffDays < 30) return `${Math.ceil(diffDays / 7)} tuần trước`;
+            return `${Math.ceil(diffDays / 30)} tháng trước`;
+        }
+
+        function showLoading() {
+            document.getElementById('loading-container').classList.remove('hidden');
+            document.getElementById('blog-posts').classList.add('hidden');
+            document.getElementById('no-results').classList.add('hidden');
+        }
+
+        function hideLoading() {
+            document.getElementById('loading-container').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>

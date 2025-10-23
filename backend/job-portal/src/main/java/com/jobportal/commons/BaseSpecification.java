@@ -164,6 +164,22 @@ public class BaseSpecification {
         try { return from.join(name, JoinType.LEFT); } catch (IllegalArgumentException ex) { return null; }
     }
 
+    public static <T> Specification<T> equalLong(String path, Long value) {
+        return (root, query, cb) -> {
+            if (value == null || path == null || path.isBlank()) return cb.conjunction();
+            Path<?> p = resolvePath2(root, path); // hỗ trợ "company.id"
+            return cb.equal(p, value);
+        };
+    }
+
+    private static <T> Path<?> resolvePath2(From<?, ?> root, String path) {
+        String[] parts = path.split("\\.");
+        Path<?> result = root;
+        for (String part : parts) result = result.get(part);
+        return result;
+    }
+
+
 
     private enum CompareOp { LT, LTE, GT, GTE }
 
