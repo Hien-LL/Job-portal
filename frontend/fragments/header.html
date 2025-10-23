@@ -1,0 +1,56 @@
+<!-- Navigation Header -->
+<header class="bg-white shadow-sm sticky top-0 z-50 border-b border-gray-200" id="main-header">
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+        <!-- Logo -->
+        <a href="index.html" class="flex items-center gap-2">
+            <span class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">jobPortal</span>
+        </a>
+
+        <!-- Desktop Menu -->
+        <div class="hidden md:flex items-center gap-8">
+            <a href="index.html" class="text-gray-700 hover:text-blue-600 transition text-sm font-medium">Trang chủ</a>
+            <a href="job.html" class="text-gray-700 hover:text-blue-600 transition text-sm font-medium">Tìm việc</a>
+            <a href="#" class="text-gray-700 hover:text-blue-600 transition text-sm font-medium">Công ty</a>
+            <a href="#" class="text-gray-700 hover:text-blue-600 transition text-sm font-medium">Blog</a>
+        </div>
+
+        <!-- Auth Buttons -->
+        <div class="flex items-center gap-3">
+            <!-- When logged in -->
+            <div id="logged-in-menu" class="hidden items-center gap-3">
+                <span class="text-gray-700 text-sm">Xin chào, <span id="user-name">User</span></span>
+                <div class="relative">
+                    <button id="user-menu-trigger" class="text-gray-700 text-sm font-medium hover:text-blue-600 flex items-center gap-1">
+                        Tài khoản ▼
+                    </button>
+                    <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50">
+                        <div class="py-1">
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Hồ sơ của tôi</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Việc làm đã lưu</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Đơn ứng tuyển</a>
+                            <hr class="my-1">
+                            <button id="logout-btn" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+                                Đăng xuất
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <button class="bg-cyan-500 text-white px-4 py-2 rounded font-semibold hover:bg-cyan-600 transition text-sm">Đăng tin tuyển dụng</button>
+            </div>
+
+            <!-- When not logged in -->
+            <div id="not-logged-in-menu" class="flex items-center gap-3">
+                <a href="login.html" class="text-gray-700 text-sm font-medium hover:text-blue-600">Đăng nhập</a>
+                <a href="login.html" class="bg-blue-600 text-white px-4 py-2 rounded font-semibold hover:bg-blue-700 transition text-sm">Đăng ký</a>
+                <button class="bg-cyan-500 text-white px-4 py-2 rounded font-semibold hover:bg-cyan-600 transition text-sm">Đăng tin tuyển dụng</button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Button -->
+        <button class="md:hidden text-gray-700 mobile-menu-trigger">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+        </button>
+    </nav>
+</header>

@@ -10,7 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserSkillResource {
-    private Long skillId;
+    private Long id;
     private String name;
     private String slug;
     private int yearsExperience;

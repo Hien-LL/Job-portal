@@ -10,4 +10,5 @@ import lombok.RequiredArgsConstructor;
 public class RefreshTokenResource {
     private String token;
     private String refreshToken;
+    private AuthResource auth;
 }

@@ -10,17 +10,18 @@ import com.jobportal.mappers.CompanyMapper;
 import com.jobportal.services.interfaces.AuthServiceInterface;
 import com.jobportal.services.interfaces.CompanyServiceInterface;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/companies")
@@ -42,6 +43,19 @@ public class CompanyController {
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
+        }
+    }
+
+    @GetMapping("/list")
+    public ResponseEntity<?> getAllCompanies(HttpServletRequest request) {
+        try {
+            Map<String, String[]> parameterMap = request.getParameterMap();
+
+            List<CompanyResource> companies = companyService.getAllCompanies(parameterMap);
+            return ResponseEntity.ok(ApiResource.ok(companies, "Lấy danh sách công ty thành công"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));

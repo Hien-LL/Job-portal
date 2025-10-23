@@ -17,9 +17,6 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
     // Check double-apply
     boolean existsByUser_IdAndJob_Id(Long userId, Long jobId);
 
-    @EntityGraph(attributePaths = {"status", "user"})
-    Page<Application> findAllByJob_Id(Long jobId, Pageable pageable);
-
     @EntityGraph(attributePaths = {"status", "job"})
     Page<Application> findAllByUser_Id(Long userId, Pageable pageable);
 
@@ -81,6 +78,7 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
       where a.id = :id
     """)
     Optional<Application> findByIdWithJoins(@Param("id") Long id);
+
 }
 
 

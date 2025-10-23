@@ -17,6 +17,8 @@ import com.jobportal.securities.configs.UploadConfig;
 import com.jobportal.services.interfaces.CompanyServiceInterface;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,7 +27,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -134,6 +138,64 @@ public class CompanyService extends BaseService implements CompanyServiceInterfa
         deleteByPublicUrl("/" + uploadConfig.getCompanyLogoDir() + "/", oldUrl, uploadConfig.getBaseDir());
         return newUrl;
     }
+
+    @Override
+    public List<CompanyResource> getAllCompanies(Map<String, String[]> parameterMap) {
+        // 0) Lấy sort tổng thể như bạn đang có
+        Sort originalSort = sortParam(parameterMap);
+
+        // 1) Tách followerCount ra khỏi sort để DB chỉ sort theo các field khác
+        List<Sort.Order> allOrders = new ArrayList<>();
+        originalSort.iterator().forEachRemaining(allOrders::add);
+
+        List<Sort.Order> followerOrders = allOrders.stream()
+                .filter(o -> o.getProperty().equalsIgnoreCase("followerCount"))
+                .toList();
+
+        Sort dbSort = Sort.by(
+                allOrders.stream()
+                        .filter(o -> !o.getProperty().equalsIgnoreCase("followerCount"))
+                        .toList()
+        );
+
+        // 2) Build spec và query DB
+        Specification<Company> spec = specificationParam(parameterMap);
+        List<Company> companies = companyRepository.findAll(spec, dbSort);
+        if (companies.isEmpty()) return List.of();
+
+        // 3) Bulk count follower cho toàn bộ id có trong trang hiện tại
+        List<Long> ids = companies.stream().map(Company::getId).toList();
+        Map<Long, Long> countMap = followCompanyRepository.countByCompanyIdsGrouped(ids).stream()
+                .collect(java.util.stream.Collectors.toMap(
+                        FollowCompanyRepository.CompanyFollowAgg::getCompanyId,
+                        FollowCompanyRepository.CompanyFollowAgg::getCnt
+                ));
+
+        // 4) Map sang resource + inject followerCount
+        List<CompanyResource> resources = companies.stream().map(c -> {
+            CompanyResource r = companyMapper.tResource(c);
+            r.setFollowerCount(countMap.getOrDefault(c.getId(), 0L).intValue());
+            return r;
+        }).toList();
+
+        // 5) Nếu có yêu cầu sort theo followerCount thì sort in-memory theo đúng direction
+        if (!followerOrders.isEmpty()) {
+            // Trường hợp có nhiều order followerCount (hiếm), mình ưu tiên order đầu tiên
+            Sort.Order order = followerOrders.getFirst();
+            java.util.Comparator<CompanyResource> cmp =
+                    java.util.Comparator.comparingInt(CompanyResource::getFollowerCount);
+            if (order.isDescending()) cmp = cmp.reversed();
+
+            // Giữ ổn định bằng id như tie-breaker
+            cmp = cmp.thenComparing(CompanyResource::getId);
+
+            resources = resources.stream().sorted(cmp).toList();
+        }
+
+        return resources;
+    }
+
+
 
     private String generateUniqueSlug(String base) {
         String slug = Slugifier.slugify(base);

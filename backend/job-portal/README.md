@@ -154,7 +154,7 @@ docker-compose restart mysql
 netstat -tulpn | grep :8080
 netstat -tulpn | grep :3306
 
-# Thay đổi port trong docker-compose.yml nếu cần
+# Thay đổi port trong docker-compose.dev.yml nếu cần
 ```
 
 ## 🛠 Phát triển Local

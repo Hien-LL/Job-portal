@@ -28,6 +28,7 @@ public class JobResource {
     private CompanyResource company;
     private CategoryResource category;
     private List<BenefitResource> benefits;
+    private List<SkillResource> skills;
 
     public boolean getIsRemote() { return isRemote; }
 }

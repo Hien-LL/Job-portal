@@ -43,7 +43,7 @@ public class SecurityConfig {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration c = new CorsConfiguration();
         // FE origin
-        c.setAllowedOrigins(List.of("http://localhost:3000"));
+        c.setAllowedOrigins(List.of("http://localhost:5500", "http://127.0.0.1:5500"));
         // Nếu sau này dùng cookie -> setAllowCredentials(true) và FE withCredentials=true
         c.setAllowCredentials(false); // hiện tại refresh token gửi qua body -> KHÔNG dùng cookie
         c.setAllowedMethods(List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS"));

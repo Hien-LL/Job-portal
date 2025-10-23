@@ -157,4 +157,18 @@ public class ApplicationController {
                     .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
         }
     }
+
+    @GetMapping("candidate-info/{applicationId}")
+    public ResponseEntity<?> getCandidateInfo(@PathVariable Long applicationId) {
+        try {
+            var data = applicationService.getCandidateInfomations(applicationId);
+            return ResponseEntity.ok(ApiResource.ok(data, "Lấy thông tin ứng viên thành công"));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
+        }
+    }
 }

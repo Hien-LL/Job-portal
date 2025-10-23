@@ -4,6 +4,7 @@ import com.jobportal.dtos.requests.creation.ApplicationCreationRequest;
 import com.jobportal.dtos.resources.ApplicationDetailResource;
 import com.jobportal.dtos.resources.ApplicationListItemForCompanyResource;
 import com.jobportal.dtos.resources.ApplicationResource;
+import com.jobportal.dtos.resources.CandidateResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -13,4 +14,5 @@ public interface ApplicationServiceInterface {
     Page<ApplicationListItemForCompanyResource> getApplicationsForMyCompanyJob(
             Long actorUserId, Long companyId, Long jobId, String status, Pageable pageable);
     ApplicationDetailResource getDetailForActor(Long applicationId, Long actorUserId);
+    CandidateResource getCandidateInfomations(Long applicationId);
 }

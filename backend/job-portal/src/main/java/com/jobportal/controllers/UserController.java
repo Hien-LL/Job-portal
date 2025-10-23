@@ -140,8 +140,9 @@ public class UserController {
     public ResponseEntity<?> updateMyProfile(@Valid @RequestBody UserUpdationRequest request) {
         try {
             String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            UserProfileResource user = authService.getUserFromEmail(email);
-            UserProfileResource resource = userService.update(user.getId(), request);
+            Long userId = authService.getUserFromEmail(email).getId();
+
+            UserProfileResource resource = userService.update(userId, request);
             ApiResource<UserProfileResource> response = ApiResource.ok(resource, "Cập nhật bản ghi thành công");
             return ResponseEntity.ok(response);
         } catch (EntityNotFoundException e) {
@@ -183,9 +184,9 @@ public class UserController {
             }
 
             String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            UserProfileResource user = authService.getUserFromEmail(email);
+            Long userId = authService.getUserFromEmail(email).getId();
 
-            String avatarUrl = userService.uploadAvatar(user.getId(), file);
+            String avatarUrl = userService.uploadAvatar(userId, file);
             return ResponseEntity.ok(ApiResource.ok(avatarUrl, "Upload avatar thành công"));
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -196,13 +197,14 @@ public class UserController {
         }
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/skills/{slug}")
     ResponseEntity<?> addSkillToUser(@PathVariable String slug, @RequestParam int yearsExperience) {
         try {
             String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            UserProfileResource user = authService.getUserFromEmail(email);
+            Long userId = authService.getUserFromEmail(email).getId();
 
-            userSkillService.addSkillToUser(user.getId(), slug, yearsExperience);
+            userSkillService.addSkillToUser(userId, slug, yearsExperience);
             return ResponseEntity.ok(ApiResource.ok(null, "Thêm kỹ năng cho người dùng thành công"));
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -220,9 +222,9 @@ public class UserController {
     ResponseEntity<?> getSkillsForUser() {
         try {
             String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            UserProfileResource user = authService.getUserFromEmail(email);
+            Long userId = authService.getUserFromEmail(email).getId();
 
-            var skills = userSkillService.getSkillsById(user.getId());
+            var skills = userSkillService.getSkillsById(userId);
             return ResponseEntity.ok(ApiResource.ok(skills, "Success"));
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -240,9 +242,9 @@ public class UserController {
     ResponseEntity<?> updateSkillForUser(@PathVariable String slug, @RequestParam int yearsExperience) {
         try {
             String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            UserProfileResource user = authService.getUserFromEmail(email);
+            Long userId = authService.getUserFromEmail(email).getId();
 
-            userSkillService.updateYearsBySlug(user.getId(), slug, yearsExperience);
+            userSkillService.updateYearsBySlug(userId, slug, yearsExperience);
             return ResponseEntity.ok(ApiResource.ok(null, "Cập nhật số năm kinh nghiệm cho kỹ năng thành công"));
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -260,9 +262,9 @@ public class UserController {
     ResponseEntity<?> removeSkillFromUser(@PathVariable String slug) {
         try {
             String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            UserProfileResource user = authService.getUserFromEmail(email);
+            Long userId = authService.getUserFromEmail(email).getId();
 
-            userSkillService.removeSkillFromUser(user.getId(), slug);
+            userSkillService.removeSkillFromUser(userId, slug);
             return ResponseEntity.ok(ApiResource.ok(null, "Xóa kỹ năng khỏi người dùng thành công"));
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -275,4 +277,23 @@ public class UserController {
                     .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
         }
     }
+
+//    @GetMapping("/candidate/infomations/{userId}")
+//    public ResponseEntity<?> getCandidateInfomations(@PathVariable @Positive(message = "id phải lớn hơn 0") Long userId) {
+//        try {
+//            String email = SecurityContextHolder.getContext().getAuthentication().getName();
+//            Long candidateId = authService.getUserFromEmail(email).getId();
+//
+//            var infomations = userService.getCandidateInfomations(candidateId, userId);
+//            return ResponseEntity.ok(ApiResource.ok(infomations, "Success"));
+//        } catch (EntityNotFoundException e) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+//                    .body(ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND));
+//        } catch (IllegalArgumentException e) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+//                    .body(ApiResource.error("BAD_REQUEST", e.getMessage(), HttpStatus.BAD_REQUEST));
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
+//        }
 }

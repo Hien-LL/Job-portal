@@ -11,6 +11,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -21,6 +23,7 @@ public interface JobRepository extends JpaRepository<Job, Long>, JpaSpecificatio
        left join fetch j.company
        left join fetch j.category
        left join fetch j.benefits
+       left join fetch j.skills
        where j.id = :id
        """)
     Optional<Job> findDetailById(@Param("id") Long id);
@@ -31,6 +34,7 @@ public interface JobRepository extends JpaRepository<Job, Long>, JpaSpecificatio
        left join fetch j.company
        left join fetch j.category
        left join fetch j.benefits
+       left join fetch j.skills
        where j.slug = :slug
        """)
     Optional<Job> findDetailBySlug(@Param("slug") String slug);
@@ -41,4 +45,17 @@ public interface JobRepository extends JpaRepository<Job, Long>, JpaSpecificatio
     boolean existsBySlug(String slug);
 
     Optional<Job> findBySlug(String slug);
+
+    @Query("""
+        select j.category.id as categoryId, count(j.id) as cnt
+        from Job j
+        where j.category.id in :categoryIds
+        group by j.category.id
+    """)
+    List<CategoryJobAgg> countByCategoryIdsGrouped(@Param("categoryIds") Collection<Long> categoryIds);
+
+    interface CategoryJobAgg {
+        Long getCategoryId();
+        long getCnt();
+    }
 }

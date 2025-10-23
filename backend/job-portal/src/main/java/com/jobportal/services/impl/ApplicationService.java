@@ -4,9 +4,9 @@ import com.jobportal.dtos.requests.creation.ApplicationCreationRequest;
 import com.jobportal.dtos.resources.ApplicationDetailResource;
 import com.jobportal.dtos.resources.ApplicationListItemForCompanyResource;
 import com.jobportal.dtos.resources.ApplicationResource;
+import com.jobportal.dtos.resources.CandidateResource;
 import com.jobportal.entities.*;
-import com.jobportal.mappers.ApplicationMapper;
-import com.jobportal.mappers.ResumeMapper;
+import com.jobportal.mappers.*;
 import com.jobportal.repositories.*;
 import com.jobportal.services.interfaces.ApplicationServiceInterface;
 import jakarta.persistence.EntityNotFoundException;
@@ -29,6 +29,9 @@ public class ApplicationService implements ApplicationServiceInterface {
     private final CompanyAdminRepository companyAdminRepository;
     private final ResumeRepository resumeRepository;
     private final ResumeMapper resumeMapper;
+    private final UserMapper userMapper;
+    private final UserSkillMapper userSkillMapper;
+    private final ApplicationStatusMapper applicationStatusMapper;
 
     @Override
     @Transactional // write
@@ -112,6 +115,29 @@ public class ApplicationService implements ApplicationServiceInterface {
         dto.setResume(resumeMapper.tResource(resume));
 
         return dto;
+    }
+
+    @Override
+    public CandidateResource getCandidateInfomations(Long applicationId) {
+        Application application = applicationRepository.findDetailById(applicationId)
+                .orElseThrow(() -> new EntityNotFoundException("Application không tồn tại"));
+
+        User user = application.getUser();
+        CandidateResource.CandidateResourceBuilder candidateResourceBuilder =
+                userMapper.tCandidateResource(user).toBuilder();
+
+        if (user.getUserSkills() != null) {
+            candidateResourceBuilder.skills(userSkillMapper.tResourceList(user.getUserSkills()));
+        }
+
+        Resume resume = resumeRepository.findById(application.getResumeId())
+                .orElseThrow(() -> new EntityNotFoundException("Resume không tồn tại"));
+        candidateResourceBuilder.resume(resumeMapper.tResource(resume));
+
+        ApplicationStatus status = application.getStatus();
+        candidateResourceBuilder.status(applicationStatusMapper.tResource(status));
+        candidateResourceBuilder.coverLetter(application.getCoverLetter());
+        return candidateResourceBuilder.build();
     }
 }
 

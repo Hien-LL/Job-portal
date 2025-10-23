@@ -2,13 +2,12 @@ package com.jobportal.services.impl;
 
 import com.jobportal.commons.BaseService;
 import com.jobportal.dtos.requests.updation.UserUpdationRequest;
-import com.jobportal.dtos.resources.UserDetailsResource;
-import com.jobportal.dtos.resources.UserProfileResource;
+import com.jobportal.dtos.resources.*;
 import com.jobportal.entities.User;
 import com.jobportal.mappers.UserMapper;
 import com.jobportal.repositories.UserRepository;
 import com.jobportal.securities.configs.UploadConfig;
-import com.jobportal.services.interfaces.UserServiceInterface;
+import com.jobportal.services.interfaces.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -35,6 +34,10 @@ public class UserService extends BaseService implements UserServiceInterface {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final UploadConfig uploadConfig;
+    private final UserSkillServiceInterface userSkillService;
+    private final ResumeServiceInterface resumeService;
+    private final ApplicationStatusServiceInterface applicationStatusService;
+    private final ApplicationServiceInterface applicationService;
 
     @Override
     public UserProfileResource update(Long id, UserUpdationRequest request) {

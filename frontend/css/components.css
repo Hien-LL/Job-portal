@@ -1,0 +1,104 @@
+/* Reusable Component Styles */
+
+/* Buttons */
+.btn-primary {
+    @apply px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors;
+}
+
+.btn-secondary {
+    @apply px-6 py-2 bg-gray-200 text-gray-900 rounded-lg font-medium hover:bg-gray-300 transition-colors;
+}
+
+.btn-outline {
+    @apply px-6 py-2 border-2 border-blue-600 text-blue-600 rounded-lg font-medium hover:bg-blue-50 transition-colors;
+}
+
+/* Cards */
+.card {
+    @apply bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-4;
+}
+
+.job-card {
+    @apply bg-white rounded-lg shadow hover:shadow-lg p-6 transition-shadow border-l-4 border-blue-600;
+}
+
+.card-border {
+    @apply bg-white rounded-lg border border-gray-200 p-5 hover:shadow-md transition;
+}
+
+/* Typography */
+.section-title {
+    @apply text-3xl font-bold text-gray-900 mb-8;
+}
+
+.subtitle {
+    @apply text-gray-600 text-sm;
+}
+
+/* Forms */
+.form-input {
+    @apply w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+}
+
+.form-label {
+    @apply block text-sm font-medium text-gray-700 mb-2;
+}
+
+/* Utilities */
+.flex-center {
+    @apply flex items-center justify-center;
+}
+
+.text-link {
+    @apply text-blue-600 hover:underline font-medium;
+}
+
+.badge {
+    @apply bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-semibold;
+}
+
+.badge-success {
+    @apply bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-semibold;
+}
+
+.badge-danger {
+    @apply bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-semibold;
+}
+
+/* Responsive Grid */
+.grid-responsive {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+}
+
+.grid-responsive-4 {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6;
+}
+
+/* Animation */
+.fade-in {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.slide-in {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(10px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

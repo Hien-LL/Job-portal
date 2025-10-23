@@ -152,8 +152,11 @@ public class AuthController {
 
             String newToken = jwtService.generateToken(userId, email, null);
             String newRefreshToken =jwtService.generateRefreshToken(userId, email);
-
-            return ResponseEntity.ok(new RefreshTokenResource(newToken, newRefreshToken));
+            ApiResource<LoginResource> response = ApiResource.ok(
+                    new LoginResource(newToken, newRefreshToken, new AuthResource(userId)),
+                    "Làm mới token thành công"
+            );
+            return ResponseEntity.ok(response);
         }
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
                 ApiResource.error("INTERNAL_SERVER_ERROR", "Có lỗi gì đó xảy ra ", HttpStatus.INTERNAL_SERVER_ERROR
