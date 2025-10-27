@@ -18,6 +18,8 @@ public class Job {
     private Long id;
 
     private String title;
+
+    @Column(columnDefinition = "TEXT")
     private String description;
     private boolean isRemote;
     private int salaryMax;

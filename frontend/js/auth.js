@@ -17,6 +17,9 @@ const AUTH_CONFIG = {
         USER_ID: 'user_id',
         LOGIN_TIME: 'login_time'
     }
+    ,
+    // Duration (ms) for login_time: 12 hours
+    LOGIN_DURATION_MS: 12 * 60 * 60 * 1000
 };
 
 class AuthService {
@@ -48,7 +51,8 @@ class AuthService {
 
     // Get login time
     getLoginTime() {
-        return localStorage.getItem(AUTH_CONFIG.STORAGE_KEYS.LOGIN_TIME);
+        const v = localStorage.getItem(AUTH_CONFIG.STORAGE_KEYS.LOGIN_TIME);
+        return v ? parseInt(v, 10) : null;
     }
 
     // Store authentication data
@@ -57,7 +61,9 @@ class AuthService {
             localStorage.setItem(AUTH_CONFIG.STORAGE_KEYS.ACCESS_TOKEN, data.token);
             localStorage.setItem(AUTH_CONFIG.STORAGE_KEYS.REFRESH_TOKEN, data.refreshToken);
             localStorage.setItem(AUTH_CONFIG.STORAGE_KEYS.USER_ID, data.user.id.toString());
-            localStorage.setItem(AUTH_CONFIG.STORAGE_KEYS.LOGIN_TIME, new Date().toISOString());
+            // Store login expiry timestamp (ms). Set to now + LOGIN_DURATION_MS (12 hours)
+            const expiry = Date.now() + AUTH_CONFIG.LOGIN_DURATION_MS;
+            localStorage.setItem(AUTH_CONFIG.STORAGE_KEYS.LOGIN_TIME, expiry.toString());
             
             console.log('Auth data stored successfully');
             return true;

@@ -180,14 +180,15 @@
                     <div class="space-y-2">
                         <div id="company-website" class="flex items-center gap-2 text-sm">
                             <span>🌐</span>
-                            <a href="#" class="text-blue-600 hover:underline">Website</a>
+                            <a href="#" class="text-blue-600 hover:underline" onclick="event.preventDefault(); viewCompany('${job.company.slug}', '${job.company.id}')">Website</a>
                         </div>
                         <div id="company-followers" class="flex items-center gap-2 text-sm text-gray-600">
                             <span>👥</span>
                             <span>0 người theo dõi</span>
                         </div>
                     </div>
-                    <button class="w-full mt-4 btn-outline text-sm py-2">
+                    <button class="w-full mt-4 btn-outline text-sm py-2"
+                        onclick="viewCompany('${job.company.slug}')">
                         Xem thông tin công ty
                     </button>
                 </div>
@@ -227,6 +228,10 @@
         let currentJobId = null;
         let isJobSaved = false;
 
+        function viewCompany(slug, companyId) {
+            window.location.href = `company-detail.html?slug=${currentCompanySlug.replace(/"/g, '')}`;
+        }
+
         // Get job slug from URL parameters
         function getJobSlugFromURL() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -264,6 +269,7 @@
             // Store job info globally
             currentJobSlug = job.slug;
             currentJobId = job.id;
+            currentCompanySlug = job.company?.slug;
 
             // Update page title
             document.title = `${job.title} - ${job.company?.name} | jobPortal`;
@@ -429,16 +435,22 @@
 
         function formatPublishedDate(dateString) {
             if (!dateString) return 'Không xác định';
-            
+
             const publishedDate = new Date(dateString);
             const now = new Date();
-            const diffTime = Math.abs(now - publishedDate);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            
+
+            // reset giờ để chỉ so sánh theo ngày
+            publishedDate.setHours(0, 0, 0, 0);
+            now.setHours(0, 0, 0, 0);
+
+            const diffTime = now - publishedDate;
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays === 0) return 'Đăng hôm nay';
             if (diffDays === 1) return 'Đăng hôm qua';
             if (diffDays < 7) return `Đăng ${diffDays} ngày trước`;
-            if (diffDays < 30) return `Đăng ${Math.ceil(diffDays / 7)} tuần trước`;
-            return `Đăng ${Math.ceil(diffDays / 30)} tháng trước`;
+            if (diffDays < 30) return `Đăng ${Math.floor(diffDays / 7)} tuần trước`;
+            return `Đăng ${Math.floor(diffDays / 30)} tháng trước`;
         }
 
         function formatDate(dateString) {
@@ -468,10 +480,51 @@
             }
         }
 
-        function formatDescription(description) {
-            // Convert line breaks to HTML
-            return description.replace(/\n/g, '<br>');
+        function formatDescription(md) {
+        if (!md) return '';
+
+        let html = md
+            // Escape ký tự đặc biệt
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+
+            // Heading (##, ###, ####, etc.)
+            .replace(/^###### (.*)$/gm, '<h6>$1</h6>')
+            .replace(/^##### (.*)$/gm, '<h5>$1</h5>')
+            .replace(/^#### (.*)$/gm, '<h4>$1</h4>')
+            .replace(/^### (.*)$/gm, '<h3>$1</h3>')
+            .replace(/^## (.*)$/gm, '<h2>$1</h2>')
+            .replace(/^# (.*)$/gm, '<h1>$1</h1>')
+
+            // Horizontal line
+            .replace(/^---$/gm, '<hr>')
+
+            // Bold, italic, code inline
+            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.+?)\*/g, '<em>$1</em>')
+            .replace(/`([^`]+)`/g, '<code>$1</code>')
+
+            // Links [text](url)
+            .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">$1</a>')
+
+            // Blockquote
+            .replace(/^> (.+)$/gm, '<blockquote class="border-l-4 border-gray-300 pl-4 italic text-gray-600">$1</blockquote>')
+
+            // Unordered lists (- item)
+            .replace(/^\s*[-*] (.+)$/gm, '<li>$1</li>')
+            .replace(/(<li>[\s\S]+?<\/li>)/gm, '<ul class="list-disc pl-6">$1</ul>')
+
+            // Line breaks
+            .replace(/\n{2,}/g, '</p><p>')
+            .replace(/\n/g, '<br>');
+
+        // Gói lại toàn bộ trong <p> nếu chưa có block
+        html = `<p>${html}</p>`;
+        
+        return html;
         }
+
 
         function getCategoryIcon(categoryName) {
             const categoryIcons = {

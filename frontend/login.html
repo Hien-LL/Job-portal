@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/components.css">
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -19,37 +20,8 @@
     </style>
 </head>
 <body class="bg-white">
-    <!-- Navigation Header -->
-    <header class="bg-white shadow-sm border-b border-gray-200">
-        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
-            <!-- Logo -->
-            <a href="index.html" class="flex items-center gap-2">
-                <span class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">jobPortal</span>
-            </a>
-
-            <!-- Desktop Menu -->
-            <div class="hidden md:flex items-center gap-8">
-                <a href="index.html" class="text-gray-700 hover:text-blue-600 transition text-sm font-medium">Việc làm</a>
-                <a href="#" class="text-gray-700 hover:text-blue-600 transition text-sm font-medium">Danh mục ▼</a>
-                <a href="#" class="text-gray-700 hover:text-blue-600 transition text-sm font-medium">Công ty</a>
-                <a href="#" class="text-gray-700 hover:text-blue-600 transition text-sm font-medium">Liên hệ</a>
-            </div>
-
-            <!-- Auth Buttons -->
-            <div class="flex items-center gap-3">
-                <a href="login.html" class="text-gray-700 text-sm font-medium hover:text-blue-600">Đăng nhập</a>
-                <button class="bg-blue-600 text-white px-4 py-2 rounded font-semibold hover:bg-blue-700 transition text-sm">Đăng ký</button>
-                <button class="bg-cyan-500 text-white px-4 py-2 rounded font-semibold hover:bg-cyan-600 transition text-sm">Đăng tin tuyển dụng</button>
-            </div>
-
-            <!-- Mobile Menu Button -->
-            <button class="md:hidden text-gray-700">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                </svg>
-            </button>
-        </nav>
-    </header>
+    <!-- Header Fragment -->
+    <div data-fragment="fragments/header.html"></div>
 
     <!-- Login Section -->
     <section class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -141,84 +113,11 @@
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="bg-gray-900 text-gray-300 py-12 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-7xl mx-auto">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-                <!-- About -->
-                <div>
-                    <div class="flex items-center gap-2 mb-4">
-                        <span class="text-xl font-bold text-white">jobPortal</span>
-                    </div>
-                    <p class="text-xs text-gray-400 mb-4">
-                        Nền tảng tìm kiếm việc làm và nhà tuyển dụng hàng đầu Việt Nam
-                    </p>
-                    <div class="space-y-2 text-xs text-gray-400">
-                        <div class="flex items-start gap-2">
-                            <span>📍</span>
-                            <span>123 Đường ABC, Quận 1, TP. Hồ Chí Minh</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span>📞</span>
-                            <span>0123 456 789</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span>✉️</span>
-                            <span>contact@jobportal.vn</span>
-                        </div>
-                    </div>
-                </div>
+    <!-- Footer Fragment -->
+    <div data-fragment="fragments/footer.html"></div>
 
-                <!-- For Candidates -->
-                <div>
-                    <h3 class="text-white font-bold mb-4 text-sm">Dành cho ứng viên</h3>
-                    <ul class="space-y-2 text-xs">
-                        <li><a href="#" class="hover:text-white transition">Tìm việc làm</a></li>
-                        <li><a href="#" class="hover:text-white transition">Tạo hồ sơ sơ</a></li>
-                        <li><a href="#" class="hover:text-white transition">Việc làm đề xuất</a></li>
-                        <li><a href="#" class="hover:text-white transition">Mẹo tìm việc</a></li>
-                    </ul>
-                </div>
-
-                <!-- For Employers -->
-                <div>
-                    <h3 class="text-white font-bold mb-4 text-sm">Dành cho nhà tuyển dụng</h3>
-                    <ul class="space-y-2 text-xs">
-                        <li><a href="#" class="hover:text-white transition">Đăng tin tuyển dụng</a></li>
-                        <li><a href="#" class="hover:text-white transition">Quản lý công ty</a></li>
-                        <li><a href="#" class="hover:text-white transition">Bảng giá dịch vụ</a></li>
-                        <li><a href="#" class="hover:text-white transition">Mẹo tìm việc</a></li>
-                    </ul>
-                </div>
-
-                <!-- Other Info -->
-                <div>
-                    <h3 class="text-white font-bold mb-4 text-sm">Thông tin khác</h3>
-                    <ul class="space-y-2 text-xs">
-                        <li><a href="#" class="hover:text-white transition">Về chúng tôi</a></li>
-                        <li><a href="#" class="hover:text-white transition">Chính sách bảo mật</a></li>
-                        <li><a href="#" class="hover:text-white transition">Điều khoản sử dụng</a></li>
-                        <li><a href="#" class="hover:text-white transition">Liên hệ</a></li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Social & Bottom -->
-            <div class="border-t border-gray-800 pt-8">
-                <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                    <p class="text-xs text-gray-400">
-                        © 2025 jobPortal. Tất cả các quyền được bảo lưu.
-                    </p>
-                    <div class="flex gap-4 text-lg">
-                        <a href="#" class="text-gray-400 hover:text-white transition">f</a>
-                        <a href="#" class="text-gray-400 hover:text-white transition">𝕏</a>
-                        <a href="#" class="text-gray-400 hover:text-white transition">📷</a>
-                        <a href="#" class="text-gray-400 hover:text-white transition">in</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </footer>
+    <!-- Fragment Loader & Auth -->
+    <script src="js/fragments-loader.js"></script>
 
     <!-- Scripts -->
     <script>
@@ -439,7 +338,7 @@
                 });
                 
                 // Optional: Auto redirect or show logged in status
-                // window.location.href = 'index.html';
+                window.location.href = 'index.html';
             }
         });
 

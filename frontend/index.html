@@ -526,9 +526,7 @@
         }
 
         function viewCompany(slug, companyId) {
-            console.log(`View company: ${slug} (ID: ${companyId})`);
-            // TODO: Implement company detail page
-            alert(`Tính năng xem chi tiết công ty "${slug}" sẽ được triển khai soon!`);
+            window.location.href = `company-detail.html?slug=${slug}`;
         }
 
         function showCompaniesError(message) {
