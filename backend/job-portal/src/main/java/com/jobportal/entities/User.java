@@ -38,6 +38,7 @@ public class User extends BaseEntity {
 
     private String headline;
 
+    @Column(name = "summary", length = 2000)
     private String summary;
 
     private String avatarUrl;

@@ -50,7 +50,9 @@
                                 <p id="company-name" class="text-gray-600 text-sm">
                                     <!-- Company name will be inserted here -->
                                 </p>
-                                <span id="company-verified" class="hidden inline-block w-3 h-3 bg-blue-500 rounded-full" title="Công ty đã xác thực"></span>
+                                <svg id="company-verified" class="hidden w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 20 20" title="Công ty đã xác thực">
+                                    <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                </svg>
                             </div>
                             <div class="flex items-center gap-4 text-sm text-gray-600">
                                 <span id="job-location">📍 </span>
@@ -217,11 +219,62 @@
         </div>
     </div>
 
+    <!-- Apply Job Modal -->
+    <div id="apply-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                <h2 class="text-xl font-bold text-gray-900">Ứng tuyển vị trí này</h2>
+                <button onclick="closeApplyModal()" class="text-gray-500 hover:text-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-6 space-y-4">
+                <!-- Job Info Display -->
+                <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                    <h3 id="modal-job-title" class="font-semibold text-gray-900 mb-1"></h3>
+                    <p id="modal-job-company" class="text-gray-600 text-sm"></p>
+                </div>
+
+                <!-- Resume Selection -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Chọn CV của bạn <span class="text-red-500">*</span></label>
+                    <select id="resume-select" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">-- Chọn CV --</option>
+                    </select>
+                    <p class="text-xs text-gray-500 mt-1">Bạn chưa có CV? <a href="cv-management.html" class="text-blue-600 hover:underline">Tạo CV ngay</a></p>
+                </div>
+
+                <!-- Cover Letter -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Thư xin việc (tùy chọn)</label>
+                    <textarea id="cover-letter" placeholder="Viết thư xin việc để tăng cơ hội được chọn..." rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                    <p class="text-xs text-gray-500 mt-1" id="cover-letter-count">0/1000 ký tự</p>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="flex items-center justify-end gap-3 p-6 border-t border-gray-200">
+                <button onclick="closeApplyModal()" class="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                    Hủy
+                </button>
+                <button onclick="submitApplication()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                    Ứng tuyển ngay
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Footer Fragment -->
     <div data-fragment="fragments/footer.html"></div>
 
     <!-- Fragment Loader & Job Detail Scripts -->
     <script src="js/fragments-loader.js"></script>
+    <script src="js/auth.js"></script>
     <script>
         // Global variables
         let currentJobSlug = '';
@@ -545,16 +598,171 @@
 
         function applyToJob(slug, jobId) {
             // Check if user is logged in
-            const token = localStorage.getItem('access_token');
-            if (!token) {
+            if (!authService.isAuthenticated()) {
                 alert('Vui lòng đăng nhập để ứng tuyển');
                 window.location.href = 'login.html';
                 return;
             }
             
-            // TODO: Implement job application logic
-            console.log(`Apply to job: ${slug} (ID: ${jobId})`);
-            alert(`Tính năng ứng tuyển cho "${slug}" sẽ được triển khai soon!`);
+            // Load resumes and show apply modal
+            loadUserResumes().then(() => {
+                openApplyModal(slug, jobId);
+            });
+        }
+
+        // Load user resumes for selection
+        async function loadUserResumes() {
+            try {
+                const token = authService.getToken();
+                const response = await fetch('http://localhost:8080/api/resumes/me', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load resumes');
+                }
+
+                const result = await response.json();
+                if (result.success && result.data) {
+                    populateResumeSelect(result.data);
+                    return true;
+                }
+                return false;
+            } catch (error) {
+                console.error('Error loading resumes:', error);
+                alert('Lỗi khi tải danh sách CV');
+                return false;
+            }
+        }
+
+        // Populate resume select dropdown
+        function populateResumeSelect(resumes) {
+            const select = document.getElementById('resume-select');
+            select.innerHTML = '<option value="">-- Chọn CV --</option>';
+
+            if (resumes.length === 0) {
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = 'Bạn chưa có CV';
+                option.disabled = true;
+                select.appendChild(option);
+                return;
+            }
+
+            resumes.forEach(resume => {
+                const option = document.createElement('option');
+                option.value = resume.id;
+                option.textContent = `${resume.title}${resume.isDefault ? ' (Mặc định)' : ''}`;
+                select.appendChild(option);
+            });
+
+            // Set default resume as selected
+            const defaultResume = resumes.find(r => r.isDefault);
+            if (defaultResume) {
+                select.value = defaultResume.id;
+            }
+        }
+
+        // Open apply modal
+        function openApplyModal(slug, jobId) {
+            currentJobSlug = slug;
+            currentJobId = jobId;
+
+            // Populate job info in modal
+            document.getElementById('modal-job-title').textContent = document.getElementById('job-title').textContent;
+            document.getElementById('modal-job-company').textContent = document.getElementById('company-name').textContent;
+
+            // Clear form
+            document.getElementById('resume-select').value = '';
+            document.getElementById('cover-letter').value = '';
+            document.getElementById('cover-letter-count').textContent = '0/1000 ký tự';
+
+            document.getElementById('apply-modal').classList.remove('hidden');
+        }
+
+        // Close apply modal
+        function closeApplyModal() {
+            document.getElementById('apply-modal').classList.add('hidden');
+        }
+
+        // Handle cover letter character count
+        document.addEventListener('DOMContentLoaded', () => {
+            const coverLetterInput = document.getElementById('cover-letter');
+            if (coverLetterInput) {
+                coverLetterInput.addEventListener('input', function() {
+                    const count = this.value.length;
+                    document.getElementById('cover-letter-count').textContent = `${count}/1000 ký tự`;
+                    
+                    if (count > 1000) {
+                        this.value = this.value.substring(0, 1000);
+                    }
+                });
+            }
+        });
+
+        // Submit application
+        async function submitApplication() {
+            try {
+                const resumeId = document.getElementById('resume-select').value;
+                const coverLetter = document.getElementById('cover-letter').value.trim();
+
+                // Validation
+                if (!resumeId) {
+                    alert('Vui lòng chọn CV');
+                    return;
+                }
+
+                if (!currentJobId) {
+                    alert('Không có thông tin việc làm');
+                    return;
+                }
+
+                // Show loading state
+                const submitBtn = event.target;
+                const originalText = submitBtn.textContent;
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Đang ứng tuyển...';
+
+                const token = authService.getToken();
+                const response = await fetch(`http://localhost:8080/api/applications/${currentJobId}/apply`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        resumeId: parseInt(resumeId),
+                        coverLetter: coverLetter || ''
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Ứng tuyển thất bại');
+                }
+
+                const result = await response.json();
+                if (result.success) {
+                    alert('Ứng tuyển thành công! Chúc bạn may mắn.');
+                    closeApplyModal();
+                    // Update button state to show already applied
+                    document.getElementById('apply-btn').textContent = 'Đã ứng tuyển';
+                    document.getElementById('apply-btn').disabled = true;
+                } else {
+                    throw new Error(result.message || 'Ứng tuyển thất bại');
+                }
+            } catch (error) {
+                console.error('Error submitting application:', error);
+                alert(`Lỗi: ${error.message}`);
+            } finally {
+                const submitBtn = event.target;
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Ứng tuyển ngay';
+            }
         }
 
         function hideLoading() {

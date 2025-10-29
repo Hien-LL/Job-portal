@@ -137,6 +137,7 @@ public class ApplicationService implements ApplicationServiceInterface {
         ApplicationStatus status = application.getStatus();
         candidateResourceBuilder.status(applicationStatusMapper.tResource(status));
         candidateResourceBuilder.coverLetter(application.getCoverLetter());
+        candidateResourceBuilder.appliedAt(application.getAppliedAt());
         return candidateResourceBuilder.build();
     }
 }

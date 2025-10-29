@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết đơn ứng tuyển - JobPortal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- Header Fragment -->
+    <div data-fragment="fragments/header.html"></div>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Breadcrumb -->
+        <nav class="flex items-center space-x-2 text-sm text-gray-500 mb-6">
+            <a href="index.html" class="hover:text-blue-600">Trang chủ</a>
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-gray-900">Dashboard ứng viên</span>
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <a href="applications.html" class="hover:text-blue-600">Đơn ứng tuyển</a>
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-gray-900">Chi tiết</span>
+        </nav>
+
+        <!-- Loading State -->
+        <div id="loading" class="flex justify-center items-center py-20">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+
+        <!-- Content -->
+        <div id="content" class="hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <!-- Main Content -->
+                <div class="lg:col-span-3">
+                    <!-- Candidate Info Card -->
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-6">
+                        <div class="bg-gradient-to-r from-blue-600 to-blue-400 h-24"></div>
+                        <div class="p-6">
+                            <div class="flex gap-6">
+                                <img id="candidate-avatar" src="" alt="Avatar" class="w-32 h-32 rounded-full object-cover -mt-20 border-4 border-white shadow-lg">
+                                <div class="flex-1 pt-4">
+                                    <h1 id="candidate-name" class="text-3xl font-bold text-gray-900 mb-1"></h1>
+                                    <p id="candidate-headline" class="text-lg text-blue-600 font-medium mb-4"></p>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-600">
+                                        <div class="flex items-center gap-2">
+                                            <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
+                                            </svg>
+                                            <span id="candidate-email"></span>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path>
+                                            </svg>
+                                            <span id="candidate-phone"></span>
+                                        </div>
+                                        <div class="flex items-center gap-2 col-span-1 md:col-span-2">
+                                            <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                                            </svg>
+                                            <span id="candidate-address"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Personal Summary -->
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-4">Tóm tắt cá nhân</h2>
+                        <p id="candidate-summary" class="text-gray-700 leading-relaxed">Chưa có tóm tắt</p>
+                    </div>
+
+                    <!-- Skills -->
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-4">Kỹ năng</h2>
+                        <div id="skills-container" class="flex flex-wrap gap-2">
+                            <!-- Skills will be loaded here -->
+                        </div>
+                    </div>
+
+                    <!-- Cover Letter -->
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-4">Thư xin việc</h2>
+                        <p id="cover-letter" class="text-gray-700 leading-relaxed line-clamp-4">Chưa có thư xin việc</p>
+                    </div>
+
+                    <!-- Resume Section -->
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-6">Thông tin CV</h2>
+                        
+                        <!-- Resume Title & Summary -->
+                        <div id="resume-info" class="mb-6 pb-6 border-b border-gray-200">
+                            <h3 id="resume-title" class="text-base font-semibold text-gray-900 mb-2"></h3>
+                            <p id="resume-summary" class="text-gray-700 text-sm leading-relaxed"></p>
+                        </div>
+
+                        <!-- Experience -->
+                        <div id="experience-section" class="mb-6 pb-6 border-b border-gray-200">
+                            <h3 class="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"></path>
+                                </svg>
+                                Kinh nghiệm làm việc
+                            </h3>
+                            <div id="experience-container" class="space-y-4">
+                                <!-- Experience will be loaded here -->
+                            </div>
+                        </div>
+
+                        <!-- Education -->
+                        <div id="education-section" class="mb-6 pb-6 border-b border-gray-200">
+                            <h3 class="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
+                                </svg>
+                                Học vấn
+                            </h3>
+                            <div id="education-container" class="space-y-4">
+                                <!-- Education will be loaded here -->
+                            </div>
+                        </div>
+
+                        <!-- Files -->
+                        <div id="files-section" style="display: none;">
+                            <h3 class="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                <svg class="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M4 4a2 2 0 012-2h6a1 1 0 10-1 1v12a1 1 0 11-2 0V4zm10 0a2 2 0 012-2h6a2 2 0 012 2v12a2 2 0 01-2 2h-6a2 2 0 01-2-2V4zm4 10a1 1 0 100-2 1 1 0 000 2z"></path>
+                                </svg>
+                                Tệp đính kèm
+                            </h3>
+                            <div id="files-container" class="space-y-2">
+                                <!-- Files will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Timeline -->
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z" clip-rule="evenodd"></path>
+                            </svg>
+                            Lịch sử thay đổi trạng thái
+                        </h2>
+                        <div id="timeline-container" class="space-y-4">
+                            <!-- Timeline will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <aside class="lg:col-span-1">
+                    <div class="space-y-6 sticky top-8">
+                        <!-- Status Card -->
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                            <h3 class="text-xs font-semibold text-gray-600 uppercase mb-4 tracking-wider">Trạng thái</h3>
+                            <div id="status-badge" class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-blue-100 text-blue-800 mb-4 w-full justify-center">
+                                Chưa xác định
+                            </div>
+                            <div class="pt-4 border-t border-gray-200">
+                                <p class="text-xs text-gray-600 uppercase font-semibold mb-2 tracking-wider">Ngày ứng tuyển</p>
+                                <p id="applied-date" class="text-gray-900 font-medium">-</p>
+                            </div>
+                        </div>
+
+                        <!-- Job Info -->
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                            <h3 class="text-xs font-semibold text-gray-600 uppercase mb-4 tracking-wider">Vị trí ứng tuyển</h3>
+                            <h4 id="job-title" class="font-semibold text-gray-900 mb-1"></h4>
+                            <p id="job-company" class="text-gray-600 text-sm mb-4"></p>
+                            <a href="#" id="job-link" class="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium text-sm transition">
+                                Xem chi tiết
+                                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </a>
+                        </div>
+
+                        <!-- Action -->
+                        <button onclick="window.location.href='applications.html'" class="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition font-medium flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                            Quay lại
+                        </button>
+                    </div>
+                </aside>
+            </div>
+        </div>
+
+        <!-- Error State -->
+        <div id="error-state" class="hidden text-center py-20">
+            <div class="text-red-500 mb-4">
+                <svg class="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                </svg>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">Không tìm thấy đơn ứng tuyển</h3>
+            <p class="text-gray-600 mb-4">Đơn ứng tuyển này có thể đã bị xóa hoặc không tồn tại</p>
+            <button onclick="window.location.href='applications.html'" class="bg-blue-600 text-white px-4 py-2 rounded font-medium hover:bg-blue-700 transition">
+                Quay lại danh sách
+            </button>
+        </div>
+    </main>
+
+    <!-- Footer Fragment -->
+    <div data-fragment="fragments/footer.html"></div>
+
+    <!-- Scripts -->
+    <script src="js/fragments-loader.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        let currentApplicationId = null;
+
+        // Get application ID from URL
+        function getApplicationIdFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id');
+        }
+
+        // Load application detail
+        async function loadApplicationDetail() {
+            try {
+                const appId = getApplicationIdFromURL();
+                if (!appId) {
+                    showError();
+                    return;
+                }
+
+                currentApplicationId = appId;
+
+                if (!authService.isAuthenticated()) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                const token = authService.getToken();
+                const response = await fetch(`http://localhost:8080/api/applications/candidate-info/${appId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load application');
+                }
+
+                const result = await response.json();
+                if (result.success && result.data) {
+                    displayApplicationDetail(result.data);
+                    loadApplicationTimeline(appId);
+                    
+                    document.getElementById('loading').classList.add('hidden');
+                    document.getElementById('content').classList.remove('hidden');
+                } else {
+                    throw new Error('Invalid response');
+                }
+            } catch (error) {
+                console.error('Error loading application detail:', error);
+                showError();
+            }
+        }
+
+        // Display application detail
+        function displayApplicationDetail(data) {
+            // Candidate info
+            document.getElementById('candidate-name').textContent = data.name || 'Chưa xác định';
+            document.getElementById('candidate-headline').textContent = data.headline || 'Chưa xác định';
+            document.getElementById('candidate-email').textContent = data.email || 'Chưa xác định';
+            document.getElementById('candidate-phone').textContent = data.phone || 'Chưa xác định';
+            document.getElementById('candidate-address').textContent = data.address || 'Chưa xác định';
+            
+            // Render summary with Markdown support
+            if (data.summary) {
+                const htmlContent = DOMPurify.sanitize(marked.parse(data.summary));
+                document.getElementById('candidate-summary').innerHTML = htmlContent;
+            } else {
+                document.getElementById('candidate-summary').textContent = 'Chưa có tóm tắt';
+            }
+            
+            if (data.avatarUrl) {
+                document.getElementById('candidate-avatar').src = `http://localhost:8080${data.avatarUrl}`;
+            } else {
+                document.getElementById('candidate-avatar').src = 'https://via.placeholder.com/128/6B7280/FFFFFF?text=' + (data.name ? data.name.charAt(0) : 'U');
+            }
+
+            // Cover letter
+            if (data.coverLetter) {
+                document.getElementById('cover-letter').textContent = data.coverLetter;
+            }
+
+            // Status
+            const statusBadge = document.getElementById('status-badge');
+            const statusClass = getStatusClass(data.status?.code);
+            statusBadge.className = `inline-flex items-center px-4 py-2 rounded-full text-sm font-medium ${statusClass} w-full justify-center`;
+            statusBadge.textContent = data.status?.name || 'Chưa xác định';
+
+            // Applied date
+            document.getElementById('applied-date').textContent = formatDate(data.appliedAt);
+
+            // Skills
+            if (data.skills && data.skills.length > 0) {
+                document.getElementById('skills-container').innerHTML = data.skills.map(skill => `
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                        ${skill.name}
+                    </span>
+                `).join('');
+            } else {
+                document.getElementById('skills-container').innerHTML = '<p class="text-gray-500 text-sm">Chưa có kỹ năng</p>';
+            }
+
+            // Resume info
+            if (data.resume) {
+                const resume = data.resume;
+                document.getElementById('resume-title').textContent = resume.title || 'CV không có tiêu đề';
+                document.getElementById('resume-summary').textContent = resume.summary || 'Chưa có mô tả';
+
+                // Experience
+                if (resume.experiences && resume.experiences.length > 0) {
+                    document.getElementById('experience-container').innerHTML = resume.experiences.map(exp => `
+                        <div class="border-l-4 border-blue-500 pl-4 pb-4">
+                            <h4 class="font-semibold text-gray-900">${exp.position || 'Chưa xác định'}</h4>
+                            <p class="text-blue-600 font-medium text-sm">${exp.company || 'Chưa xác định'}</p>
+                            <p class="text-gray-600 text-xs mt-1">
+                                ${formatDate(exp.startDate)} - ${exp.current ? 'Hiện tại' : formatDate(exp.endDate)}
+                            </p>
+                            ${exp.current ? '<span class="inline-block mt-2 text-green-600 text-xs font-medium">● Đang làm việc</span>' : ''}
+                            <p class="text-gray-700 text-sm mt-2">${exp.description || 'Chưa có mô tả'}</p>
+                        </div>
+                    `).join('');
+                } else {
+                    document.getElementById('experience-container').innerHTML = '<p class="text-gray-500 text-sm">Chưa có kinh nghiệm</p>';
+                }
+
+                // Education
+                if (resume.educations && resume.educations.length > 0) {
+                    document.getElementById('education-container').innerHTML = resume.educations.map(edu => `
+                        <div class="border-l-4 border-green-500 pl-4 pb-4">
+                            <h4 class="font-semibold text-gray-900">${edu.degree || 'Chưa xác định'}</h4>
+                            <p class="text-green-600 font-medium text-sm">${edu.school || 'Chưa xác định'}</p>
+                            <p class="text-gray-600 text-xs mt-1">
+                                ${formatDate(edu.startDate)} - ${formatDate(edu.endDate)}
+                            </p>
+                            <p class="text-gray-700 text-sm mt-2">Chuyên ngành: ${edu.major || 'Chưa xác định'}</p>
+                        </div>
+                    `).join('');
+                } else {
+                    document.getElementById('education-container').innerHTML = '<p class="text-gray-500 text-sm">Chưa có thông tin học vấn</p>';
+                }
+
+                // Files
+                if (resume.files && resume.files.length > 0) {
+                    document.getElementById('files-section').style.display = 'block';
+                    document.getElementById('files-container').innerHTML = resume.files.map(file => `
+                        <a href="http://localhost:8080${file.fileUrl}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition">
+                            <svg class="w-5 h-5 text-purple-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M4 4a2 2 0 012-2h6a1 1 0 10-1 1v12a1 1 0 11-2 0V4zm10 0a2 2 0 012-2h6a2 2 0 012 2v12a2 2 0 01-2 2h-6a2 2 0 01-2-2V4zm4 10a1 1 0 100-2 1 1 0 000 2z"></path>
+                            </svg>
+                            <div>
+                                <p class="text-sm font-medium text-gray-900">${file.fileType || 'Tệp'}</p>
+                                <p class="text-xs text-gray-600">Tải lên ${formatDate(file.uploadedAt)}</p>
+                            </div>
+                            <svg class="w-4 h-4 text-gray-400 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </a>
+                    `).join('');
+                }
+            }
+
+            // Job info (load from API)
+            loadJobDetail(data.resume?.id || null);
+        }
+
+        // Load job detail
+        async function loadJobDetail(resumeId) {
+            try {
+                // Get job ID from application (we'll need to store it)
+                // For now, we can try to load it from the job API
+                // This is a placeholder - actual implementation depends on API
+            } catch (error) {
+                console.error('Error loading job detail:', error);
+            }
+        }
+
+        // Load application timeline
+        async function loadApplicationTimeline(appId) {
+            try {
+                const token = authService.getToken();
+                const response = await fetch(`http://localhost:8080/api/applications/${appId}/timeline`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) return;
+
+                const result = await response.json();
+                if (result.success && result.data) {
+                    displayTimeline(result.data);
+                }
+            } catch (error) {
+                console.error('Error loading timeline:', error);
+            }
+        }
+
+        // Display timeline
+        function displayTimeline(timeline) {
+            const container = document.getElementById('timeline-container');
+            
+            if (timeline.length === 0) {
+                container.innerHTML = '<p class="text-gray-600 text-sm">Chưa có thay đổi trạng thái</p>';
+                return;
+            }
+
+            container.innerHTML = timeline.map((item, index) => `
+                <div class="flex gap-4">
+                    <div class="flex flex-col items-center">
+                        <div class="w-3 h-3 bg-blue-600 rounded-full mt-1.5"></div>
+                        ${index < timeline.length - 1 ? '<div class="w-0.5 h-16 bg-gray-200 mt-2"></div>' : ''}
+                    </div>
+                    <div class="pb-4">
+                        <div class="flex gap-2 items-center">
+                            <p class="font-medium text-gray-900">${item.oldStatusName}</p>
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                            <p class="font-medium text-gray-900">${item.newStatusName}</p>
+                        </div>
+                        <p class="text-gray-600 text-sm mt-1">${item.note || 'Không có ghi chú'}</p>
+                        <p class="text-gray-500 text-xs mt-2">${formatDate(item.changedAt)}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Get status badge class
+        function getStatusClass(statusCode) {
+            const statusClasses = {
+                'APPLIED': 'bg-blue-100 text-blue-800',
+                'INTERVIEWED': 'bg-purple-100 text-purple-800',
+                'OFFERED': 'bg-green-100 text-green-800',
+                'REJECTED': 'bg-red-100 text-red-800'
+            };
+            return statusClasses[statusCode] || 'bg-gray-100 text-gray-800';
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            if (!dateString) return 'Chưa xác định';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('vi-VN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+        }
+
+        // Show error
+        function showError() {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('content').classList.add('hidden');
+            document.getElementById('error-state').classList.remove('hidden');
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFragments().then(() => {
+                loadApplicationDetail();
+            });
+        });
+    </script>
+</body>
+</html>

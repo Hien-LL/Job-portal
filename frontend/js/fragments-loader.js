@@ -2,6 +2,8 @@
  * Load HTML fragment and insert into target element
  * Usage: <div data-fragment="fragments/header.html"></div>
  */
+
+
 async function loadFragments() {
     const fragments = document.querySelectorAll('[data-fragment]');
     
@@ -138,21 +140,28 @@ function clearAuthData() {
     localStorage.removeItem('login_time');
 }
 
-// Check token expiration (5 minutes = 300000ms)
+// Check token expiration (12 hours)
 function checkTokenExpiration() {
-    const loginTime = localStorage.getItem('login_time');
+    const loginExpiry = localStorage.getItem('login_expiry');
     const accessToken = localStorage.getItem('access_token');
     
-    if (!loginTime || !accessToken) {
+    if (!loginExpiry || !accessToken) {
         return;
     }
     
     const currentTime = Date.now();
-    const tokenAge = currentTime - parseInt(loginTime);
-    const fiveMinutes = 5 * 60 * 1000; // 5 minutes in milliseconds
+    const expiryTime = parseInt(loginExpiry);
     
-    // If token is older than 5 minutes, show expiration modal
-    if (tokenAge >= fiveMinutes) {
+    // If current time has passed expiry time, token is expired
+    if (currentTime > expiryTime) {
+        // Token expired, clear auth data
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        localStorage.removeItem('user_id');
+        localStorage.removeItem('login_time');
+        localStorage.removeItem('login_expiry');
+        
+        // Show expiration modal or redirect
         showTokenExpirationModal();
     }
 }
@@ -223,7 +232,10 @@ async function handleRefreshToken() {
                 if (result.data.refreshToken) {
                     localStorage.setItem('refresh_token', result.data.refreshToken);
                 }
+                // Update login time and expiry
                 localStorage.setItem('login_time', Date.now().toString());
+                const expiryTime = Date.now() + (12 * 60 * 60 * 1000);
+                localStorage.setItem('login_expiry', expiryTime.toString());
                 
                 // Remove modal
                 const modal = document.getElementById('token-expiration-modal');

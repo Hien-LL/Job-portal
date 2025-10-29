@@ -15,4 +15,6 @@ public class UserResource {
     private String name;
     private String phone;
     private String address;
+    private String headline;
+    private String description;
 }

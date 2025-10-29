@@ -199,12 +199,12 @@ public class UserController {
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/skills/{slug}")
-    ResponseEntity<?> addSkillToUser(@PathVariable String slug, @RequestParam int yearsExperience) {
+    ResponseEntity<?> addSkillToUser(@PathVariable String slug) {
         try {
             String email = SecurityContextHolder.getContext().getAuthentication().getName();
             Long userId = authService.getUserFromEmail(email).getId();
 
-            userSkillService.addSkillToUser(userId, slug, yearsExperience);
+            userSkillService.addSkillToUser(userId, slug);
             return ResponseEntity.ok(ApiResource.ok(null, "Thêm kỹ năng cho người dùng thành công"));
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)

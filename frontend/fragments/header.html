@@ -1,5 +1,5 @@
 <!-- Navigation Header -->
-<header class="bg-white shadow-sm sticky top-0 z-50 border-b border-gray-200" id="main-header">
+<header class="bg-white shadow-sm sticky top-0 border-b border-gray-200" id="main-header" style="z-index: 9999;">
     <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
         <!-- Logo -->
         <a href="index.html" class="flex items-center gap-2">
@@ -24,7 +24,7 @@
                     <button id="user-menu-trigger" class="text-gray-700 text-sm font-medium hover:text-blue-600 flex items-center gap-1">
                         Tài khoản ▼
                     </button>
-                    <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50">
+                    <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200" style="z-index: 9998;">
                         <div class="py-1">
                             <a href="profile.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Hồ sơ của tôi</a>
                             <a href="saved-jobs.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Việc làm đã lưu</a>
@@ -36,13 +36,12 @@
                         </div>
                     </div>
                 </div>
-                <button class="bg-cyan-500 text-white px-4 py-2 rounded font-semibold hover:bg-cyan-600 transition text-sm">Đăng tin tuyển dụng</button>
             </div>
 
             <!-- When not logged in -->
             <div id="not-logged-in-menu" class="flex items-center gap-3">
                 <a href="login.html" class="text-gray-700 text-sm font-medium hover:text-blue-600">Đăng nhập</a>
-                <a href="login.html" class="bg-blue-600 text-white px-4 py-2 rounded font-semibold hover:bg-blue-700 transition text-sm">Đăng ký</a>
+                <a href="register.html" class="bg-blue-600 text-white px-4 py-2 rounded font-semibold hover:bg-blue-700 transition text-sm">Đăng ký</a>
                 <button class="bg-cyan-500 text-white px-4 py-2 rounded font-semibold hover:bg-cyan-600 transition text-sm">Đăng tin tuyển dụng</button>
             </div>
         </div>

@@ -21,8 +21,7 @@ public class UserSkillService implements UserSkillServiceInterface {
     private final UserSkillRepository userSkillRepo;
 
     @Override
-    public void addSkillToUser(Long userId, String Slug, int yearsOfExperience) {
-        validateYears(yearsOfExperience);
+    public void addSkillToUser(Long userId, String Slug) {
 
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Người dùng không tồn tại"));
@@ -38,7 +37,6 @@ public class UserSkillService implements UserSkillServiceInterface {
                 .id(id)
                 .user(user)
                 .skill(skill)
-                .yearsExperience(yearsOfExperience)
                 .build();
         userSkillRepo.save(userSkill);
     }

@@ -5,12 +5,15 @@ import com.jobportal.commons.BaseSpecification;
 import com.jobportal.commons.Slugifier;
 import com.jobportal.dtos.requests.creation.JobCreationRequest;
 import com.jobportal.dtos.requests.updation.JobUpdationRequest;
+import com.jobportal.dtos.resources.CompanyResource;
 import com.jobportal.dtos.resources.JobResource;
 import com.jobportal.entities.*;
+import com.jobportal.mappers.CompanyMapper;
 import com.jobportal.mappers.JobMapper;
 import com.jobportal.repositories.*;
 import com.jobportal.securities.filters.FilterParameter;
 import com.jobportal.services.interfaces.JobServiceInterface;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,6 +37,8 @@ public class JobService extends BaseService implements JobServiceInterface {
     private final BenefitRepository benefitRepository;
     private final CategoryRepository categoryRepository;
     private final LocationRepository locationRepository;
+    private final CompanyMapper companyMapper;
+    private final FollowCompanyRepository followCompanyRepository;
 
     @Override
     public JobResource createJobForMyCompany(Long userId, Long companyId, JobCreationRequest request) {
@@ -75,7 +80,12 @@ public class JobService extends BaseService implements JobServiceInterface {
     public JobResource getJobDetailBySlug(String slug) {
         Job job = jobRepository.findDetailBySlug(slug)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy việc làm với slug: " + slug));
-        return jobMapper.tResource(job);
+
+        JobResource jobResource = jobMapper.tResource(job);
+        CompanyResource companyResource = companyMapper.tResource(job.getCompany());
+        companyResource.setFollowerCount((int) followCompanyRepository.countByCompany_Id(job.getCompany().getId()));
+        jobResource.setCompany(companyResource);
+        return jobResource;
     }
 
     @Override

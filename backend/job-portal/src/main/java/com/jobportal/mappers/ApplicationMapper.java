@@ -16,10 +16,11 @@ public interface ApplicationMapper extends BaseMapper<Application, ApplicationRe
     // Entity -> Resource
     @Override
     @Mapping(target = "jobId", source = "job.id")
+    @Mapping(target = "jobTitle", source = "job.title")
     @Mapping(target = "applicationStatus", source = "status") // dùng ApplicationStatusMapper
     ApplicationResource tResource(Application entity);
-
     @Mapping(target = "jobId", source = "job.id")
+    @Mapping(target = "jobTitle", source = "job.title")
     @Mapping(target = "applicationStatus", source = "status") // dùng ApplicationStatusMapper
     @Mapping(target = "userId", source = "user.id")
     ApplicationListItemForCompanyResource tResourceListItem(Application entity);

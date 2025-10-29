@@ -1,9 +1,11 @@
 package com.jobportal.services.impl;
 
+import com.jobportal.dtos.resources.CompanyListItemResource;
 import com.jobportal.entities.Company;
 import com.jobportal.entities.FollowCompany;
 import com.jobportal.entities.FollowCompanyId;
 import com.jobportal.entities.User;
+import com.jobportal.mappers.CompanyMapper;
 import com.jobportal.repositories.CompanyRepository;
 import com.jobportal.repositories.FollowCompanyRepository;
 import com.jobportal.repositories.UserRepository;
@@ -11,12 +13,15 @@ import com.jobportal.services.interfaces.FollowCompanyServiceInterface;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class FollowCompanyService implements FollowCompanyServiceInterface {
     private final FollowCompanyRepository followCompanyRepository;
     private final UserRepository userRepository;
     private final CompanyRepository companyRepository;
+    private final CompanyMapper companyMapper;
 
     @Override
     public void followCompany(Long userId, Long companyId) {
@@ -35,4 +40,26 @@ public class FollowCompanyService implements FollowCompanyServiceInterface {
         }
         followCompanyRepository.deleteById(new FollowCompanyId(userId, companyId));
     }
+
+    @Override
+    public boolean isFollowing(Long userId, Long companyId) {
+        return followCompanyRepository.existsByUser_IdAndCompany_Id(userId, companyId);
+    }
+
+    @Override
+    public List<CompanyListItemResource> tCompanies(Long userId) {
+        return followCompanyRepository.findCompaniesByUserIdNative(userId)
+                .stream()
+                .map(p -> {
+                    CompanyListItemResource dto = new CompanyListItemResource();
+                    dto.setId(p.getId());
+                    dto.setName(p.getName());
+                    dto.setSlug(p.getSlug());
+                    dto.setLogoUrl(p.getLogoUrl());
+                    dto.setVerified(p.isVerified());
+                    return dto;
+                })
+                .toList();
+    }
+
 }

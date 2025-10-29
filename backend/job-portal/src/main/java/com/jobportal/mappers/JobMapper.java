@@ -17,6 +17,7 @@ public interface JobMapper extends BaseMapper<Job, JobResource, JobCreationReque
     @Override
     @Mapping(target = "skills", source = "skills")
     @Mapping(target = "yearsOfExperience", source = "yearsOfExperience")
+    @Mapping(target = "company", source = "company")
     JobResource tResource(Job job);
     default Page<JobListItemResource> tListResourcePage(Page<Job> jobs) {
         return jobs.map(this::tListItemResource);

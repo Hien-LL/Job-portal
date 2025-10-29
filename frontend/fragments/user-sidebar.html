@@ -1,0 +1,136 @@
+<!-- User Sidebar Fragment -->
+<!-- Displays user info card and navigation menu -->
+<!-- Usage: <div data-fragment="fragments/user-sidebar.html"></div> -->
+
+<div class="lg:col-span-1">
+    <style>
+        /* Ensure sidebar is fully visible */
+        .sidebar-menu {
+            max-height: none !important;
+            overflow: visible !important;
+        }
+        
+        .sidebar-menu nav {
+            overflow: visible !important;
+        }
+        
+        .sidebar-menu ul {
+            overflow: visible !important;
+        }
+    </style>
+    <!-- Navigation Menu -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 sidebar-menu">
+        <nav class="p-4">
+            <ul class="space-y-2">
+                <li>
+                    <a href="profile.html" id="nav-dashboard" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-gray-50 p-3 rounded-lg text-sm transition">
+                        Hồ sơ cá nhân
+                    </a>
+                </li>
+                <li>
+                    <a href="cv-management.html" id="nav-cv" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-gray-50 p-3 rounded-lg text-sm transition">
+                        Quản lý CV
+                    </a>
+                </li>
+                <li>
+                    <a href="applications.html" id="nav-apply" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-gray-50 p-3 rounded-lg text-sm transition">
+                        Đơn ứng tuyển
+                    </a>
+                </li>
+
+                <li>
+                    <a href="saved-jobs.html" id="nav-saved-jobs" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-gray-50 p-3 rounded-lg text-sm transition">
+                        Việc đã lưu
+                    </a>
+                </li>
+                
+                
+                <li>
+                    <a href="followed-companies.html" id="nav-followed-companies" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-gray-50 p-3 rounded-lg text-sm transition">
+                        Công ty theo dõi
+                    </a>
+                </li>
+                <li>
+                    <a href="#" id="nav-notifications" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-gray-50 p-3 rounded-lg text-sm transition">
+                        Thông báo
+                    </a>
+                </li>
+                <li>
+                    <a href="#" id="nav-settings" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-gray-50 p-3 rounded-lg text-sm transition">
+                        Cài đặt
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="logout(); return false;" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-gray-50 p-3 rounded-lg text-sm transition">
+                        Đăng xuất
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<script>
+    // Highlight active menu item based on current page
+    function highlightActiveMenu() {
+        const currentPage = window.location.pathname.split('/').pop();
+        
+        // Reset all nav items
+        document.querySelectorAll('[id^="nav-"]').forEach(nav => {
+            nav.classList.remove('text-blue-600', 'bg-blue-50');
+            nav.classList.add('text-gray-700', 'hover:bg-gray-50');
+        });
+
+        // Highlight current page based on filename
+        let activeNavId = null; 
+        
+        if (currentPage === 'profile.html' || currentPage === '') {
+            activeNavId = 'nav-profile';
+        } else if (currentPage === 'cv-management.html') {
+            activeNavId = 'nav-cv';
+        } else if (currentPage === 'saved-jobs.html') {
+            activeNavId = 'nav-saved-jobs';
+        } else if (currentPage === 'followed-companies.html') {
+            activeNavId = 'nav-followed-companies';
+        } else if (currentPage === 'applications.html') {
+            activeNavId = 'nav-apply'
+        } else if (currentPage === 'settings.html') {
+            activeNavId = 'nav-settings';
+        } else if (currentPage = '')
+
+
+        if (activeNavId) {
+            const activeNav = document.getElementById(activeNavId);
+            if (activeNav) {
+                activeNav.classList.remove('text-gray-700', 'hover:bg-gray-50');
+                activeNav.classList.add('text-blue-600', 'bg-blue-50');
+            }
+        }
+    }
+
+    // Logout function
+    function logout() {
+        if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+            // Try to use authService if available, otherwise use localStorage
+            if (typeof authService !== 'undefined' && authService.clearAuthData) {
+                authService.clearAuthData();
+            } else {
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('refresh_token');
+                localStorage.removeItem('user_id');
+                localStorage.removeItem('login_time');
+                localStorage.removeItem('login_expiry');
+            }
+            window.location.href = 'login.html';
+        }
+    }
+
+    // Auto-initialize sidebar when loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        // Highlight active menu
+        highlightActiveMenu();
+        
+        // Debug: log all menu items to ensure they're rendered
+        console.log('Sidebar menu items:', document.querySelectorAll('#nav-profile, #nav-personal-profile, #nav-cv, #nav-saved-jobs, #nav-followed-companies,#nav-app #nav-settings'));
+    });
+</script>

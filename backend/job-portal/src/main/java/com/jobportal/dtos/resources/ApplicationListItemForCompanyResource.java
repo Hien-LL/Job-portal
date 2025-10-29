@@ -14,5 +14,6 @@ public class ApplicationListItemForCompanyResource {
     private String coverLetter;
     private Long resumeId;
     private Long jobId;
+    private String jobTitle;
     private Long userId;
 }

@@ -28,88 +28,9 @@
         </nav>
 
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            <!-- Sidebar -->
+            <!-- Sidebar Fragment -->
             <div class="lg:col-span-1">
-                <!-- User Info Card -->
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-                    <div class="text-center">
-                        <img id="user-avatar" src="" alt="Avatar" class="w-20 h-20 rounded-full mx-auto mb-4 object-cover">
-                        <h2 id="user-name" class="text-lg font-semibold text-gray-900 mb-1"></h2>
-                        <p id="user-email" class="text-sm text-gray-600 mb-4"></p>
-                    </div>
-                </div>
-
-                <!-- Navigation Menu -->
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200">
-                    <nav class="p-4">
-                        <ul class="space-y-2">
-                            <li>
-                                <a href="profile.html" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-gray-50 p-3 rounded-lg text-sm transition">
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"></path>
-                                    </svg>
-                                    Dashboard
-                                </a>
-                            </li>
-                            <li>
-                                <a href="profile.html" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-gray-50 p-3 rounded-lg text-sm transition">
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
-                                    </svg>
-                                    Hồ sơ cá nhân
-                                </a>
-                            </li>
-                            <li>
-                                <a href="cv-management.html" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-gray-50 p-3 rounded-lg text-sm transition">
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 0v12h8V4H6z" clip-rule="evenodd"></path>
-                                    </svg>
-                                    Quản lý CV
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-gray-50 p-3 rounded-lg text-sm transition">
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                    Đơn ứng tuyển
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="flex items-center gap-3 text-blue-600 bg-blue-50 p-3 rounded-lg text-sm font-medium">
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path>
-                                    </svg>
-                                    Việc làm đã lưu
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-gray-50 p-3 rounded-lg text-sm transition">
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
-                                    </svg>
-                                    Công ty theo dõi
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-gray-50 p-3 rounded-lg text-sm transition">
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path>
-                                    </svg>
-                                    Cài đặt tài khoản
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" onclick="window.authUtils.logout(); return false;" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-gray-50 p-3 rounded-lg text-sm transition">
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"></path>
-                                    </svg>
-                                    Đăng xuất
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
+                <div data-fragment="fragments/user-sidebar.html"></div>
             </div>
 
             <!-- Main Content -->
@@ -214,7 +135,10 @@
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
             loadFragments().then(() => {
-                initializePage();
+                // Add a small delay to ensure DOM is updated
+                setTimeout(() => {
+                    initializePage();
+                }, 100);
             });
         });
 
@@ -224,12 +148,23 @@
                 return;
             }
 
-            await loadUserInfo();
+            // Load user profile and populate sidebar
+            await loadUserProfile();
+            
+            // Load sidebar user info from fragment
+            if (typeof loadSidebarUserInfo === 'function') {
+                loadSidebarUserInfo();
+            }
+            if (typeof highlightActiveMenu === 'function') {
+                highlightActiveMenu();
+            }
+            
             await loadSavedJobs();
         }
 
-        // Load user info for sidebar
-        async function loadUserInfo() {
+        // Load user profile data to populate sidebar
+        let userProfile = null;
+        async function loadUserProfile() {
             try {
                 const response = await window.authUtils.apiRequest('/users/me', {
                     method: 'GET'
@@ -237,21 +172,16 @@
 
                 if (response && response.ok) {
                     const result = await response.json();
+                    
                     if (result.success) {
-                        const user = result.data;
-                        document.getElementById('user-name').textContent = user.name || 'Chưa cập nhật';
-                        document.getElementById('user-email').textContent = user.email || '';
-                        
-                        const avatarElement = document.getElementById('user-avatar');
-                        if (user.avatarUrl) {
-                            avatarElement.src = `http://localhost:8080${user.avatarUrl}`;
-                        } else {
-                            avatarElement.src = 'https://via.placeholder.com/80/6B7280/FFFFFF?text=' + (user.name ? user.name.charAt(0) : 'U');
-                        }
+                        userProfile = result.data;
+                        return true;
                     }
                 }
+                return false;
             } catch (error) {
-                console.error('Error loading user info:', error);
+                console.error('Error loading user profile:', error);
+                return false;
             }
         }
 

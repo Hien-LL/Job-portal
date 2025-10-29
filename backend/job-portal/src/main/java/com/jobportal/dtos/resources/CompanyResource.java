@@ -1,10 +1,12 @@
 package com.jobportal.dtos.resources;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class CompanyResource {
     private Long id;
     private String name;

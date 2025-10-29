@@ -27,4 +27,21 @@ public interface FollowCompanyRepository extends JpaRepository<FollowCompany, Fo
         Long getCompanyId();
         long getCnt();
     }
+
+    interface CompanyListItemProjection {
+        Long getId();
+        String getName();
+        String getSlug();
+        String getLogoUrl();
+        boolean isVerified();
+    }
+
+    @Query(value = """
+    SELECT c.id AS id, c.name AS name, c.slug AS slug, c.logo_url AS logoUrl, c.verified AS verified
+    FROM companies c
+    INNER JOIN follow_companies f ON c.id = f.company_id
+    WHERE f.user_id = :userId
+    """, nativeQuery = true)
+    List<CompanyListItemProjection> findCompaniesByUserIdNative(@Param("userId") Long userId);
+
 }

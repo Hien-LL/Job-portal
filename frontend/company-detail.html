@@ -42,7 +42,9 @@
                 <div class="flex-1">
                     <div class="flex items-center gap-3 mb-2">
                         <h1 id="company-name" class="text-3xl font-bold text-gray-900"></h1>
-                        <span id="company-verified" class="hidden inline-block w-4 h-4 bg-blue-500 rounded-full" title="Công ty đã xác thực"></span>
+                        <svg id="company-verified" class="hidden w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20" title="Công ty đã xác thực">
+                            <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                        </svg>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600 mb-4">
                         <div class="flex items-center gap-2">
@@ -66,7 +68,7 @@
                         </div>
                     </div>
                     <div class="flex gap-3">
-                        <button id="follow-btn" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition">
+                        <button id="follow-btn" onclick="followCompany()" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition">
                             + Theo dõi
                         </button>
                         <button class="bg-gray-100 text-gray-700 px-6 py-2 rounded-lg font-medium hover:bg-gray-200 transition">
@@ -177,9 +179,11 @@
 
     <!-- Scripts -->
     <script src="js/fragments-loader.js"></script>
+    <script src="js/auth.js"></script>
     <script>
         let currentCompany = null;
         let companyJobs = [];
+        let isFollowing = false;
 
         // Get company slug from URL
         function getCompanySlugFromURL() {
@@ -204,6 +208,12 @@
                     currentCompany = result.data;
                     displayCompanyDetail(result.data);
                     loadCompanyJobs(result.data.id);
+                    
+                    // Check follow status if user is authenticated
+                    if (authService.isAuthenticated()) {
+                        checkFollowStatus(result.data.id);
+                    }
+                    
                     hideLoading();
                 } else {
                     showError('Không tìm thấy công ty này');
@@ -421,6 +431,123 @@
             } else {
                 errorTitle.textContent = 'Có lỗi xảy ra';
                 errorText.textContent = message;
+            }
+        }
+
+        // Follow company
+        async function followCompany() {
+            if (!authService.isAuthenticated()) {
+                alert('Vui lòng đăng nhập để theo dõi công ty');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            if (!currentCompany) return;
+
+            try {
+                const token = authService.getToken();
+                const response = await fetch(
+                    `http://localhost:8080/api/follow-company/${currentCompany.id}/follow`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    }
+                );
+
+                const result = await response.json();
+
+                if (result.success) {
+                    isFollowing = true;
+                    updateFollowButton();
+                    alert(result.message || 'Theo dõi công ty thành công');
+                } else {
+                    alert(result.message || 'Lỗi khi theo dõi công ty');
+                }
+            } catch (error) {
+                console.error('Error following company:', error);
+                alert('Lỗi khi theo dõi công ty');
+            }
+        }
+
+        // Unfollow company
+        async function unfollowCompany() {
+            if (!authService.isAuthenticated()) {
+                alert('Vui lòng đăng nhập');
+                return;
+            }
+
+            if (!currentCompany) return;
+
+            try {
+                const token = authService.getToken();
+                const response = await fetch(
+                    `http://localhost:8080/api/follow-company/${currentCompany.id}/unfollow`,
+                    {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    }
+                );
+
+                const result = await response.json();
+
+                if (result.success) {
+                    isFollowing = false;
+                    updateFollowButton();
+                    alert(result.message || 'Bỏ theo dõi công ty thành công');
+                } else {
+                    alert(result.message || 'Lỗi khi bỏ theo dõi công ty');
+                }
+            } catch (error) {
+                console.error('Error unfollowing company:', error);
+                alert('Lỗi khi bỏ theo dõi công ty');
+            }
+        }
+
+        // Check if user is following company
+        async function checkFollowStatus(companyId) {
+            try {
+                const token = authService.getToken();
+                const response = await fetch(
+                    `http://localhost:8080/api/follow-company/${companyId}/is-following`,
+                    {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    }
+                );
+
+                const result = await response.json();
+
+                if (result.success && result.data !== undefined) {
+                    isFollowing = result.data;
+                    updateFollowButton();
+                }
+            } catch (error) {
+                console.error('Error checking follow status:', error);
+            }
+        }
+
+        // Update follow button state
+        function updateFollowButton() {
+            const followBtn = document.getElementById('follow-btn');
+            if (isFollowing) {
+                followBtn.textContent = '✓ Đã theo dõi';
+                followBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                followBtn.classList.add('bg-gray-400', 'hover:bg-gray-500');
+                followBtn.onclick = unfollowCompany;
+            } else {
+                followBtn.textContent = '+ Theo dõi';
+                followBtn.classList.remove('bg-gray-400', 'hover:bg-gray-500');
+                followBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                followBtn.onclick = followCompany;
             }
         }
 

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đơn ứng tuyển - JobPortal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Header Fragment -->
+    <div data-fragment="fragments/header.html"></div>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Breadcrumb -->
+        <nav class="flex items-center space-x-2 text-sm text-gray-500 mb-6">
+            <a href="index.html" class="hover:text-blue-600">Trang chủ</a>
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-gray-900">Dashboard ứng viên</span>
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-gray-900">Đơn ứng tuyển</span>
+        </nav>
+
+        <!-- Loading State -->
+        <div id="loading" class="flex justify-center items-center py-20">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+
+        <!-- Content -->
+        <div id="content" class="hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <!-- Sidebar Fragment -->
+                <div data-fragment="fragments/user-sidebar.html"></div>
+
+                <!-- Main Content -->
+                <div class="lg:col-span-3">
+                    <!-- Header -->
+                    <div class="mb-6">
+                        <h1 class="text-3xl font-bold text-gray-900 mb-2">Đơn ứng tuyển của bạn</h1>
+                        <p class="text-gray-600">Quản lý các đơn ứng tuyển và theo dõi trạng thái</p>
+                    </div>
+
+                    <!-- Filter Tabs -->
+                    <div class="flex gap-2 mb-6 border-b border-gray-200">
+                        <button class="status-filter active px-4 py-3 border-b-2 border-blue-600 text-blue-600 font-medium text-sm" data-status="all">
+                            Tất cả
+                        </button>
+                        <button class="status-filter px-4 py-3 border-b-2 border-transparent text-gray-600 hover:text-gray-900 font-medium text-sm" data-status="APPLIED">
+                            Đã ứng tuyển
+                        </button>
+                        <button class="status-filter px-4 py-3 border-b-2 border-transparent text-gray-600 hover:text-gray-900 font-medium text-sm" data-status="INTERVIEWED">
+                            Phỏng vấn
+                        </button>
+                        <button class="status-filter px-4 py-3 border-b-2 border-transparent text-gray-600 hover:text-gray-900 font-medium text-sm" data-status="OFFERED">
+                            Nhận việc
+                        </button>
+                        <button class="status-filter px-4 py-3 border-b-2 border-transparent text-gray-600 hover:text-gray-900 font-medium text-sm" data-status="REJECTED">
+                            Từ chối
+                        </button>
+                    </div>
+
+                    <!-- Applications List -->
+                    <div id="applications-container" class="space-y-4">
+                        <!-- Applications will be loaded here -->
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="empty-state" class="hidden text-center py-12">
+                        <div class="text-6xl mb-4">📝</div>
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">Chưa có đơn ứng tuyển</h3>
+                        <p class="text-gray-600 mb-4">Hãy bắt đầu ứng tuyển các vị trí phù hợp với bạn</p>
+                        <a href="job.html" class="text-blue-600 hover:text-blue-700 font-medium">Tìm việc làm →</a>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div id="pagination" class="mt-8 flex justify-center items-center gap-2" style="display: none;">
+                        <!-- Pagination buttons will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error State -->
+        <div id="error-state" class="hidden text-center py-20">
+            <div class="text-red-500 mb-4">
+                <svg class="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                </svg>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">Không thể tải đơn ứng tuyển</h3>
+            <p class="text-gray-600 mb-4">Vui lòng thử lại sau</p>
+            <button onclick="loadApplications()" class="bg-blue-600 text-white px-4 py-2 rounded font-medium hover:bg-blue-700 transition">
+                Thử lại
+            </button>
+        </div>
+    </main>
+
+    <!-- Footer Fragment -->
+    <div data-fragment="fragments/footer.html"></div>
+
+    <!-- Scripts -->
+    <script src="js/fragments-loader.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        let currentPage = 1;
+        let totalPages = 1;
+        let currentStatusFilter = 'all';
+        let applications = [];
+
+        // Load applications
+        async function loadApplications(page = 1, status = 'all') {
+            try {
+                document.getElementById('loading').classList.remove('hidden');
+                document.getElementById('content').classList.add('hidden');
+                document.getElementById('error-state').classList.add('hidden');
+
+                if (!authService.isAuthenticated()) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                const token = authService.getToken();
+                const params = new URLSearchParams({
+                    page: page - 1,
+                    perPage: 10
+                });
+
+                const response = await fetch(`http://localhost:8080/api/applications/my-applications?${params.toString()}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load applications');
+                }
+
+                const result = await response.json();
+                if (result.success && result.data) {
+                    applications = result.data.content || [];
+                    currentPage = page;
+                    totalPages = result.data.totalPages || 1;
+                    
+                    displayApplications(status);
+                    displayPagination();
+                    
+                    document.getElementById('loading').classList.add('hidden');
+                    document.getElementById('content').classList.remove('hidden');
+                } else {
+                    throw new Error('Invalid response');
+                }
+            } catch (error) {
+                console.error('Error loading applications:', error);
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('error-state').classList.remove('hidden');
+            }
+        }
+
+        // Display applications
+        function displayApplications(statusFilter = 'all') {
+            const container = document.getElementById('applications-container');
+            const emptyState = document.getElementById('empty-state');
+
+            // Filter applications by status
+            let filteredApps = applications;
+            if (statusFilter !== 'all') {
+                filteredApps = applications.filter(app => app.applicationStatus?.code === statusFilter);
+            }
+
+            if (filteredApps.length === 0) {
+                container.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            container.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+
+            container.innerHTML = filteredApps.map(app => {
+                const statusClass = getStatusClass(app.applicationStatus?.code);
+                const appliedDate = formatDate(app.appliedAt);
+
+                return `
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition cursor-pointer" onclick="viewApplicationDetail(${app.id})">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <h3 class="font-semibold text-gray-900">${app.jobTitle || 'Chưa xác định'}</h3>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusClass}">
+                                        ${app.applicationStatus?.name || 'Chưa xác định'}
+                                    </span>
+                                </div>
+                                <p class="text-gray-600 text-sm" id="app-company-${app.id}">Công ty</p>
+                                <p class="text-gray-500 text-xs mt-1">Ứng tuyển: ${appliedDate}</p>
+                            </div>
+                            <div class="text-right">
+                                <button class="text-blue-600 hover:text-blue-700 font-medium text-sm" onclick="event.stopPropagation(); viewApplicationDetail(${app.id})">
+                                    Xem chi tiết →
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Load job info for each application
+            filteredApps.forEach(app => {
+                loadJobInfo(app.jobId, app.id);
+            });
+        }
+
+        // Load job info for application
+        async function loadJobInfo(jobId, appId) {
+            try {
+                const response = await fetch(`http://localhost:8080/api/jobs/${jobId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) return;
+
+                const result = await response.json();
+                if (result.success && result.data) {
+                    const job = result.data;
+                    document.getElementById(`app-job-${appId}`).textContent = job.title || 'Việc làm';
+                    document.getElementById(`app-company-${appId}`).textContent = job.company?.name || 'Công ty';
+                }
+            } catch (error) {
+                console.error('Error loading job info:', error);
+            }
+        }
+
+        // Get status badge class
+        function getStatusClass(statusCode) {
+            const statusClasses = {
+                'APPLIED': 'bg-blue-100 text-blue-800',
+                'INTERVIEWED': 'bg-purple-100 text-purple-800',
+                'OFFERED': 'bg-green-100 text-green-800',
+                'REJECTED': 'bg-red-100 text-red-800'
+            };
+            return statusClasses[statusCode] || 'bg-gray-100 text-gray-800';
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            if (!dateString) return 'Chưa xác định';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('vi-VN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+        }
+
+        // View application detail
+        function viewApplicationDetail(applicationId) {
+            window.location.href = `application-detail.html?id=${applicationId}`;
+        }
+
+        // Display pagination
+        function displayPagination() {
+            const container = document.getElementById('pagination');
+            
+            if (totalPages <= 1) {
+                container.style.display = 'none';
+                return;
+            }
+
+            let html = '';
+            
+            // Previous button
+            if (currentPage > 1) {
+                html += `<button onclick="goToPage(${currentPage - 1})" class="px-3 py-2 border border-gray-300 rounded hover:bg-gray-50">Trước</button>`;
+            }
+
+            // Page numbers
+            for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+                if (i === currentPage) {
+                    html += `<button class="px-3 py-2 bg-blue-600 text-white rounded">${i}</button>`;
+                } else {
+                    html += `<button onclick="goToPage(${i})" class="px-3 py-2 border border-gray-300 rounded hover:bg-gray-50">${i}</button>`;
+                }
+            }
+
+            // Next button
+            if (currentPage < totalPages) {
+                html += `<button onclick="goToPage(${currentPage + 1})" class="px-3 py-2 border border-gray-300 rounded hover:bg-gray-50">Tiếp</button>`;
+            }
+
+            container.innerHTML = html;
+            container.style.display = 'flex';
+        }
+
+        // Go to page
+        function goToPage(page) {
+            loadApplications(page, currentStatusFilter);
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFragments().then(() => {
+                loadApplications();
+
+                // Setup status filter buttons
+                document.querySelectorAll('.status-filter').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        currentStatusFilter = this.dataset.status;
+                        
+                        // Update active button
+                        document.querySelectorAll('.status-filter').forEach(b => {
+                            b.classList.remove('border-blue-600', 'text-blue-600');
+                            b.classList.add('border-transparent', 'text-gray-600', 'hover:text-gray-900');
+                        });
+                        this.classList.remove('border-transparent', 'text-gray-600', 'hover:text-gray-900');
+                        this.classList.add('border-blue-600', 'text-blue-600');
+                        
+                        // Reload with new filter
+                        displayApplications(currentStatusFilter);
+                    });
+                });
+
+                // Highlight active menu
+                if (typeof highlightActiveMenu === 'function') {
+                    highlightActiveMenu();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

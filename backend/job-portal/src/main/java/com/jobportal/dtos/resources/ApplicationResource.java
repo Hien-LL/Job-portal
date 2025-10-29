@@ -13,4 +13,5 @@ public class ApplicationResource {
     private String coverLetter;
     private Long resumeId;
     private Long jobId;
+    private String jobTitle;
 }
