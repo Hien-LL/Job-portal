@@ -9,4 +9,6 @@ public interface NotificationServiceInterface {
     void sendNotification(Long userId, NotificationRequest request);
     List<Notification> findByUserId(Long userId);
     Notification findById(Long userId, Long notificationId);
+    void markAsRead(Long userId, Long notificationId);
+    void markAllAsRead(Long userId);
 }

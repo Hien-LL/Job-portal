@@ -24,22 +24,26 @@
             <ul class="space-y-2">
                 <li>
                     <a href="profile.html" id="nav-dashboard" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-gray-50 p-3 rounded-lg text-sm transition">
+                        <img src="img/icon-profile.png" alt="Profile Icon" class="w-5 h-5">
                         Hồ sơ cá nhân
                     </a>
                 </li>
                 <li>
                     <a href="cv-management.html" id="nav-cv" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-gray-50 p-3 rounded-lg text-sm transition">
+                        <img src="img/icon-cv.png" alt="CV Icon" class="w-5 h-5">
                         Quản lý CV
                     </a>
                 </li>
                 <li>
                     <a href="applications.html" id="nav-apply" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-gray-50 p-3 rounded-lg text-sm transition">
+                        <img src="img/icon-applications.png" alt="Applications Icon" class="w-5 h-5">
                         Đơn ứng tuyển
                     </a>
                 </li>
 
                 <li>
                     <a href="saved-jobs.html" id="nav-saved-jobs" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-gray-50 p-3 rounded-lg text-sm transition">
+                        <img src="img/icon-saved-jobs.png" alt="Saved Jobs Icon" class="w-5 h-5">
                         Việc đã lưu
                     </a>
                 </li>
@@ -47,21 +51,25 @@
                 
                 <li>
                     <a href="followed-companies.html" id="nav-followed-companies" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-gray-50 p-3 rounded-lg text-sm transition">
+                        <img src="img/icon-followed-companies.png" alt="Followed Companies Icon" class="w-5 h-5">
                         Công ty theo dõi
                     </a>
                 </li>
                 <li>
-                    <a href="#" id="nav-notifications" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-gray-50 p-3 rounded-lg text-sm transition">
+                    <a href="notifications.html" id="nav-notifications" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-gray-50 p-3 rounded-lg text-sm transition">
+                        <img src="img/icon-notifications.png" alt="Notifications Icon" class="w-5 h-5">
                         Thông báo
                     </a>
                 </li>
                 <li>
                     <a href="#" id="nav-settings" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-gray-50 p-3 rounded-lg text-sm transition">
+                        <img src="img/icon-settings.png" alt="Settings Icon" class="w-5 h-5">
                         Cài đặt
                     </a>
                 </li>
                 <li>
                     <a href="#" onclick="logout(); return false;" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-gray-50 p-3 rounded-lg text-sm transition">
+                        <img src="img/icon-logout.png" alt="Logout Icon" class="w-5 h-5">
                         Đăng xuất
                     </a>
                 </li>
@@ -85,7 +93,7 @@
         let activeNavId = null; 
         
         if (currentPage === 'profile.html' || currentPage === '') {
-            activeNavId = 'nav-profile';
+            activeNavId = 'nav-dashboard';
         } else if (currentPage === 'cv-management.html') {
             activeNavId = 'nav-cv';
         } else if (currentPage === 'saved-jobs.html') {
@@ -93,10 +101,12 @@
         } else if (currentPage === 'followed-companies.html') {
             activeNavId = 'nav-followed-companies';
         } else if (currentPage === 'applications.html') {
-            activeNavId = 'nav-apply'
+            activeNavId = 'nav-apply';
+        } else if (currentPage === 'notifications.html') {
+            activeNavId = 'nav-notifications';
         } else if (currentPage === 'settings.html') {
             activeNavId = 'nav-settings';
-        } else if (currentPage = '')
+        }
 
 
         if (activeNavId) {

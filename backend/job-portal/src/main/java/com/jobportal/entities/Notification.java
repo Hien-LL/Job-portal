@@ -19,6 +19,7 @@ public class Notification {
     private Long id;
 
     private String title;
+    @Column(columnDefinition = "TEXT")
     private String body;
     private LocalDateTime createdAt;
     private LocalDateTime readAt;

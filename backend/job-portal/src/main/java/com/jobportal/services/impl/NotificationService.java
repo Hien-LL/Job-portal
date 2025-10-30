@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -39,7 +40,33 @@ public class NotificationService extends BaseService implements NotificationServ
 
     @Override
     public Notification findById(Long userId, Long notificationId) {
-        return null;
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy thông báo"));
+        if (!notification.getUser().getId().equals(userId)) {
+            throw new IllegalArgumentException("Thông báo không thuộc về người dùng");
+        }
+        return notification;
+    }
+
+    @Override
+    public void markAsRead(Long userId, Long notificationId) {
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy thông báo"));
+        if (!notification.getUser().getId().equals(userId)) {
+            throw new IllegalArgumentException("Thông báo không thuộc về người dùng");
+        }
+        notification.setReadAt(LocalDateTime.now());
+        notificationRepository.save(notification);
+    }
+
+    @Override
+    public void markAllAsRead(Long userId) {
+        List<Notification> notifications = notificationRepository.findAll(hasUser(userId));
+        LocalDateTime now = LocalDateTime.now();
+        for (Notification notification : notifications) {
+            notification.setReadAt(now);
+        }
+        notificationRepository.saveAll(notifications);
     }
 
 

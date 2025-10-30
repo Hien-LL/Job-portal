@@ -223,7 +223,7 @@
                 const companySizeText = formatCompanySize(company.size_min, company.size_max);
 
                 return `
-                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition">
+                    <a href="company-detail.html?slug=${company.slug}" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition">
                         <div class="flex items-start gap-4 mb-4">
                             <div class="w-16 h-16 bg-gray-100 rounded flex-shrink-0 flex items-center justify-center cursor-pointer" 
                                  onclick="viewCompany('${company.slug}')">
@@ -263,9 +263,6 @@
                                     </button>` : 
                                     ''
                                 }
-                                <a href="company-detail.html?slug=${company.slug}" class="text-blue-600 text-sm font-medium hover:underline">
-                                    Xem chi tiết →
-                                </a>
                             </div>
                         </div>
                     </div>

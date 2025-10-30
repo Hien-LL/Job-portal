@@ -140,6 +140,11 @@ public class ApplicationService implements ApplicationServiceInterface {
         candidateResourceBuilder.appliedAt(application.getAppliedAt());
         return candidateResourceBuilder.build();
     }
+
+    @Override
+    public boolean existsByJobIdAndUserId(Long jobId, Long userId) {
+        return applicationRepository.existsByUser_IdAndJob_Id(userId, jobId);
+    }
 }
 
 

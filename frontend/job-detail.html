@@ -17,6 +17,16 @@
         h1, h2, h3, h4, h5, h6 {
             font-family: 'Poppins', sans-serif;
         }
+        
+        /* Disabled button styles */
+        .btn-disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .btn-disabled:hover {
+            opacity: 0.6;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -280,6 +290,7 @@
         let currentJobSlug = '';
         let currentJobId = null;
         let isJobSaved = false;
+        let isJobApplied = false;
 
         function viewCompany(slug, companyId) {
             window.location.href = `company-detail.html?slug=${currentCompanySlug.replace(/"/g, '')}`;
@@ -307,6 +318,12 @@
                 if (result.success && result.data) {
                     displayJobDetail(result.data);
                     loadSimilarJobs(result.data.category?.slug);
+                    
+                    // Check if user has applied for this job (only if logged in)
+                    if (authService.isAuthenticated()) {
+                        checkJobApplied(result.data.id);
+                    }
+                    
                     hideLoading();
                 } else {
                     showError('Không tìm thấy việc làm này');
@@ -420,10 +437,53 @@
                 <span>${job.company?.followerCount || 0} người theo dõi</span>
             `;
 
-            // Apply button functionality
-            document.getElementById('apply-btn').addEventListener('click', () => {
-                applyToJob(job.slug, job.id);
-            });
+            // Apply button functionality will be set by updateApplyButton()
+            // Initial state will be updated after checking application status
+        }
+
+        // Check if user has already applied for this job
+        async function checkJobApplied(jobId) {
+            try {
+                const token = authService.getToken();
+                if (!token) return;
+
+                const response = await fetch(`http://localhost:8080/api/applications/isApplied/${jobId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        isJobApplied = result.data === true;
+                        updateApplyButton();
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking application status:', error);
+            }
+        }
+
+        // Update apply button based on application status
+        function updateApplyButton() {
+            const applyBtn = document.getElementById('apply-btn');
+            
+            if (isJobApplied) {
+                applyBtn.textContent = 'Đã ứng tuyển';
+                applyBtn.disabled = true;
+                applyBtn.className = 'btn-secondary flex-1 btn-disabled';
+                applyBtn.onclick = null;
+                applyBtn.title = 'Bạn đã ứng tuyển công việc này';
+            } else {
+                applyBtn.textContent = 'Ứng tuyển ngay';
+                applyBtn.disabled = false;
+                applyBtn.className = 'btn-primary flex-1';
+                applyBtn.onclick = () => applyToJob(currentJobSlug, currentJobId);
+                applyBtn.title = 'Nhấn để ứng tuyển';
+            }
         }
 
         // Load similar jobs
@@ -749,9 +809,10 @@
                 if (result.success) {
                     alert('Ứng tuyển thành công! Chúc bạn may mắn.');
                     closeApplyModal();
-                    // Update button state to show already applied
-                    document.getElementById('apply-btn').textContent = 'Đã ứng tuyển';
-                    document.getElementById('apply-btn').disabled = true;
+                    
+                    // Update application status
+                    isJobApplied = true;
+                    updateApplyButton();
                 } else {
                     throw new Error(result.message || 'Ứng tuyển thất bại');
                 }

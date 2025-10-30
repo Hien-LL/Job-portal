@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông báo - JobPortal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Header Fragment -->
+    <div data-fragment="fragments/header.html"></div>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Breadcrumb -->
+        <nav class="flex items-center space-x-2 text-sm text-gray-500 mb-6">
+            <a href="index.html" class="hover:text-blue-600">Trang chủ</a>
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-gray-900">Thông báo</span>
+        </nav>
+
+        <!-- Loading State -->
+        <div id="loading" class="flex justify-center items-center py-20">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+
+        <!-- Notifications Content -->
+        <div id="notifications-content" class="hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <!-- Sidebar Fragment -->
+                <div data-fragment="fragments/user-sidebar.html"></div>
+
+                <!-- Main Content -->
+                <div class="lg:col-span-3">
+                    <!-- Page Header -->
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+                        <div class="flex items-center justify-between">
+                            <h1 class="text-2xl font-bold text-gray-900">Thông báo</h1>
+                            <div class="flex items-center gap-3">
+                                <button id="mark-all-read-btn" onclick="markAllAsRead()" class="btn-outline text-sm">
+                                    Đánh dấu tất cả đã đọc
+                                </button>
+                                <div class="text-sm text-gray-600">
+                                    <span id="notification-count">0 thông báo</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notifications List -->
+                    <div id="notifications-list" class="space-y-4">
+                        <!-- Notifications will be inserted here -->
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="empty-state" class="hidden bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+                        <div class="text-6xl mb-4">🔔</div>
+                        <h2 class="text-xl font-semibold text-gray-900 mb-2">Chưa có thông báo</h2>
+                        <p class="text-gray-600">Bạn sẽ nhận được thông báo về các hoạt động mới tại đây.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error State -->
+        <div id="error-state" class="hidden text-center py-20">
+            <div class="text-red-500 mb-4">
+                <svg class="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                </svg>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">Không thể tải thông báo</h3>
+            <p class="text-gray-600 mb-4">Vui lòng thử lại sau hoặc đăng nhập lại</p>
+            <button onclick="loadNotifications()" class="bg-blue-600 text-white px-4 py-2 rounded font-medium hover:bg-blue-700 transition">
+                Thử lại
+            </button>
+        </div>
+    </main>
+
+    <!-- Footer Fragment -->
+    <div data-fragment="fragments/footer.html"></div>
+
+    <!-- Mark as Read Modal -->
+    <div id="mark-read-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-lg max-w-md w-full">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                <h2 class="text-xl font-bold text-gray-900">Xác nhận</h2>
+                <button onclick="closeMarkReadModal()" class="text-gray-500 hover:text-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-6">
+                <p class="text-gray-600">Bạn có chắc chắn muốn đánh dấu tất cả thông báo là đã đọc?</p>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="flex items-center justify-end gap-3 p-6 border-t border-gray-200">
+                <button onclick="closeMarkReadModal()" class="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                    Hủy
+                </button>
+                <button onclick="confirmMarkAllRead()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                    Xác nhận
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/fragments-loader.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/notification-service.js"></script>
+    <script>
+        let notifications = [];
+
+        // Load notifications from API
+        async function loadNotifications() {
+            try {
+                showLoading();
+                
+                // Check authentication
+                if (!authService.isAuthenticated()) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                // Use notification service
+                const success = await notificationService.loadNotifications();
+                if (success) {
+                    notifications = notificationService.getAllNotifications();
+                    displayNotifications();
+                    updateNotificationCount();
+                    hideLoading();
+                } else {
+                    showError();
+                }
+            } catch (error) {
+                console.error('Error loading notifications:', error);
+                showError();
+            }
+        }
+
+        // Display notifications
+        function displayNotifications() {
+            const container = document.getElementById('notifications-list');
+            
+            if (!notifications || notifications.length === 0) {
+                showEmptyState();
+                return;
+            }
+
+            const html = notifications.map(notification => `
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 ${!notification.readAt ? 'border-l-4 border-l-blue-500' : ''} hover:shadow-md transition-shadow cursor-pointer" onclick="goToNotificationDetail(${notification.id})">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-2">
+                                <h3 class="font-semibold text-gray-900 ${!notification.readAt ? 'text-blue-900' : ''}">${notification.title}</h3>
+                                ${!notification.readAt ? '<span class="inline-block w-2 h-2 bg-blue-500 rounded-full"></span>' : ''}
+                            </div>
+                            <div class="text-gray-700 mb-3">
+                                <p class="notification-body-preview">${truncateText(notification.body, 120)}</p>
+                                ${notification.body.length > 120 ? '<span class="text-blue-600 text-sm font-medium hover:text-blue-800">Xem thêm...</span>' : ''}
+                            </div>
+                            <div class="flex items-center gap-4 text-sm text-gray-500">
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    ${formatDate(notification.createdAt)}
+                                </span>
+                                ${notification.readAt ? `
+                                    <span class="flex items-center gap-1 text-green-600">
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        Đã đọc
+                                    </span>
+                                ` : ''}
+                            </div>
+                        </div>
+                        ${!notification.readAt ? `
+                            <button onclick="event.stopPropagation(); markAsRead(${notification.id})" class="ml-4 text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                Đánh dấu đã đọc
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+
+            container.innerHTML = html;
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            if (!dateString) return 'Không xác định';
+            
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffTime = Math.abs(now - date);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays === 1) return 'Hôm qua';
+            if (diffDays < 7) return `${diffDays} ngày trước`;
+            if (diffDays < 30) return `${Math.ceil(diffDays / 7)} tuần trước`;
+            
+            return date.toLocaleDateString('vi-VN', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+        }
+
+        // Update notification count
+        function updateNotificationCount() {
+            const unreadCount = notifications.filter(n => !n.readAt).length;
+            const totalCount = notifications.length;
+            
+            document.getElementById('notification-count').textContent = 
+                `${totalCount} thông báo${unreadCount > 0 ? ` (${unreadCount} chưa đọc)` : ''}`;
+        }
+
+        // Mark single notification as read
+        async function markAsRead(notificationId) {
+            try {
+                const success = await notificationService.markAsRead(notificationId);
+                if (success) {
+                    // Update local display
+                    notifications = notificationService.getAllNotifications();
+                    displayNotifications();
+                    updateNotificationCount();
+                } else {
+                    alert('Lỗi khi đánh dấu thông báo đã đọc');
+                }
+            } catch (error) {
+                console.error('Error marking notification as read:', error);
+                alert('Lỗi khi đánh dấu thông báo đã đọc');
+            }
+        }
+
+        // Mark all notifications as read
+        async function markAllAsRead() {
+            const unreadCount = notifications.filter(n => !n.readAt).length;
+            if (unreadCount === 0) {
+                alert('Tất cả thông báo đã được đọc');
+                return;
+            }
+            
+            document.getElementById('mark-read-modal').classList.remove('hidden');
+        }
+
+        // Confirm mark all as read
+        async function confirmMarkAllRead() {
+            try {
+                closeMarkReadModal();
+                
+                const success = await notificationService.markAllAsRead();
+                if (success) {
+                    // Update local display
+                    notifications = notificationService.getAllNotifications();
+                    displayNotifications();
+                    updateNotificationCount();
+                } else {
+                    alert('Lỗi khi đánh dấu tất cả thông báo đã đọc');
+                }
+            } catch (error) {
+                console.error('Error marking all notifications as read:', error);
+                alert('Lỗi khi đánh dấu tất cả thông báo đã đọc');
+            }
+        }
+
+        // Close mark as read modal
+        function closeMarkReadModal() {
+            document.getElementById('mark-read-modal').classList.add('hidden');
+        }
+
+        // UI helper functions
+        function showLoading() {
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('notifications-content').classList.add('hidden');
+            document.getElementById('error-state').classList.add('hidden');
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('notifications-content').classList.remove('hidden');
+            document.getElementById('error-state').classList.add('hidden');
+        }
+
+        function showError() {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('notifications-content').classList.add('hidden');
+            document.getElementById('error-state').classList.remove('hidden');
+        }
+
+        function showEmptyState() {
+            document.getElementById('notifications-list').innerHTML = '';
+            document.getElementById('empty-state').classList.remove('hidden');
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFragments().then(() => {
+                loadNotifications();
+            });
+        });
+
+        // Truncate text function
+        function truncateText(text, maxLength) {
+            if (!text || text.length <= maxLength) return text;
+            return text.substring(0, maxLength).trim() + '...';
+        }
+
+        // Go to notification detail page
+        function goToNotificationDetail(notificationId) {
+            window.location.href = `notification-detail.html?id=${notificationId}`;
+        }
+
+        // Close modal when clicking outside
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('mark-read-modal');
+            if (event.target === modal) {
+                closeMarkReadModal();
+            }
+        });
+    </script>
+</body>
+</html>

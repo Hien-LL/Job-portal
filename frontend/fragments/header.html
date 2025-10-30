@@ -18,17 +18,18 @@
         <!-- Auth Buttons -->
         <div class="flex items-center gap-3">
             <!-- When logged in -->
-            <div id="logged-in-menu" class="hidden items-center gap-3">
-                <span class="text-gray-700 text-sm">Xin chào, <span id="user-name">User</span></span>
+            <div id="logged-in-menu" class="hidden items-center gap-3">                
                 <div class="relative">
                     <button id="user-menu-trigger" class="text-gray-700 text-sm font-medium hover:text-blue-600 flex items-center gap-1">
+                        <img src="img/icon-account.png" alt="User Avatar" class="w-6 h-6 rounded-full object-cover">
                         Tài khoản ▼
                     </button>
                     <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200" style="z-index: 9998;">
                         <div class="py-1">
                             <a href="profile.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Hồ sơ của tôi</a>
+                            <a href="notifications.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Thông báo</a>
                             <a href="saved-jobs.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Việc làm đã lưu</a>
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Đơn ứng tuyển</a>
+                            <a href="applications.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Đơn ứng tuyển</a>
                             <hr class="my-1">
                             <button id="logout-btn" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
                                 Đăng xuất
@@ -42,7 +43,6 @@
             <div id="not-logged-in-menu" class="flex items-center gap-3">
                 <a href="login.html" class="text-gray-700 text-sm font-medium hover:text-blue-600">Đăng nhập</a>
                 <a href="register.html" class="bg-blue-600 text-white px-4 py-2 rounded font-semibold hover:bg-blue-700 transition text-sm">Đăng ký</a>
-                <button class="bg-cyan-500 text-white px-4 py-2 rounded font-semibold hover:bg-cyan-600 transition text-sm">Đăng tin tuyển dụng</button>
             </div>
         </div>
 
@@ -54,3 +54,6 @@
         </button>
     </nav>
 </header>
+
+<!-- Load notification service -->
+<script src="js/notification-service.js"></script>

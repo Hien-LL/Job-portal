@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết thông báo - JobPortal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Header Fragment -->
+    <div data-fragment="fragments/header.html"></div>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Breadcrumb -->
+        <nav class="flex items-center space-x-2 text-sm text-gray-500 mb-6">
+            <a href="index.html" class="hover:text-blue-600">Trang chủ</a>
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <a href="notifications.html" class="hover:text-blue-600">Thông báo</a>
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-gray-900">Chi tiết thông báo</span>
+        </nav>
+
+        <!-- Loading State -->
+        <div id="loading" class="flex justify-center items-center py-20">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+
+        <!-- Notification Detail Content -->
+        <div id="notification-content" class="hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <!-- Sidebar Fragment -->
+                <div data-fragment="fragments/user-sidebar.html"></div>
+
+                <!-- Main Content -->
+                <div class="lg:col-span-3">
+                    <!-- Back Button -->
+                    <div class="mb-6">
+                        <a href="notifications.html" class="inline-flex items-center text-blue-600 hover:text-blue-800 transition">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                            Quay lại danh sách thông báo
+                        </a>
+                    </div>
+
+                    <!-- Notification Detail Card -->
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                        <!-- Header -->
+                        <div class="p-6 border-b border-gray-200">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <h1 id="notification-title" class="text-2xl font-bold text-gray-900">Loading...</h1>
+                                        <span id="read-status" class="hidden px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full font-medium">
+                                            Đã đọc
+                                        </span>
+                                        <span id="unread-status" class="hidden px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full font-medium">
+                                            Chưa đọc
+                                        </span>
+                                    </div>
+                                    <div class="flex items-center gap-4 text-sm text-gray-500">
+                                        <span class="flex items-center gap-1">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                                            </svg>
+                                            <span id="created-at">Loading...</span>
+                                        </span>
+                                        <span id="read-at-info" class="hidden flex items-center gap-1 text-green-600">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                            </svg>
+                                            <span id="read-at">Đã đọc</span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2 ml-4">
+                                    <button id="mark-read-btn" onclick="markAsRead()" class="hidden btn-outline text-sm">
+                                        Đánh dấu đã đọc
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Content -->
+                        <div class="p-6">
+                            <div class="prose max-w-none">
+                                <div id="notification-body" class="text-gray-700 leading-relaxed">
+                                    Loading...
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="p-6 border-t border-gray-200 bg-gray-50">
+                            <div class="flex items-center justify-between">
+                                <div class="text-sm text-gray-500">
+                                    ID thông báo: <span id="notification-id" class="font-mono">-</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <a href="notifications.html" class="btn-secondary text-sm">
+                                        Danh sách thông báo
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error State -->
+        <div id="error-state" class="hidden text-center py-20">
+            <div class="text-red-500 mb-4">
+                <svg class="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                </svg>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">Không thể tải thông báo</h3>
+            <p class="text-gray-600 mb-4">Thông báo không tồn tại hoặc bạn không có quyền xem</p>
+            <div class="flex items-center justify-center gap-3">
+                <button onclick="loadNotification()" class="bg-blue-600 text-white px-4 py-2 rounded font-medium hover:bg-blue-700 transition">
+                    Thử lại
+                </button>
+                <a href="notifications.html" class="btn-secondary">
+                    Quay về danh sách
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Fragment -->
+    <div data-fragment="fragments/footer.html"></div>
+
+    <!-- Scripts -->
+    <script src="js/fragments-loader.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/notification-service.js"></script>
+    <script>
+        let currentNotification = null;
+        let notificationId = null;
+
+        // Get notification ID from URL parameters
+        function getNotificationIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id');
+        }
+
+        // Load notification detail from API
+        async function loadNotification() {
+            try {
+                showLoading();
+                
+                // Check authentication
+                if (!authService.isAuthenticated()) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                // Get notification ID from URL
+                notificationId = getNotificationIdFromUrl();
+                if (!notificationId) {
+                    showError();
+                    return;
+                }
+
+                // Use notification service
+                const notification = await notificationService.getNotificationDetail(notificationId);
+                if (notification) {
+                    currentNotification = notification;
+                    displayNotification();
+                    
+                    // Auto mark as read if not already read
+                    if (!currentNotification.readAt) {
+                        setTimeout(() => {
+                            markAsRead();
+                        }, 2000); // Mark as read after 2 seconds of viewing
+                    }
+                    
+                    hideLoading();
+                } else {
+                    showError('Thông báo không tồn tại hoặc đã bị xóa');
+                }
+            } catch (error) {
+                console.error('Error loading notification:', error);
+                showError();
+            }
+        }
+
+        // Display notification details
+        function displayNotification() {
+            if (!currentNotification) return;
+
+            // Update title
+            document.getElementById('notification-title').textContent = currentNotification.title;
+            
+            // Update body
+            document.getElementById('notification-body').innerHTML = formatNotificationBody(currentNotification.body);
+            
+            // Update created date
+            document.getElementById('created-at').textContent = formatFullDate(currentNotification.createdAt);
+            
+            // Update notification ID
+            document.getElementById('notification-id').textContent = currentNotification.id;
+            
+            // Update read status
+            if (currentNotification.readAt) {
+                document.getElementById('read-status').classList.remove('hidden');
+                document.getElementById('unread-status').classList.add('hidden');
+                document.getElementById('mark-read-btn').classList.add('hidden');
+                document.getElementById('read-at-info').classList.remove('hidden');
+                document.getElementById('read-at').textContent = `Đã đọc lúc ${formatFullDate(currentNotification.readAt)}`;
+            } else {
+                document.getElementById('read-status').classList.add('hidden');
+                document.getElementById('unread-status').classList.remove('hidden');
+                document.getElementById('mark-read-btn').classList.remove('hidden');
+                document.getElementById('read-at-info').classList.add('hidden');
+            }
+        }
+
+        // Format notification body with better formatting
+        function formatNotificationBody(body) {
+            if (!body) return 'Không có nội dung';
+            
+            // Convert line breaks to HTML
+            return body.replace(/\n/g, '<br>').replace(/\r/g, '');
+        }
+
+        // Format full date
+        function formatFullDate(dateString) {
+            if (!dateString) return 'Không xác định';
+            
+            const date = new Date(dateString);
+            return date.toLocaleString('vi-VN', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Mark notification as read
+        async function markAsRead() {
+            if (!currentNotification || currentNotification.readAt) return;
+
+            try {
+                const success = await notificationService.markAsRead(currentNotification.id);
+                if (success) {
+                    // Update current notification
+                    currentNotification.readAt = new Date().toISOString();
+                    displayNotification();
+                }
+            } catch (error) {
+                console.error('Error marking notification as read:', error);
+            }
+        }
+
+        // UI helper functions
+        function showLoading() {
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('notification-content').classList.add('hidden');
+            document.getElementById('error-state').classList.add('hidden');
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('notification-content').classList.remove('hidden');
+            document.getElementById('error-state').classList.add('hidden');
+        }
+
+        function showError(message = null) {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('notification-content').classList.add('hidden');
+            document.getElementById('error-state').classList.remove('hidden');
+            
+            if (message) {
+                document.querySelector('#error-state p').textContent = message;
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFragments().then(() => {
+                loadNotification();
+            });
+        });
+    </script>
+</body>
+</html>

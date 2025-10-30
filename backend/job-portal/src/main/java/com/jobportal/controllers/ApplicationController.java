@@ -171,4 +171,21 @@ public class ApplicationController {
                     .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
         }
     }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("isApplied/{jobId}")
+    public ResponseEntity<?> checkIfApplied(@PathVariable Long jobId) {
+        try {
+            String email = SecurityContextHolder.getContext().getAuthentication().getName();
+            Long userId = authService.getUserFromEmail(email).getId();
+            boolean isApplied = applicationService.existsByJobIdAndUserId(jobId, userId);
+            return ResponseEntity.ok(ApiResource.ok(isApplied, "Kiểm tra ứng tuyển thành công"));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
+        }
+    }
 }
