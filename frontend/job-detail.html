@@ -417,7 +417,7 @@
             document.getElementById('sidebar-location').textContent = locationText;
             document.getElementById('sidebar-salary').textContent = salaryText;
             document.getElementById('sidebar-seniority').textContent = job.seniority || 'Không xác định';
-            document.getElementById('sidebar-experience').textContent = job.yearsOfExperience + " Năm Kinh nghiệm" || 'Không yêu cầu';
+            document.getElementById('sidebar-experience').textContent = job.yearsOfExperience ? job.yearsOfExperience + " Năm Kinh nghiệm" : 'Không yêu cầu';
 
             // Company info
             document.getElementById('company-sidebar-name').textContent = job.company?.name || 'Công ty không xác định';
