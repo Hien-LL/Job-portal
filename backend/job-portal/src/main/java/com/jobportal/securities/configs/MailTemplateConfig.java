@@ -2,8 +2,8 @@ package com.jobportal.securities.configs;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver;
 import org.thymeleaf.spring6.SpringTemplateEngine;
+import org.thymeleaf.spring6.templateresolver.SpringResourceTemplateResolver;
 import org.thymeleaf.templatemode.TemplateMode;
 
 @Configuration
@@ -16,17 +16,17 @@ public class MailTemplateConfig {
         r.setSuffix(".html");
         r.setTemplateMode(TemplateMode.HTML);
         r.setCharacterEncoding("UTF-8");
-        r.setCacheable(true); // bật cache prod
-        r.setOrder(1); // ưu tiên hơn resolver mặc định của web (nếu có)
+        r.setCacheable(false);
+        r.setOrder(1);
         return r;
     }
 
     @Bean
-    public SpringTemplateEngine mailTemplateEngine(SpringResourceTemplateResolver mailTemplateResolver) {
+    public SpringTemplateEngine mailTemplateEngine() {
         SpringTemplateEngine engine = new SpringTemplateEngine();
-        engine.setTemplateResolver(mailTemplateResolver);
-        engine.setEnableSpringELCompiler(true);
+        engine.addTemplateResolver(mailTemplateResolver());
         return engine;
     }
 }
+
 

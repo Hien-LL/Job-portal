@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cập Nhật Trạng Thái Đơn Ứng Tuyển</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+            text-align: center;
+            color: white;
+        }
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .greeting {
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        .content p {
+            color: #666;
+            font-size: 15px;
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+        .status-box {
+            border-radius: 8px;
+            padding: 25px;
+            margin: 25px 0;
+            text-align: center;
+            border: 2px solid;
+        }
+        .status-box.accepted {
+            background-color: #d4edda;
+            border-color: #28a745;
+        }
+        .status-box.rejected {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+        }
+        .status-box.pending {
+            background-color: #fff3cd;
+            border-color: #ffc107;
+        }
+        .status-box h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .status-box.accepted h2 {
+            color: #155724;
+        }
+        .status-box.rejected h2 {
+            color: #721c24;
+        }
+        .status-box.pending h2 {
+            color: #856404;
+        }
+        .status-box p {
+            margin: 0;
+            font-weight: 600;
+        }
+        .status-box.accepted p {
+            color: #155724;
+        }
+        .status-box.rejected p {
+            color: #721c24;
+        }
+        .status-box.pending p {
+            color: #856404;
+        }
+        .job-details {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+        }
+        .job-detail-item {
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .job-detail-label {
+            color: #666;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        .job-detail-value {
+            color: #333;
+            font-weight: 500;
+        }
+        .next-steps {
+            background-color: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .next-steps h3 {
+            color: #1565c0;
+            font-size: 15px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+        .next-steps p {
+            color: #1565c0;
+            font-size: 14px;
+            margin: 0;
+        }
+        .button-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: opacity 0.3s ease;
+        }
+        .button:hover {
+            opacity: 0.9;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+        }
+        .footer p {
+            color: #666;
+            font-size: 12px;
+            margin: 5px 0;
+        }
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Job Portal</h1>
+            <p>Cập Nhật Trạng Thái Đơn Ứng Tuyển</p>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <p class="greeting">Xin chào <span th:text="${recipientName}">Người Dùng</span>,</p>
+
+            <p>Chúng tôi có một cập nhật về đơn ứng tuyển của bạn. Xem chi tiết bên dưới:</p>
+
+            <!-- Status Box -->
+            <div class="status-box" th:classappend="${status == 'ACCEPTED' ? 'accepted' : status == 'REJECTED' ? 'rejected' : 'pending'}">
+                <h2 th:if="${status == 'ACCEPTED'}">🎉 Chúc Mừng!</h2>
+                <h2 th:if="${status == 'REJECTED'}">Cập Nhật Đơn Ứng Tuyển</h2>
+                <h2 th:if="${status == 'PENDING'}">Đơn Ứng Tuyển Đang Được Xem Xét</h2>
+                <p th:if="${status == 'ACCEPTED'}">Đơn ứng tuyển của bạn đã được chấp nhận!</p>
+                <p th:if="${status == 'REJECTED'}">Thật không may, đơn ứng tuyển của bạn chưa được chọn lần này</p>
+                <p th:if="${status == 'PENDING'}">Đơn ứng tuyển của bạn đang được xem xét</p>
+            </div>
+
+            <!-- Job Details -->
+            <div class="job-details">
+                <div class="job-detail-item">
+                    <span class="job-detail-label">Vị Trí:</span>
+                    <span class="job-detail-value" th:text="${jobTitle}">Tiêu Đề Công Việc</span>
+                </div>
+                <div class="job-detail-item">
+                    <span class="job-detail-label">Công Ty:</span>
+                    <span class="job-detail-value" th:text="${companyName}">Tên Công Ty</span>
+                </div>
+                <div class="job-detail-item">
+                    <span class="job-detail-label">Trạng Thái:</span>
+                    <span class="job-detail-value" th:text="${status}">Trạng Thái</span>
+                </div>
+            </div>
+
+            <!-- Next Steps (if accepted) -->
+            <div th:if="${status == 'ACCEPTED'}" class="next-steps">
+                <h3>Bước Tiếp Theo</h3>
+                <p>Đội tuyển dụng sẽ liên hệ với bạn trong thời gian sớm nhất với các chi tiết về giai đoạn tiếp theo của quá trình tuyển dụng. Hãy theo dõi hộp thư đến của bạn!</p>
+            </div>
+
+            <!-- Next Steps (if rejected) -->
+            <div th:if="${status == 'REJECTED'}" class="next-steps">
+                <h3>Đừng Bỏ Cuộc!</h3>
+                <p>Mặc dù chúng tôi không thể tiếp tục với đơn ứng tuyển này, nhưng chúng tôi khuyến khích bạn khám phá những cơ hội khác trên nền tảng của chúng tôi. Hãy kiểm tra những vị trí tương tự và tiếp tục xây dựng hồ sơ của bạn!</p>
+            </div>
+
+            <!-- View Application Button -->
+            <div class="button-container">
+                <a href="#" class="button">Xem Chi Tiết Đơn Ứng Tuyển</a>
+            </div>
+
+            <p style="text-align: center; color: #999; font-size: 13px; margin-top: 20px;">
+                Có câu hỏi? <a href="#" style="color: #667eea;">Liên hệ với đội hỗ trợ của chúng tôi</a>
+            </p>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>Đội Ngũ Job Portal</strong></p>
+            <p>Khám phá thêm cơ hội: <a href="#">Duyệt Công Việc</a></p>
+            <p style="margin-top: 15px; font-size: 11px; color: #999;">
+                Đây là một tin nhắn tự động, vui lòng không trả lời email này.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

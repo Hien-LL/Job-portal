@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chào Mừng Đến Job Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 50px 20px;
+            text-align: center;
+            color: white;
+        }
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        .header p {
+            font-size: 18px;
+            opacity: 0.95;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .greeting {
+            color: #333;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        .content p {
+            color: #666;
+            font-size: 15px;
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+        .features {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+        .features h3 {
+            color: #333;
+            font-size: 16px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        .feature-list {
+            list-style: none;
+        }
+        .feature-list li {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 12px;
+            padding-left: 25px;
+            position: relative;
+        }
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .button-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .button {
+            display: inline-block;
+            padding: 14px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 15px;
+            transition: opacity 0.3s ease;
+        }
+        .button:hover {
+            opacity: 0.9;
+        }
+        .highlight {
+            background-color: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #1565c0;
+        }
+        .divider {
+            height: 1px;
+            background-color: #e9ecef;
+            margin: 30px 0;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+        }
+        .footer p {
+            color: #666;
+            font-size: 12px;
+            margin: 5px 0;
+        }
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        .social {
+            margin-top: 15px;
+        }
+        .social a {
+            display: inline-block;
+            margin: 0 8px;
+            color: #667eea;
+            text-decoration: none;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Chào Mừng! 🎉</h1>
+            <p>Bạn đã trở thành thành viên của Job Portal</p>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <p class="greeting">Xin chào <span th:text="${name}">Người Dùng</span>,</p>
+
+            <p>
+                Cảm ơn bạn đã tham gia <strong>Job Portal</strong>! Chúng tôi rất vui khi có bạn tại đây.
+                Dù bạn đang tìm kiếm cơ hội việc làm tiếp theo hay tìm kiếm nhân tài xuất sắc, bạn đã đến đúng nơi.
+            </p>
+
+            <!-- Highlight -->
+            <div class="highlight">
+                <strong>✓ Tài khoản của bạn đã được kích hoạt!</strong><br/>
+                Bạn có thể bắt đầu khám phá cơ hội việc làm và kết nối với các nhà tuyển dụng ngay bây giờ.
+            </div>
+
+            <!-- Features -->
+            <div class="features">
+                <h3>Đây là những gì bạn có thể làm:</h3>
+                <ul class="feature-list">
+                    <li>Duyệt và tìm kiếm cơ hội việc làm</li>
+                    <li>Lưu công việc yêu thích để xem lại sau</li>
+                    <li>Ứng tuyển công việc chỉ với một clic</li>
+                    <li>Theo dõi trạng thái đơn ứng tuyển của bạn</li>
+                    <li>Xây dựng và quản lý hồ sơ chuyên nghiệp</li>
+                    <li>Theo dõi công ty và cập nhật thông tin mới nhất</li>
+                </ul>
+            </div>
+
+            <p>
+                Đội ngũ của chúng tôi cam kết giúp bạn tìm được công việc phù hợp.
+                Hãy khám phá các cơ hội, thể hiện kỹ năng của bạn và tiến tới bước tiếp theo trong sự nghiệp của bạn ngay hôm nay!
+            </p>
+
+            <!-- CTA Button -->
+            <div class="button-container">
+                <a href="#" class="button">Bắt Đầu Khám Phá Công Việc</a>
+            </div>
+
+            <!-- Additional Info -->
+            <div class="divider"></div>
+
+            <p style="color: #999; font-size: 13px;">
+                Nếu bạn có bất kỳ câu hỏi hoặc cần sự hỗ trợ, đội hỗ trợ của chúng tôi luôn sẵn sàng giúp.
+                Vui lòng liên hệ chúng tôi bất kỳ lúc nào!
+            </p>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>Đội Ngũ Job Portal</strong></p>
+            <p>Có câu hỏi? <a href="#">Xem Câu Hỏi Thường Gặp</a> hoặc <a href="#">Liên Hệ Hỗ Trợ</a></p>
+            <div class="social">
+                <a href="#">Theo Dõi Trên Twitter</a> •
+                <a href="#">Thích Trên Facebook</a> •
+                <a href="#">Kết Nối Trên LinkedIn</a>
+            </div>
+            <p style="margin-top: 15px; font-size: 11px; color: #999;">
+                Đây là một tin nhắn tự động, vui lòng không trả lời email này.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
