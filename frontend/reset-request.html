@@ -10,7 +10,7 @@
     <style>body { font-family: 'Inter', sans-serif; } h1,h2,h3{ font-family: 'Poppins', sans-serif; }</style>
 </head>
 <body class="bg-white">
-    <div data-fragment="fragments/header.html"></div>
+    <div data-fragment="fragments/header.html" data-header-type="auto"></div>
 
     <section class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div class="w-full max-w-md">
@@ -75,5 +75,9 @@
     <script src="js/fragments-loader.js"></script>
     <script src="js/config.js"></script>
     <script src="js/reset-request-service.js"></script>
+    <script>
+        // Expose backToStep1 function globally for onclick handler
+        window.backToStep1 = backToStep1;
+    </script>
 </body>
 </html>

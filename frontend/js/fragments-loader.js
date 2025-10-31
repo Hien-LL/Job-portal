@@ -1,6 +1,8 @@
 /**
  * Load HTML fragment and insert into target element
  * Usage: <div data-fragment="fragments/header.html"></div>
+ * For header: <div data-fragment="fragments/header.html" data-header-type="auto"></div>
+ * data-header-type can be: "auto" (detect from user_type), "candidate", "recruiter", or default "header.html"
  */
 
 
@@ -8,7 +10,27 @@ async function loadFragments() {
     const fragments = document.querySelectorAll('[data-fragment]');
     
     for (let fragment of fragments) {
-        const path = fragment.getAttribute('data-fragment');
+        let path = fragment.getAttribute('data-fragment');
+        
+        // Handle header auto-detection
+        if (path === 'fragments/header.html') {
+            const headerType = fragment.getAttribute('data-header-type') || 'auto';
+            
+            if (headerType === 'auto') {
+                const userType = localStorage.getItem('user_type');
+                if (userType === 'recruiter') {
+                    path = 'fragments/header-recruiter.html';
+                } else if (userType === 'candidate') {
+                    path = 'fragments/header-candidate.html';
+                }
+                // If no user_type, use default header.html
+            } else if (headerType === 'recruiter') {
+                path = 'fragments/header-recruiter.html';
+            } else if (headerType === 'candidate') {
+                path = 'fragments/header-candidate.html';
+            }
+        }
+        
         try {
             const response = await fetch(path);
             if (response.ok) {

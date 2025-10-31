@@ -94,9 +94,9 @@ const API_CONFIG = {
     },
     
     // Password Reset Endpoints
-    PASSWORD_RESET: {
-        REQUEST: '/auth/request-reset-password',
-        RESET: '/auth/reset-password',
+    PASSWORD: {
+        SEND_OTP: '/password/otp/send',
+        RESET: '/password/reset',
     },
 };
 
@@ -162,3 +162,7 @@ if (typeof window !== 'undefined') {
     window.buildQueryString = buildQueryString;
     window.buildCompleteUrl = buildCompleteUrl;
 }
+window.APP_CONFIG = {
+  API_BASE: "http://localhost:8080" // File base URL - điều chỉnh khi deploy
+};
+

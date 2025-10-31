@@ -15,6 +15,7 @@ const AUTH_CONFIG = {
         ACCESS_TOKEN: 'access_token',
         REFRESH_TOKEN: 'refresh_token',
         USER_ID: 'user_id',
+        USER_TYPE: 'user_type',
         LOGIN_TIME: 'login_time',
         LOGIN_EXPIRY: 'login_expiry'
     }
@@ -50,6 +51,11 @@ class AuthService {
         return localStorage.getItem(AUTH_CONFIG.STORAGE_KEYS.USER_ID);
     }
 
+    // Get stored user type
+    getUserType() {
+        return localStorage.getItem(AUTH_CONFIG.STORAGE_KEYS.USER_TYPE);
+    }
+
     // Get login time
     getLoginTime() {
         const v = localStorage.getItem(AUTH_CONFIG.STORAGE_KEYS.LOGIN_TIME);
@@ -57,18 +63,19 @@ class AuthService {
     }
 
     // Store authentication data
-    storeAuthData(data) {
+    storeAuthData(data, userType = 'candidate') {
         try {
             localStorage.setItem(AUTH_CONFIG.STORAGE_KEYS.ACCESS_TOKEN, data.token);
             localStorage.setItem(AUTH_CONFIG.STORAGE_KEYS.REFRESH_TOKEN, data.refreshToken);
             localStorage.setItem(AUTH_CONFIG.STORAGE_KEYS.USER_ID, data.user.id.toString());
+            localStorage.setItem(AUTH_CONFIG.STORAGE_KEYS.USER_TYPE, userType);
             // Store login time as current timestamp
             localStorage.setItem(AUTH_CONFIG.STORAGE_KEYS.LOGIN_TIME, Date.now().toString());
             // Store login expiry timestamp (ms). Set to now + LOGIN_DURATION_MS (12 hours)
             const expiry = Date.now() + AUTH_CONFIG.LOGIN_DURATION_MS;
             localStorage.setItem(AUTH_CONFIG.STORAGE_KEYS.LOGIN_EXPIRY, expiry.toString());
             
-            console.log('Auth data stored successfully');
+            console.log('Auth data stored successfully', { userType });
             return true;
         } catch (error) {
             console.error('Error storing auth data:', error);

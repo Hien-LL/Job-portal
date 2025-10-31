@@ -1,17 +1,20 @@
         // Tab switch functionality
-        document.querySelectorAll('button').forEach((btn, index) => {
-            if (index < 2) {
-                btn.addEventListener('click', function() {
-                    document.querySelectorAll('button').forEach((b, i) => {
-                        if (i < 2) {
-                            b.classList.remove('bg-blue-600', 'text-white');
-                            b.classList.add('bg-gray-100', 'text-gray-700');
-                        }
-                    });
-                    this.classList.remove('bg-gray-100', 'text-gray-700');
-                    this.classList.add('bg-blue-600', 'text-white');
+        let selectedUserType = 'candidate'; // Default to candidate
+
+        document.querySelectorAll('button[data-type]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                selectedUserType = this.getAttribute('data-type');
+                
+                // Update button styles
+                document.querySelectorAll('button[data-type]').forEach(b => {
+                    b.classList.remove('bg-blue-600', 'text-white');
+                    b.classList.add('bg-gray-100', 'text-gray-700');
                 });
-            }
+                this.classList.remove('bg-gray-100', 'text-gray-700');
+                this.classList.add('bg-blue-600', 'text-white');
+                
+                console.log('Selected user type:', selectedUserType);
+            });
         });
 
         // API Configuration
@@ -87,10 +90,12 @@
                 localStorage.setItem('access_token', data.token);
                 localStorage.setItem('refresh_token', data.refreshToken);
                 localStorage.setItem('user_id', data.user.id.toString());
+                localStorage.setItem('user_type', selectedUserType);
                 localStorage.setItem('login_time', Date.now().toString()); // Store as timestamp
                 
                 console.log('Auth data stored successfully:', {
                     userId: data.user.id,
+                    userType: selectedUserType,
                     hasToken: !!data.token,
                     hasRefreshToken: !!data.refreshToken,
                     loginTime: Date.now()
@@ -110,6 +115,7 @@
             localStorage.removeItem('access_token');
             localStorage.removeItem('refresh_token');
             localStorage.removeItem('user_id');
+            localStorage.removeItem('user_type');
             localStorage.removeItem('login_time');
             console.log('User logged out');
         }
