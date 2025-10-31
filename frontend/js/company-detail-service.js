@@ -57,7 +57,7 @@
             // Company logo
             const logoElement = document.getElementById('company-logo');
             if (company.logoUrl) {
-                logoElement.innerHTML = `<img src="http://localhost:8080${company.logoUrl}" alt="${company.name}" class="w-full h-full object-contain rounded-lg">`;
+                logoElement.innerHTML = `<img src="${window.APP_CONFIG.API_BASE + company.logoUrl}" alt="${company.name}" class="w-full h-full object-contain rounded-lg">`;
             } else {
                 logoElement.innerHTML = `<span class="text-4xl">🏢</span>`;
             }

@@ -191,7 +191,7 @@
                 const mainAvatar = document.getElementById('main-avatar');
                 if (mainAvatar) {
                     if (userProfile.avatarUrl) {
-                        mainAvatar.src = `http://localhost:8080${userProfile.avatarUrl}`;
+                        mainAvatar.src = window.APP_CONFIG.API_BASE + userProfile.avatarUrl;
                     } else {
                         mainAvatar.src = 'https://via.placeholder.com/80/6B7280/FFFFFF?text=' + (userProfile.name ? userProfile.name.charAt(0) : 'U');
                     }
@@ -200,7 +200,7 @@
                 const sidebarAvatar = document.getElementById('sidebar-user-avatar');
                 if (sidebarAvatar) {
                     if (userProfile.avatarUrl) {
-                        sidebarAvatar.src = `http://localhost:8080${userProfile.avatarUrl}`;
+                        sidebarAvatar.src = window.APP_CONFIG.API_BASE + userProfile.avatarUrl;
                     } else {
                         sidebarAvatar.src = 'https://via.placeholder.com/80/6B7280/FFFFFF?text=' + (userProfile.name ? userProfile.name.charAt(0) : 'U');
                     }

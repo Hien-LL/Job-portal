@@ -243,7 +243,7 @@
                         <a href="job-detail.html?slug=${job.slug}" class="flex gap-4">
                             <div class="w-16 h-16 bg-gray-100 rounded flex-shrink-0 flex items-center justify-center">
                                 ${companyLogo ? 
-                                    `<img src="http://localhost:8080${companyLogo}" alt="${job.company?.name}" class="w-full h-full object-contain rounded">` :
+                                    `<img src="${window.APP_CONFIG.API_BASE + companyLogo}" alt="${job.company?.name}" class="w-full h-full object-contain rounded">` :
                                     `<span class="text-2xl">${getCategoryIcon(job.category?.name)}</span>`
                                 }
                             </div>

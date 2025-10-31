@@ -69,7 +69,7 @@
             }
             
             if (data.avatarUrl) {
-                document.getElementById('candidate-avatar').src = `http://localhost:8080${data.avatarUrl}`;
+                document.getElementById('candidate-avatar').src = window.APP_CONFIG.API_BASE + data.avatarUrl;
             } else {
                 document.getElementById('candidate-avatar').src = 'https://via.placeholder.com/128/6B7280/FFFFFF?text=' + (data.name ? data.name.charAt(0) : 'U');
             }
@@ -142,7 +142,7 @@
                 if (resume.files && resume.files.length > 0) {
                     document.getElementById('files-section').style.display = 'block';
                     document.getElementById('files-container').innerHTML = resume.files.map(file => `
-                        <a href="http://localhost:8080${file.fileUrl}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition">
+                        <a href="${window.APP_CONFIG.API_BASE + file.fileUrl}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition">
                             <svg class="w-5 h-5 text-purple-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M4 4a2 2 0 012-2h6a1 1 0 10-1 1v12a1 1 0 11-2 0V4zm10 0a2 2 0 012-2h6a2 2 0 012 2v12a2 2 0 01-2 2h-6a2 2 0 01-2-2V4zm4 10a1 1 0 100-2 1 1 0 000 2z"></path>
                             </svg>

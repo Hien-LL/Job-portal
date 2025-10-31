@@ -57,7 +57,7 @@
             emptyState.classList.add('hidden');
 
             container.innerHTML = followedCompanies.map(company => {
-                const logoUrl = company.logoUrl ? `http://localhost:8080${company.logoUrl}` : 'https://via.placeholder.com/200/6B7280/FFFFFF?text=No+Logo';
+                const logoUrl = company.logoUrl ? window.APP_CONFIG.API_BASE + company.logoUrl : 'https://via.placeholder.com/200/6B7280/FFFFFF?text=No+Logo';
                 
                 return `
                     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition">

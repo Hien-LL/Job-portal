@@ -37,7 +37,7 @@
                 
                 // Get company logo or use default
                 const logoUrl = company.logoUrl ? 
-                    `http://localhost:8080${company.logoUrl}` : null;
+                    window.APP_CONFIG.API_BASE + company.logoUrl : null;
 
                 return `
                     <div class="bg-white rounded-lg border border-gray-200 p-6 text-center hover:shadow-md transition cursor-pointer" 

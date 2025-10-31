@@ -96,7 +96,7 @@
 
             grid.innerHTML = filteredCompanies.map(company => {
                 const logoUrl = company.logoUrl ? 
-                    `http://localhost:8080${company.logoUrl}` : null;
+                    window.APP_CONFIG.API_BASE + company.logoUrl : null;
                 const companySizeText = formatCompanySize(company.size_min, company.size_max);
 
                 return `
@@ -308,7 +308,6 @@
                         'Content-Type': 'application/json'
                     }
                 });
-                );
 
                 const result = await response.json();
 

@@ -73,7 +73,7 @@
             
             logoElements.forEach(element => {
                 if (job.company?.logoUrl) {
-                    element.innerHTML = `<img src="http://localhost:8080${job.company.logoUrl}" alt="${job.company.name}" class="w-full h-full object-contain rounded">`;
+                    element.innerHTML = `<img src="${window.APP_CONFIG.API_BASE + job.company.logoUrl}" alt="${job.company.name}" class="w-full h-full object-contain rounded">`;
                 } else {
                     element.innerHTML = `<span class="text-2xl">${getCategoryIcon(job.category?.name)}</span>`;
                 }

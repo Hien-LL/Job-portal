@@ -50,7 +50,7 @@
                         <div class="flex gap-4 mb-4">
                             <div class="w-12 h-12 bg-gray-200 rounded flex-shrink-0 flex items-center justify-center">
                                 ${companyLogo ? 
-                                    `<img src="http://localhost:8080${companyLogo}" alt="${job.company?.name}" class="w-full h-full object-contain rounded">` :
+                                    `<img src="${window.APP_CONFIG.API_BASE + companyLogo}" alt="${job.company?.name}" class="w-full h-full object-contain rounded">` :
                                     `<span class="text-xl">${getDefaultCompanyIcon(job.category?.name)}</span>`
                                 }
                             </div>

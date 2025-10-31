@@ -155,7 +155,7 @@
                                                     <span class="text-gray-500">- ${getFileName(file.fileUrl)}</span>
                                                 </div>
                                                 <div class="flex items-center gap-1">
-                                                    <a href="http://localhost:8080${file.fileUrl}" target="_blank" class="text-blue-600 hover:text-blue-800 p-1" title="Xem/Tải file">
+                                                    <a href="${window.APP_CONFIG.API_BASE + file.fileUrl}" target="_blank" class="text-blue-600 hover:text-blue-800 p-1" title="Xem/Tải file">
                                                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                                             <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"></path>
                                                         </svg>
@@ -490,7 +490,8 @@
             try {
                 // Don't use authUtils.apiRequest for file upload to avoid Content-Type header conflict
                 const token = localStorage.getItem('access_token');
-                const response = await fetch(`http://localhost:8080/api/resumes/me/${uploadingResumeId}/upload?fileType=${fileType}`, {
+                const uploadUrl = buildApiUrl(API_CONFIG.RESUMES.UPLOAD, { resumeId: uploadingResumeId });
+                const response = await fetch(`${uploadUrl}?fileType=${fileType}`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`
