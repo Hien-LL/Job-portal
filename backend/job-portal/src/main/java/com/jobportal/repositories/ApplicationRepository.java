@@ -79,6 +79,14 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
     """)
     Optional<Application> findByIdWithJoins(@Param("id") Long id);
 
+    // Optimized query for getCandidateInfomations - fetch tất cả trong 1 lần
+    @Query("""
+        select a from Application a
+        join fetch a.status s
+        join fetch a.user u
+        left join fetch u.userSkills
+        where a.id = :id
+    """)
+    Optional<Application> findCandidateById(@Param("id") Long id);
 }
-
 
