@@ -5,8 +5,10 @@ import com.jobportal.dtos.requests.updation.ResumeUpdationRequest;
 import com.jobportal.dtos.resources.ResumeResource;
 import com.jobportal.entities.*;
 import com.jobportal.mappers.ResumeMapper;
+import com.jobportal.repositories.ResumeFileRepository;
 import com.jobportal.repositories.ResumeRepository;
 import com.jobportal.repositories.UserRepository;
+import com.jobportal.services.interfaces.ResumeFileServiceInterface;
 import com.jobportal.services.interfaces.ResumeServiceInterface;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -23,15 +25,25 @@ public class ResumeService implements ResumeServiceInterface {
     private final ResumeRepository resumeRepository;
     private final UserRepository userRepository;
     private final ResumeMapper resumeMapper;
+    private final ResumeFileServiceInterface resumeFileService;
+    private final ResumeFileRepository resumeFileRepository;
 
     @Override
     @Transactional(readOnly = true)
-    public List<ResumeResource> getListById(Long userId) {
-        if (!userRepository.existsById(userId)) throw new EntityNotFoundException("Người dùng không tồn tại");
+    public List<ResumeResource> getListById(Long userId, Boolean isDefault) {
+        if (!userRepository.existsById(userId))
+            throw new EntityNotFoundException("Người dùng không tồn tại");
 
-        List<Resume> resumes = resumeRepository.findByUserIdOrderByIdDesc(userId);
+        List<Resume> resumes;
+        if (isDefault != null) {
+            resumes = resumeRepository.findByUserIdAndIsDefaultOrderByIdDesc(userId, isDefault);
+        } else {
+            resumes = resumeRepository.findByUserIdOrderByIdDesc(userId);
+        }
+
         return resumeMapper.tResourceList(resumes);
     }
+
 
     @Override
     @Transactional(readOnly = true)
@@ -161,6 +173,18 @@ public class ResumeService implements ResumeServiceInterface {
         return resumeMapper.tResource(saved);
     }
 
+    @Override
+    public void delete(Long userId, Long resumeId) {
+        if (!resumeRepository.existsByIdAndUserId(resumeId, userId))
+            throw new EntityNotFoundException("Resume không tồn tại");
+        // xoá file liên quan
+        List<ResumeFile> files = resumeFileRepository.findByResumeId(resumeId);
+        for (ResumeFile f : files) {
+            resumeFileService.deleteFile(userId, f.getId());
+        }
+        // xoá resume
+        resumeRepository.deleteById(resumeId);
+    }
 
 
     // ===== helpers =====

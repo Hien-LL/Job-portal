@@ -119,14 +119,14 @@ public class ApplicationService implements ApplicationServiceInterface {
 
     @Override
     public CandidateResource getCandidateInfomations(Long applicationId) {
-        Application application = applicationRepository.findDetailById(applicationId)
+        Application application = applicationRepository.findCandidateById(applicationId)
                 .orElseThrow(() -> new EntityNotFoundException("Application không tồn tại"));
 
         User user = application.getUser();
         CandidateResource.CandidateResourceBuilder candidateResourceBuilder =
                 userMapper.tCandidateResource(user).toBuilder();
 
-        if (user.getUserSkills() != null) {
+        if (user.getUserSkills() != null && !user.getUserSkills().isEmpty()) {
             candidateResourceBuilder.skills(userSkillMapper.tResourceList(user.getUserSkills()));
         }
 
@@ -146,5 +146,3 @@ public class ApplicationService implements ApplicationServiceInterface {
         return applicationRepository.existsByUser_IdAndJob_Id(userId, jobId);
     }
 }
-
-

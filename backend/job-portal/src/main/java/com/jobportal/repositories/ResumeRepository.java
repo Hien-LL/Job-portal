@@ -12,6 +12,8 @@ public interface ResumeRepository extends JpaRepository<Resume, Long>, JpaSpecif
 
     // LIST: không kéo children
     List<Resume> findByUserIdOrderByIdDesc(Long userId);
+    List<Resume> findByUserIdAndIsDefaultOrderByIdDesc(Long userId, boolean isDefault);
+
 
     Optional<Resume> findFirstByUserIdAndIsDefaultTrue(Long userId);
 
@@ -23,4 +25,6 @@ public interface ResumeRepository extends JpaRepository<Resume, Long>, JpaSpecif
       where r.id = :id and r.user.id = :userId
     """)
     Optional<Resume> fetchDetailWithExperiences(@Param("id") Long id, @Param("userId") Long userId);
+
+    boolean existsByIdAndUserId(Long resumeId, Long userId);
 }

@@ -29,12 +29,12 @@ public class ResumeController {
     private final ResumeFileServiceInterface resumeFileService;
 
     @GetMapping("/me")
-    public ResponseEntity<?> getList() {
+    public ResponseEntity<?> getList(@RequestParam(required = false) Boolean isDefault) {
         try {
             String email = SecurityContextHolder.getContext().getAuthentication().getName();
             UserProfileResource user = authService.getUserFromEmail(email);
 
-            List<ResumeResource> resumes = resumeService.getListById(user.getId());
+            List<ResumeResource> resumes = resumeService.getListById(user.getId(), isDefault);
             return ResponseEntity.ok(ApiResource.ok(resumes, "Success"));
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -126,6 +126,22 @@ public class ResumeController {
             UserProfileResource user = authService.getUserFromEmail(email);
             resumeFileService.deleteFile(user.getId(), resumeId);
             return ResponseEntity.ok(ApiResource.ok(null, "Xoá File thành công"));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
+        }
+    }
+
+    @DeleteMapping("/me/{resumeId}")
+    public ResponseEntity<?> delete(@PathVariable Long resumeId) {
+        try {
+            String email = SecurityContextHolder.getContext().getAuthentication().getName();
+            UserProfileResource user = authService.getUserFromEmail(email);
+            resumeService.delete(user.getId(), resumeId);
+            return ResponseEntity.ok(ApiResource.ok(null, "Deleted"));
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND));

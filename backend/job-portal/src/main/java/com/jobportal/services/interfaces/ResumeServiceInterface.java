@@ -6,9 +6,11 @@ import com.jobportal.dtos.resources.ResumeResource;
 import java.util.List;
 
 public interface ResumeServiceInterface {
-    List<ResumeResource> getListById(Long userId);
+    List<ResumeResource> getListById(Long userId, Boolean isDefault);
     ResumeResource getDetail(Long userId, Long resumeId);
 
     ResumeResource create(Long userId, ResumeCreationRequest request);
     ResumeResource update(Long userId, Long resumeId, ResumeUpdationRequest request);
+
+    void delete(Long userId, Long resumeId);
 }

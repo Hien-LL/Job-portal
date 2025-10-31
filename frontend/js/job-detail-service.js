@@ -1,0 +1,622 @@
+        // Global variables
+        let currentJobSlug = '';
+        let currentJobId = null;
+        let isJobSaved = false;
+        let isJobApplied = false;
+
+        function viewCompany(slug, companyId) {
+            window.location.href = `company-detail.html?slug=${currentCompanySlug.replace(/"/g, '')}`;
+        }
+
+        // Get job slug from URL parameters
+        function getJobSlugFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('slug') || urlParams.get('job');
+        }
+
+        // Load job detail from API
+        async function loadJobDetail() {
+            const jobSlug = getJobSlugFromURL();
+            
+            if (!jobSlug) {
+                showError('Không tìm thấy thông tin việc làm');
+                return;
+            }
+
+            try {
+                const url = buildApiUrl(API_CONFIG.JOBS.GET_DETAIL, { jobSlug });
+                const response = await fetch(url);
+                const result = await response.json();
+
+                if (result.success && result.data) {
+                    displayJobDetail(result.data);
+                    loadSimilarJobs(result.data.category?.slug);
+                    
+                    // Check if user has applied for this job (only if logged in)
+                    if (authService.isAuthenticated()) {
+                        checkJobApplied(result.data.id);
+                    }
+                    
+                    hideLoading();
+                } else {
+                    showError('Không tìm thấy việc làm này');
+                }
+            } catch (error) {
+                console.error('Error loading job detail:', error);
+                showError('Lỗi khi tải thông tin việc làm');
+            }
+        }
+
+        // Display job detail
+        function displayJobDetail(job) {
+            // Store job info globally
+            currentJobSlug = job.slug;
+            currentJobId = job.id;
+            currentCompanySlug = job.company?.slug;
+
+            // Update page title
+            document.title = `${job.title} - ${job.company?.name} | jobPortal`;
+
+            // Job header
+            document.getElementById('job-title').textContent = job.title;
+            document.getElementById('company-name').textContent = job.company?.name || 'Công ty không xác định';
+            
+            if (job.company?.verified) {
+                document.getElementById('company-verified').classList.remove('hidden');
+            }
+
+            // Company logo
+            const logoElements = [
+                document.getElementById('company-logo'),
+                document.getElementById('company-sidebar-logo')
+            ];
+            
+            logoElements.forEach(element => {
+                if (job.company?.logoUrl) {
+                    element.innerHTML = `<img src="http://localhost:8080${job.company.logoUrl}" alt="${job.company.name}" class="w-full h-full object-contain rounded">`;
+                } else {
+                    element.innerHTML = `<span class="text-2xl">${getCategoryIcon(job.category?.name)}</span>`;
+                }
+            });
+
+            // Job info
+            const locationText = job.isRemote ? 'Remote' : (job.location?.displayName || 'Không xác định');
+            const salaryText = formatSalary(job.salaryMin, job.salaryMax);
+            
+            document.getElementById('job-location').textContent = `📍 ${locationText}`;
+            document.getElementById('job-salary').textContent = `💰 ${salaryText}`;
+            document.getElementById('job-type').textContent = `⏰ ${job.seniority || 'Toàn thời gian'}`;
+            document.getElementById('published-date').textContent = formatPublishedDate(job.publishedAt);
+
+            // Job description
+            document.getElementById('job-description').innerHTML = formatDescription(job.description || 'Chưa có mô tả công việc.');
+
+            // Job requirements (if available in API response)
+            if (job.requirements) {
+                document.getElementById('job-requirements').innerHTML = formatDescription(job.requirements);
+            } else {
+                // Hide requirements section if not available
+                document.querySelector('.bg-white:has(#job-requirements)').style.display = 'none';
+            }
+
+            // Benefits
+            if (job.benefits && job.benefits.length > 0) {
+                const benefitsHTML = job.benefits.map(benefit => `
+                    <div class="flex items-center gap-2 text-sm">
+                        <span class="text-green-500">✓</span>
+                        <span>${benefit.name}</span>
+                    </div>
+                `).join('');
+                document.getElementById('job-benefits').innerHTML = benefitsHTML;
+            } else {
+                document.getElementById('benefits-section').style.display = 'none';
+            }
+
+            // Skills
+            if (job.skills && job.skills.length > 0) {
+                const skillsHTML = job.skills.map(skill => `
+                    <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                        ${skill.name}
+                    </span>
+                `).join('');
+                document.getElementById('job-skills').innerHTML = skillsHTML;
+            } else {
+                document.getElementById('skills-section').style.display = 'none';
+            }
+
+            // Sidebar info
+            document.getElementById('sidebar-published').textContent = formatPublishedDate(job.publishedAt);
+            document.getElementById('sidebar-expires').textContent = job.expiresAt ? formatDate(job.expiresAt) : 'Không xác định';
+            document.getElementById('sidebar-location').textContent = locationText;
+            document.getElementById('sidebar-salary').textContent = salaryText;
+            document.getElementById('sidebar-seniority').textContent = job.seniority || 'Không xác định';
+            document.getElementById('sidebar-experience').textContent = job.yearsOfExperience ? job.yearsOfExperience + " Năm Kinh nghiệm" : 'Không yêu cầu';
+
+            // Company info
+            document.getElementById('company-sidebar-name').textContent = job.company?.name || 'Công ty không xác định';
+            document.getElementById('company-size').textContent = formatCompanySize(job.company?.size_min, job.company?.size_max);
+            document.getElementById('company-description').textContent = job.company?.description || 'Chưa có mô tả công ty.';
+            
+            if (job.company?.website) {
+                const websiteLink = document.querySelector('#company-website a');
+                websiteLink.href = job.company.website.startsWith('http') ? job.company.website : `https://${job.company.website}`;
+                websiteLink.textContent = job.company.website;
+            } else {
+                document.getElementById('company-website').style.display = 'none';
+            }
+
+            document.getElementById('company-followers').innerHTML = `
+                <span>👥</span>
+                <span>${job.company?.followerCount || 0} người theo dõi</span>
+            `;
+
+            // Apply button functionality will be set by updateApplyButton()
+            // Initial state will be updated after checking application status
+        }
+
+        // Check if user has already applied for this job
+        async function checkJobApplied(jobId) {
+            try {
+                const token = authService.getToken();
+                if (!token) return;
+
+                const url = buildApiUrl(API_CONFIG.JOBS.CHECK_APPLIED, { jobId });
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        isJobApplied = result.data === true;
+                        updateApplyButton();
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking application status:', error);
+            }
+        }
+
+        // Update apply button based on application status
+        function updateApplyButton() {
+            const applyBtn = document.getElementById('apply-btn');
+            
+            if (isJobApplied) {
+                applyBtn.textContent = 'Đã ứng tuyển';
+                applyBtn.disabled = true;
+                applyBtn.className = 'btn-secondary flex-1 btn-disabled';
+                applyBtn.onclick = null;
+                applyBtn.title = 'Bạn đã ứng tuyển công việc này';
+            } else {
+                applyBtn.textContent = 'Ứng tuyển ngay';
+                applyBtn.disabled = false;
+                applyBtn.className = 'btn-primary flex-1';
+                applyBtn.onclick = () => applyToJob(currentJobSlug, currentJobId);
+                applyBtn.title = 'Nhấn để ứng tuyển';
+            }
+        }
+
+        // Load similar jobs
+        async function loadSimilarJobs(categorySlug) {
+            if (!categorySlug) return;
+
+            try {
+                const url = buildCompleteUrl(API_CONFIG.JOBS.GET_RELATED, { categorySlug }, { perPage: 3, published: true });
+                const response = await fetch(url);
+                const result = await response.json();
+
+                if (result.success && result.data && result.data.content) {
+                    displaySimilarJobs(result.data.content.slice(0, 3));
+                }
+            } catch (error) {
+                console.error('Error loading similar jobs:', error);
+            }
+        }
+
+        // Display similar jobs
+        function displaySimilarJobs(jobs) {
+            const container = document.getElementById('similar-jobs');
+            
+            if (!jobs || jobs.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-sm">Không có việc làm tương tự</p>';
+                return;
+            }
+
+            const html = jobs.map(job => `
+                <div class="border border-gray-200 rounded-lg p-3 hover:shadow-sm transition cursor-pointer" 
+                     onclick="window.location.href='job-detail.html?slug=${job.slug}'">
+                    <h4 class="font-medium text-gray-900 text-sm mb-1">${job.title}</h4>
+                    <p class="text-gray-600 text-xs mb-2">${job.company?.name}</p>
+                    <div class="flex items-center justify-between text-xs text-gray-500">
+                        <span>💰 ${formatSalary(job.salaryMin, job.salaryMax)}</span>
+                        <span>${formatPublishedDate(job.publishedAt)}</span>
+                    </div>
+                </div>
+            `).join('');
+
+            container.innerHTML = html;
+        }
+
+        // Utility functions
+        function formatSalary(min, max) {
+            if (!min && !max) return 'Thỏa thuận';
+            
+            const formatAmount = (amount) => {
+                if (amount >= 1000000) {
+                    return (amount / 1000000).toFixed(0) + ' triệu';
+                }
+                return amount.toLocaleString('vi-VN');
+            };
+
+            if (min && max) {
+                return `${formatAmount(min)} - ${formatAmount(max)}`;
+            } else if (min) {
+                return `Từ ${formatAmount(min)}`;
+            } else {
+                return `Lên đến ${formatAmount(max)}`;
+            }
+        }
+
+        function formatPublishedDate(dateString) {
+            if (!dateString) return 'Không xác định';
+
+            const publishedDate = new Date(dateString);
+            const now = new Date();
+
+            // reset giờ để chỉ so sánh theo ngày
+            publishedDate.setHours(0, 0, 0, 0);
+            now.setHours(0, 0, 0, 0);
+
+            const diffTime = now - publishedDate;
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays === 0) return 'Đăng hôm nay';
+            if (diffDays === 1) return 'Đăng hôm qua';
+            if (diffDays < 7) return `Đăng ${diffDays} ngày trước`;
+            if (diffDays < 30) return `Đăng ${Math.floor(diffDays / 7)} tuần trước`;
+            return `Đăng ${Math.floor(diffDays / 30)} tháng trước`;
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'Không xác định';
+            
+            const date = new Date(dateString);
+            return date.toLocaleDateString('vi-VN', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+        }
+
+        function formatCompanySize(sizeMin, sizeMax) {
+            if (!sizeMin && !sizeMax) return 'Quy mô không xác định';
+            if (sizeMin === 0 && sizeMax === 0) return 'Quy mô không xác định';
+            
+            if (sizeMin && sizeMax) {
+                if (sizeMin === sizeMax) {
+                    return `${sizeMin} nhân viên`;
+                }
+                return `${sizeMin} - ${sizeMax} nhân viên`;
+            } else if (sizeMin) {
+                return `Từ ${sizeMin} nhân viên`;
+            } else {
+                return `Lên đến ${sizeMax} nhân viên`;
+            }
+        }
+
+        function formatDescription(md) {
+        if (!md) return '';
+
+        let html = md
+            // Escape ký tự đặc biệt
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+
+            // Heading (##, ###, ####, etc.)
+            .replace(/^###### (.*)$/gm, '<h6>$1</h6>')
+            .replace(/^##### (.*)$/gm, '<h5>$1</h5>')
+            .replace(/^#### (.*)$/gm, '<h4>$1</h4>')
+            .replace(/^### (.*)$/gm, '<h3>$1</h3>')
+            .replace(/^## (.*)$/gm, '<h2>$1</h2>')
+            .replace(/^# (.*)$/gm, '<h1>$1</h1>')
+
+            // Horizontal line
+            .replace(/^---$/gm, '<hr>')
+
+            // Bold, italic, code inline
+            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.+?)\*/g, '<em>$1</em>')
+            .replace(/`([^`]+)`/g, '<code>$1</code>')
+
+            // Links [text](url)
+            .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">$1</a>')
+
+            // Blockquote
+            .replace(/^> (.+)$/gm, '<blockquote class="border-l-4 border-gray-300 pl-4 italic text-gray-600">$1</blockquote>')
+
+            // Unordered lists (- item)
+            .replace(/^\s*[-*] (.+)$/gm, '<li>$1</li>')
+            .replace(/(<li>[\s\S]+?<\/li>)/gm, '<ul class="list-disc pl-6">$1</ul>')
+
+            // Line breaks
+            .replace(/\n{2,}/g, '</p><p>')
+            .replace(/\n/g, '<br>');
+
+        // Gói lại toàn bộ trong <p> nếu chưa có block
+        html = `<p>${html}</p>`;
+        
+        return html;
+        }
+
+
+        function getCategoryIcon(categoryName) {
+            const categoryIcons = {
+                'Digital Marketing': '📊',
+                'Marketing': '📊', 
+                'IT': '💻',
+                'Technology': '💻',
+                'Software': '⚙️',
+                'Design': '🎨',
+                'Sales': '🚀',
+                'HR': '👔',
+                'Finance': '💰',
+                'Education': '🎓'
+            };
+            
+            return categoryIcons[categoryName] || '🏢';
+        }
+
+        function applyToJob(slug, jobId) {
+            // Check if user is logged in
+            if (!authService.isAuthenticated()) {
+                alert('Vui lòng đăng nhập để ứng tuyển');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Load resumes and show apply modal
+            loadUserResumes().then(() => {
+                openApplyModal(slug, jobId);
+            });
+        }
+
+        // Load user resumes for selection
+        async function loadUserResumes() {
+            try {
+                const url = buildApiUrl(API_CONFIG.RESUMES.LIST);
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authService.getToken()}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load resumes');
+                }
+
+                const result = await response.json();
+                if (result.success && result.data) {
+                    populateResumeSelect(result.data);
+                    return true;
+                }
+                return false;
+            } catch (error) {
+                console.error('Error loading resumes:', error);
+                alert('Lỗi khi tải danh sách CV');
+                return false;
+            }
+        }
+
+        // Populate resume select dropdown
+        function populateResumeSelect(resumes) {
+            const select = document.getElementById('resume-select');
+            select.innerHTML = '<option value="">-- Chọn CV --</option>';
+
+            if (resumes.length === 0) {
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = 'Bạn chưa có CV';
+                option.disabled = true;
+                select.appendChild(option);
+                return;
+            }
+
+            resumes.forEach(resume => {
+                const option = document.createElement('option');
+                option.value = resume.id;
+                option.textContent = `${resume.title}${resume.isDefault ? ' (Mặc định)' : ''}`;
+                select.appendChild(option);
+            });
+
+            // Set default resume as selected
+            const defaultResume = resumes.find(r => r.isDefault);
+            if (defaultResume) {
+                select.value = defaultResume.id;
+            }
+        }
+
+        // Open apply modal
+        function openApplyModal(slug, jobId) {
+            currentJobSlug = slug;
+            currentJobId = jobId;
+
+            // Populate job info in modal
+            document.getElementById('modal-job-title').textContent = document.getElementById('job-title').textContent;
+            document.getElementById('modal-job-company').textContent = document.getElementById('company-name').textContent;
+
+            // Clear form
+            document.getElementById('resume-select').value = '';
+            document.getElementById('cover-letter').value = '';
+            document.getElementById('cover-letter-count').textContent = '0/1000 ký tự';
+
+            document.getElementById('apply-modal').classList.remove('hidden');
+        }
+
+        // Close apply modal
+        function closeApplyModal() {
+            document.getElementById('apply-modal').classList.add('hidden');
+        }
+
+        // Handle cover letter character count
+        document.addEventListener('DOMContentLoaded', () => {
+            const coverLetterInput = document.getElementById('cover-letter');
+            if (coverLetterInput) {
+                coverLetterInput.addEventListener('input', function() {
+                    const count = this.value.length;
+                    document.getElementById('cover-letter-count').textContent = `${count}/1000 ký tự`;
+                    
+                    if (count > 1000) {
+                        this.value = this.value.substring(0, 1000);
+                    }
+                });
+            }
+        });
+
+        // Submit application
+        async function submitApplication() {
+            try {
+                const resumeId = document.getElementById('resume-select').value;
+                const coverLetter = document.getElementById('cover-letter').value.trim();
+
+                // Validation
+                if (!resumeId) {
+                    alert('Vui lòng chọn CV');
+                    return;
+                }
+
+                if (!currentJobId) {
+                    alert('Không có thông tin việc làm');
+                    return;
+                }
+
+                // Show loading state
+                const submitBtn = event.target;
+                const originalText = submitBtn.textContent;
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Đang ứng tuyển...';
+
+                const url = buildApiUrl(API_CONFIG.JOBS.APPLY, { jobId: currentJobId });
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authService.getToken()}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        resumeId: parseInt(resumeId),
+                        coverLetter: coverLetter || ''
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Ứng tuyển thất bại');
+                }
+
+                const result = await response.json();
+                if (result.success) {
+                    alert('Ứng tuyển thành công! Chúc bạn may mắn.');
+                    closeApplyModal();
+                    
+                    // Update application status
+                    isJobApplied = true;
+                    updateApplyButton();
+                } else {
+                    throw new Error(result.message || 'Ứng tuyển thất bại');
+                }
+            } catch (error) {
+                console.error('Error submitting application:', error);
+                alert(`Lỗi: ${error.message}`);
+            } finally {
+                const submitBtn = event.target;
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Ứng tuyển ngay';
+            }
+        }
+
+        function hideLoading() {
+            document.getElementById('loading-container').style.display = 'none';
+            document.getElementById('job-detail-container').style.display = 'block';
+        }
+
+        function showError(message) {
+            document.getElementById('loading-container').style.display = 'none';
+            document.getElementById('error-container').style.display = 'block';
+            
+            const errorTitle = document.querySelector('#error-container h2');
+            const errorText = document.querySelector('#error-container p');
+            
+            if (message === 'Không tìm thấy thông tin việc làm') {
+                errorTitle.textContent = 'Thiếu thông tin';
+                errorText.textContent = 'Vui lòng truy cập từ trang tìm việc để xem chi tiết.';
+            } else {
+                errorTitle.textContent = 'Có lỗi xảy ra';
+                errorText.textContent = message;
+            }
+        }
+
+        // Toggle save job functionality
+        async function toggleSaveJob() {
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                alert('Vui lòng đăng nhập để lưu việc làm');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            if (!currentJobSlug) {
+                alert('Không thể lưu việc làm này');
+                return;
+            }
+
+            try {
+                const method = isJobSaved ? 'DELETE' : 'POST';
+                const endpoint = isJobSaved ? `/jobs/${currentJobSlug}/unsave` : `/jobs/${currentJobSlug}/save`;
+
+                const response = await window.authUtils.apiRequest(endpoint, {
+                    method: method
+                });
+
+                if (response && response.ok) {
+                    isJobSaved = !isJobSaved;
+                    updateSaveButton();
+                } else {
+                    throw new Error('Failed to save/unsave job');
+                }
+            } catch (error) {
+                console.error('Error saving/unsaving job:', error);
+                alert('Có lỗi xảy ra khi lưu việc làm');
+            }
+        }
+
+        // Update save button text and style
+        function updateSaveButton() {
+            const saveBtn = document.getElementById('save-job-btn');
+            const saveText = document.getElementById('save-text');
+            
+            if (isJobSaved) {
+                saveBtn.className = 'btn-secondary';
+                saveText.textContent = 'Đã lưu';
+            } else {
+                saveBtn.className = 'btn-outline';
+                saveText.textContent = 'Lưu việc làm';
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            loadJobDetail();
+
+            // Add favorite functionality
+            document.querySelector('.favorite-btn').addEventListener('click', function() {
+                this.classList.toggle('text-red-500');
+                this.textContent = this.classList.contains('text-red-500') ? '♥' : '♡';
+            });
+        });
