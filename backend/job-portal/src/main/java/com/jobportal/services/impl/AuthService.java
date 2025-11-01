@@ -43,13 +43,13 @@ public class AuthService extends BaseService implements AuthServiceInterface {
     public Object authenticate(LoginRequest request) {
         try {
             User user = userRepository.findByEmailWithRolesAndPermissions(
-                    request.getEmail()).orElseThrow(() -> new BadCredentialsException("Email hoac mat khau khong dung"));
+                    request.getEmail()).orElseThrow(() -> new BadCredentialsException("Email hoặc mật khẩu không đúng"));
 
             if (!user.isEmailVerified()) throw new IllegalStateException("Email chưa đuợc xác thực");
 
             if (!passwordEncoder.matches(request.getPassword(), user.getPassword()))
             {
-                throw new BadCredentialsException("Email hoac mat khau khong dung");
+                throw new BadCredentialsException("Email hoặc mật khẩu không đúng");
             }
 
             AuthResource userResource = userMapper.tAuthResource(user);
