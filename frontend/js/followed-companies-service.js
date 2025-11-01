@@ -111,15 +111,15 @@
 
                 const result = await response.json();
                 if (result.success) {
-                    alert('Bỏ theo dõi công ty thành công');
+                    showSuccessToast('Bỏ theo dõi công ty thành công ✓', 2000);
                     // Reload companies list
                     loadFollowedCompanies();
                 } else {
-                    alert('Lỗi khi bỏ theo dõi công ty');
+                    showErrorToast('Lỗi khi bỏ theo dõi công ty', 3000);
                 }
             } catch (error) {
                 console.error('Error unfollowing company:', error);
-                alert('Lỗi khi bỏ theo dõi công ty');
+                showErrorToast('Lỗi khi bỏ theo dõi công ty', 3000);
             }
         }
 

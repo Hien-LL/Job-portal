@@ -123,13 +123,13 @@
             const emptyState = document.getElementById('empty-state');
 
             if (!jobs || jobs.length === 0) {
-                container.classList.add('hidden');
-                emptyState.classList.remove('hidden');
+                hideElement(container);
+                showElement(emptyState);
                 return;
             }
 
-            emptyState.classList.add('hidden');
-            container.classList.remove('hidden');
+            hideElement(emptyState);
+            showElement(container);
 
             container.innerHTML = jobs.map(job => {
                 const salaryText = formatSalary(job.salaryMin, job.salaryMax, job.currency);
@@ -222,16 +222,65 @@
             loadSavedJobs(1);
         }
 
-        // Unsave job
-        async function unsaveJob(slug, buttonElement) {
-            if (!confirm('Bạn có chắc chắn muốn bỏ lưu việc làm này?')) return;
+        // Store job info for unsave confirmation
+        let pendingUnsaveJob = { slug: null, buttonElement: null };
 
+        // Show confirmation modal
+        function showConfirmUnsaveModal(slug, buttonElement) {
+            pendingUnsaveJob = { slug, buttonElement };
+            const modal = document.getElementById('confirm-unsave-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+            }
+        }
+
+        // Close confirmation modal
+        function closeConfirmModal() {
+            const modal = document.getElementById('confirm-unsave-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+            pendingUnsaveJob = { slug: null, buttonElement: null };
+        }
+
+        // Confirm and execute unsave
+        async function confirmUnsaveJob() {
+            if (pendingUnsaveJob.slug && pendingUnsaveJob.buttonElement) {
+                await performUnsaveJob(pendingUnsaveJob.slug, pendingUnsaveJob.buttonElement);
+            }
+            closeConfirmModal();
+        }
+
+        // Unsave job - show beautiful modal
+        function unsaveJob(slug, buttonElement) {
+            showConfirmUnsaveModal(slug, buttonElement);
+        }
+
+        // Perform the actual unsave operation
+        async function performUnsaveJob(slug, buttonElement) {
             try {
-                const response = await window.authUtils.apiRequest(`/jobs/${slug}/unsave`, {
-                    method: 'DELETE'
+                const token = getStoredToken();
+                if (!token) {
+                    showErrorToast('Vui lòng đăng nhập', 3000);
+                    return;
+                }
+
+                const url = `${API_CONFIG.BASE_URL}/jobs/${slug}/unsave`;
+                const response = await fetch(url, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
                 });
 
-                if (response && response.ok) {
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result?.message || 'Failed to unsave job');
+                }
+
+                if (result.success) {
                     // Remove job card from UI
                     const jobCard = buttonElement.closest('.bg-white');
                     jobCard.remove();
@@ -246,19 +295,20 @@
                         const currentTotal = parseInt(totalElement.textContent);
                         totalElement.textContent = currentTotal - 1;
                     }
+                    showSuccessToast('Đã bỏ lưu việc làm ✓', 2000);
                 } else {
-                    throw new Error('Failed to unsave job');
+                    throw new Error(result.message || 'Failed to unsave job');
                 }
             } catch (error) {
                 console.error('Error unsaving job:', error);
-                alert('Có lỗi xảy ra khi bỏ lưu việc làm');
+                showErrorToast(error.message || 'Có lỗi xảy ra khi bỏ lưu việc làm', 3000);
             }
         }
 
         // Apply to job
         function applyToJob(slug, jobId) {
             console.log(`Apply to job: ${slug} (ID: ${jobId})`);
-            alert(`Tính năng ứng tuyển cho "${slug}" sẽ được triển khai soon!`);
+            showErrorToast(`Tính năng ứng tuyển sẽ được triển khai sớm!`, 3000);
         }
 
         // Display pagination
@@ -267,7 +317,7 @@
             totalPages = data.totalPages;
             
             if (totalPages <= 1) {
-                container.style.display = 'none';
+                hideElement(container);
                 return;
             }
 
@@ -292,8 +342,8 @@
                 html += `<button onclick="loadSavedJobs(${currentPage + 1})" class="px-3 py-2 border border-gray-300 rounded text-sm text-gray-700 hover:bg-gray-50">Tiếp</button>`;
             }
 
-            container.innerHTML = html;
-            container.style.display = 'flex';
+            setHtmlContent('pagination', html);
+            showElement(container);
         }
 
         // Utility functions
@@ -346,26 +396,25 @@
         }
 
         function showLoading() {
-            document.getElementById('loading').classList.remove('hidden');
-            document.getElementById('saved-jobs-list').classList.add('hidden');
-            document.getElementById('empty-state').classList.add('hidden');
+            showElement('loading');
+            hideElement('saved-jobs-list');
+            hideElement('empty-state');
         }
 
         function hideLoading() {
-            document.getElementById('loading').classList.add('hidden');
+            hideElement('loading');
         }
 
         function showEmpty() {
-            document.getElementById('loading').classList.add('hidden');
-            document.getElementById('saved-jobs-list').classList.add('hidden');
-            document.getElementById('empty-state').classList.remove('hidden');
+            hideElement('loading');
+            hideElement('saved-jobs-list');
+            showElement('empty-state');
         }
 
         function showError() {
-            document.getElementById('loading').classList.add('hidden');
-            const container = document.getElementById('saved-jobs-list');
-            container.classList.remove('hidden');
-            container.innerHTML = `
+            hideElement('loading');
+            showElement('saved-jobs-list');
+            setHtmlContent('saved-jobs-list', `
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
                     <div class="text-red-500 mb-4">
                         <svg class="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 20 20">
@@ -378,7 +427,7 @@
                         Thử lại
                     </button>
                 </div>
-            `;
+            `);
         }
 
         // Add enter key search functionality

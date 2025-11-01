@@ -18,7 +18,7 @@
                 currentApplicationId = appId;
 
                 if (!authService.isAuthenticated()) {
-                    window.location.href = 'login.html';
+                    redirectToUrl('login.html');
                     return;
                 }
 
@@ -26,7 +26,7 @@
                 const response = await fetch(url, {
                     method: 'GET',
                     headers: {
-                        'Authorization': `Bearer ${authService.getToken()}`,
+                        'Authorization': `Bearer ${getStoredToken()}`,
                         'Content-Type': 'application/json'
                     }
                 });
@@ -40,8 +40,8 @@
                     displayApplicationDetail(result.data);
                     loadApplicationTimeline(appId);
                     
-                    document.getElementById('loading').classList.add('hidden');
-                    document.getElementById('content').classList.remove('hidden');
+                    hideElement('loading');
+                    showElement('content');
                 } else {
                     throw new Error('Invalid response');
                 }
@@ -60,9 +60,9 @@
             document.getElementById('candidate-phone').textContent = data.phone || 'Chưa xác định';
             document.getElementById('candidate-address').textContent = data.address || 'Chưa xác định';
             
-            // Render summary with Markdown support
+            // Render summary with Markdown support using markdown-service
             if (data.summary) {
-                const htmlContent = DOMPurify.sanitize(marked.parse(data.summary));
+                const htmlContent = parseSafeMarkdown(data.summary);
                 document.getElementById('candidate-summary').innerHTML = htmlContent;
             } else {
                 document.getElementById('candidate-summary').textContent = 'Chưa có tóm tắt';
@@ -140,8 +140,8 @@
 
                 // Files
                 if (resume.files && resume.files.length > 0) {
-                    document.getElementById('files-section').style.display = 'block';
-                    document.getElementById('files-container').innerHTML = resume.files.map(file => `
+                    showElement('files-section');
+                    setHtmlContent('files-container', resume.files.map(file => `
                         <a href="${window.APP_CONFIG.API_BASE + file.fileUrl}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition">
                             <svg class="w-5 h-5 text-purple-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M4 4a2 2 0 012-2h6a1 1 0 10-1 1v12a1 1 0 11-2 0V4zm10 0a2 2 0 012-2h6a2 2 0 012 2v12a2 2 0 01-2 2h-6a2 2 0 01-2-2V4zm4 10a1 1 0 100-2 1 1 0 000 2z"></path>
@@ -154,7 +154,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                             </svg>
                         </a>
-                    `).join('');
+                    `).join(''));
                 }
             }
 
@@ -180,7 +180,7 @@
                 const response = await fetch(url, {
                     method: 'GET',
                     headers: {
-                        'Authorization': `Bearer ${authService.getToken()}`,
+                        'Authorization': `Bearer ${getStoredToken()}`,
                         'Content-Type': 'application/json'
                     }
                 });
@@ -237,22 +237,14 @@
             return statusClasses[statusCode] || 'bg-gray-100 text-gray-800';
         }
 
-        // Format date
-        function formatDate(dateString) {
-            if (!dateString) return 'Chưa xác định';
-            const date = new Date(dateString);
-            return date.toLocaleDateString('vi-VN', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit'
-            });
-        }
+        // Format date - Delegated to markdown-service.js
+        const formatDate = formatDateDisplay;
 
         // Show error
         function showError() {
-            document.getElementById('loading').classList.add('hidden');
-            document.getElementById('content').classList.add('hidden');
-            document.getElementById('error-state').classList.remove('hidden');
+            hideElement('loading');
+            hideElement('content');
+            showElement('error-state');
         }
 
         // Initialize page

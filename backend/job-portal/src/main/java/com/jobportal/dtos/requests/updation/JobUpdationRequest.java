@@ -25,11 +25,13 @@ public class JobUpdationRequest {
 
     private Long categoryId;            // null: không đụng, có: đổi category
     private String locationCountryCode; // null: không đụng, có: đổi location
+    private int yearsOfExperience;
 
     // null  : không động tới benefits
     // []    : clear hết benefits
     // [ids] : set danh sách mới
     private List<Long> benefitIds;
+    private List<Long> skillIds;
 
     private String publishedAt;
 

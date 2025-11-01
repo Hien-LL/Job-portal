@@ -17,6 +17,9 @@ public class JobListItemResource {
     private int salaryMin;
     private String seniority;
     private boolean published;
+    private String employmentType;
+    private LocalDateTime expiresAt;
+    private String currency;
     private LocalDateTime publishedAt;
     private String slug;
 

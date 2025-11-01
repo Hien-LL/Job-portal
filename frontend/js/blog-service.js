@@ -133,20 +133,20 @@
             const noResults = document.getElementById('no-results');
             
             if (posts.length === 0) {
-                container.classList.add('hidden');
-                noResults.classList.remove('hidden');
+                hideElement(container);
+                showElement(noResults);
                 return;
             }
             
-            noResults.classList.add('hidden');
-            container.classList.remove('hidden');
+            hideElement(noResults);
+            showElement(container);
             
             // Pagination
             const startIndex = (currentPage - 1) * 6;
             const endIndex = startIndex + 6;
             const paginatedPosts = posts.slice(startIndex, endIndex);
             
-            container.innerHTML = paginatedPosts.map(post => {
+            setHtmlContent('blog-posts', paginatedPosts.map(post => {
                 const publishedDate = formatDate(post.publishedAt);
                 
                 return `
@@ -191,7 +191,7 @@
                         </div>
                     </article>
                 `;
-            }).join('');
+            }).join(''));
         }
 
         // Load popular posts for sidebar
@@ -257,11 +257,11 @@
             const pagination = document.getElementById('pagination');
             
             if (totalPages <= 1) {
-                pagination.classList.add('hidden');
+                hideElement(pagination);
                 return;
             }
             
-            pagination.classList.remove('hidden');
+            showElement(pagination);
             
             // Update buttons
             document.getElementById('prev-btn').disabled = currentPage === 1;
@@ -302,11 +302,11 @@
         }
 
         function showLoading() {
-            document.getElementById('loading-container').classList.remove('hidden');
-            document.getElementById('blog-posts').classList.add('hidden');
-            document.getElementById('no-results').classList.add('hidden');
+            showElement('loading-container');
+            hideElement('blog-posts');
+            hideElement('no-results');
         }
 
         function hideLoading() {
-            document.getElementById('loading-container').classList.add('hidden');
+            hideElement('loading-container');
         }

@@ -267,11 +267,14 @@
             }
         }
 
-        // Step 1: Register Form Handler
-        document.getElementById('register-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const submitButton = this.querySelector('button[type="submit"]');
+// Step 1: Register Form Handler
+document.getElementById('register-form').addEventListener('submit', async function(e) {
+    // Only handle if candidate is active
+    if (typeof currentUserType !== 'undefined' && currentUserType === 'recruiter') {
+        return;
+    }
+    
+    e.preventDefault();            const submitButton = this.querySelector('button[type="submit"]');
             const email = document.getElementById('register-email').value.trim();
             const password = document.getElementById('register-password').value;
             const confirmPassword = document.getElementById('confirm-password').value;
@@ -330,11 +333,14 @@
             }
         });
 
-        // Step 2: Verify Email Form Handler
-        document.getElementById('verify-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const submitButton = this.querySelector('button[type="submit"]');
+// Step 2: Verify Email Form Handler
+document.getElementById('verify-form').addEventListener('submit', async function(e) {
+    // Only handle if candidate is active
+    if (typeof currentUserType !== 'undefined' && currentUserType === 'recruiter') {
+        return;
+    }
+    
+    e.preventDefault();            const submitButton = this.querySelector('button[type="submit"]');
             const otpCode = document.getElementById('otp-code').value.trim();
             
             // Validation
@@ -379,58 +385,61 @@
             }
         });
 
-        // Step 3: Profile Form Handler
-        document.getElementById('profile-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const submitButton = this.querySelector('button[type="submit"]');
-            const name = document.getElementById('full-name').value.trim();
-            const phone = document.getElementById('phone-number').value.trim();
-            const address = document.getElementById('address').value.trim();
-            const headline = document.getElementById('headline').value.trim();
-            const summary = document.getElementById('summary').value.trim();
-            
-            // Validation
-            if (!name || !phone || !address) {
-                showError('Vui lòng điền đầy đủ thông tin bắt buộc');
-                return;
-            }
-
-            if (phone.length < 10) {
-                showError('Số điện thoại không hợp lệ');
-                return;
-            }
-
-            // Show loading
-            showLoading(submitButton, 'Đang hoàn tất...');
-
-            try {
-                const profileData = {
-                    name,
-                    phone,
-                    address,
-                    headline: headline || null,
-                    summary: summary || null
-                };
-
-                const result = await updateProfile(profileData, userData.accessToken);
-
-                if (result.success) {
-                    showSuccess('Đăng ký thành công! Đang chuyển hướng...');
-                    
-                    setTimeout(() => {
-                        window.location.href = 'index.html';
-                    }, 2000);
-                } else {
-                    showError(result.message);
+        // Step 3: Profile Form Handler (Candidate only)
+        const candidateProfileForm = document.getElementById('candidate-profile-form');
+        if (candidateProfileForm) {
+            candidateProfileForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const submitButton = this.querySelector('button[type="submit"]');
+                const name = document.getElementById('full-name').value.trim();
+                const phone = document.getElementById('phone-number').value.trim();
+                const address = document.getElementById('address').value.trim();
+                const headline = document.getElementById('headline').value.trim();
+                const summary = document.getElementById('summary').value.trim();
+                
+                // Validation
+                if (!name || !phone || !address) {
+                    showError('Vui lòng điền đầy đủ thông tin bắt buộc');
+                    return;
                 }
-            } catch (error) {
-                console.error('Update profile error:', error);
-                showError('Có lỗi xảy ra. Vui lòng thử lại.');
-            } finally {
-                hideLoading(submitButton, 'Hoàn tất đăng ký');
-            }
-        });
+
+                if (phone.length < 10) {
+                    showError('Số điện thoại không hợp lệ');
+                    return;
+                }
+
+                // Show loading
+                showLoading(submitButton, 'Đang hoàn tất...');
+
+                try {
+                    const profileData = {
+                        name,
+                        phone,
+                        address,
+                        headline: headline || null,
+                        summary: summary || null
+                    };
+
+                    const result = await updateProfile(profileData, userData.accessToken);
+
+                    if (result.success) {
+                        showSuccess('Đăng ký thành công! Đang chuyển hướng...');
+                        
+                        setTimeout(() => {
+                            window.location.href = 'index.html';
+                        }, 2000);
+                    } else {
+                        showError(result.message);
+                    }
+                } catch (error) {
+                    console.error('Update profile error:', error);
+                    showError('Có lỗi xảy ra. Vui lòng thử lại.');
+                } finally {
+                    hideLoading(submitButton, 'Hoàn tất đăng ký');
+                }
+            });
+        }
 
         // Resend OTP Handler
         let resendCountdown = 0;
@@ -484,9 +493,12 @@
             showStep(1);
         });
 
-        document.getElementById('back-to-verify').addEventListener('click', function() {
-            showStep(2);
-        });
+        const backToVerifyCandidate = document.getElementById('back-to-verify-candidate');
+        if (backToVerifyCandidate) {
+            backToVerifyCandidate.addEventListener('click', function() {
+                showStep(2);
+            });
+        }
 
         // Tab switch functionality
         document.querySelectorAll('button').forEach((btn, index) => {

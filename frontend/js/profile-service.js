@@ -394,7 +394,7 @@
                 if (file) {
                     // Validate file size (5MB max)
                     if (file.size > 5 * 1024 * 1024) {
-                        alert('Kích thước ảnh không được vượt quá 5MB');
+                        showErrorToast('Kích thước ảnh không được vượt quá 5MB', 3000);
                         avatarFileInput.value = '';
                         return;
                     }
@@ -419,7 +419,7 @@
                             sidebarAvatar.src = avatar.src;
                         }
                         
-                        alert('Cập nhật ảnh đại diện thành công');
+                        showSuccessNotificationBanner('Tải lên ảnh đại diện thành công ✓', 3000);
                     } else {
                         avatar.src = originalSrc;
                     }
@@ -476,7 +476,7 @@
 
                 // Validation
                 if (!name) {
-                    alert('Vui lòng nhập họ và tên');
+                    showErrorToast('Vui lòng nhập họ và tên', 3000);
                     return;
                 }
 
@@ -489,14 +489,16 @@
                 });
 
                 if (updateSuccess) {
-                    alert('Cập nhật hồ sơ thành công');
                     closeEditProfileModal();
-                    // Reload page to get fresh data
-                    location.reload();
+                    showSuccessNotificationBanner('Cập nhật hồ sơ thành công ✓', 5000);
+                    // Reload page after notification
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
                 }
             } catch (error) {
                 console.error('Error saving profile:', error);
-                alert('Có lỗi xảy ra khi lưu hồ sơ');
+                showErrorToast('Có lỗi xảy ra khi lưu hồ sơ', 4000);
             }
         }
 
@@ -517,7 +519,7 @@
 
                 if (!response.ok) {
                     const errorData = await response.json();
-                    alert(errorData.message || 'Lỗi khi tải lên ảnh');
+                    showErrorToast(errorData.message || 'Lỗi khi tải lên ảnh', 4000);
                     return false;
                 }
 
@@ -525,14 +527,15 @@
                 if (result.success) {
                     // Update userProfile with new avatar
                     userProfile.avatarUrl = result.data.avatarUrl;
+                    showSuccessNotificationBanner('Tải lên ảnh đại diện thành công ✓', 3000);
                     return true;
                 } else {
-                    alert(result.message || 'Lỗi khi tải lên ảnh');
+                    showErrorToast(result.message || 'Lỗi khi tải lên ảnh', 4000);
                     return false;
                 }
             } catch (error) {
                 console.error('Error uploading avatar:', error);
-                alert('Lỗi khi tải lên ảnh');
+                showErrorToast('Lỗi khi tải lên ảnh', 4000);
                 return false;
             }
         }
@@ -552,7 +555,7 @@
 
                 if (!response.ok) {
                     const errorData = await response.json();
-                    alert(errorData.message || 'Lỗi khi cập nhật hồ sơ');
+                    showErrorToast(errorData.message || 'Lỗi khi cập nhật hồ sơ', 4000);
                     return false;
                 }
 
@@ -561,12 +564,12 @@
                     userProfile = result.data;
                     return true;
                 } else {
-                    alert(result.message || 'Lỗi khi cập nhật hồ sơ');
+                    showErrorToast(result.message || 'Lỗi khi cập nhật hồ sơ', 4000);
                     return false;
                 }
             } catch (error) {
                 console.error('Error updating profile:', error);
-                alert('Lỗi khi cập nhật hồ sơ');
+                showErrorToast('Lỗi khi cập nhật hồ sơ', 4000);
                 return false;
             }
         }
@@ -608,11 +611,11 @@
                 const skillSlug = document.getElementById('skill-select').value.trim();
 
                 if (!skillSlug) {
-                    alert('Vui lòng chọn kỹ năng');
+                    showErrorToast('Vui lòng chọn kỹ năng', 3000);
                     return;
                 }
 
-                const url = buildCompleteUrl(API_CONFIG.USERS.ADD_SKILL, { skillSlug }, { yearsExperience: 0 });
+                const url = buildApiUrl(API_CONFIG.USERS.ADD_SKILL, { skillSlug });
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: {
@@ -623,23 +626,23 @@
 
                 if (!response.ok) {
                     const errorData = await response.json();
-                    alert(errorData.message || 'Lỗi khi thêm kỹ năng');
+                    showErrorToast(errorData.message || 'Lỗi khi thêm kỹ năng', 3000);
                     return;
                 }
 
                 const result = await response.json();
                 if (result.success) {
-                    alert('Thêm kỹ năng thành công');
+                    showSuccessToast('Thêm kỹ năng thành công ✓', 2000);
                     closeAddSkillModal();
                     // Reload skills
                     await loadUserSkills();
                     displaySkills();
                 } else {
-                    alert(result.message || 'Lỗi khi thêm kỹ năng');
+                    showErrorToast(result.message || 'Lỗi khi thêm kỹ năng', 3000);
                 }
             } catch (error) {
                 console.error('Error saving skill:', error);
-                alert('Lỗi khi thêm kỹ năng');
+                showErrorToast('Lỗi khi thêm kỹ năng', 3000);
             }
         }
 
@@ -667,7 +670,7 @@
         // Confirm delete from modal
         async function confirmDeleteSkill() {
             if (!currentEditingSkillSlug) {
-                alert('Lỗi: Không thể xác định kỹ năng cần xóa');
+                showErrorToast('Lỗi: Không thể xác định kỹ năng cần xóa', 3000);
                 return;
             }
             await performDeleteSkill(currentEditingSkillSlug);
@@ -687,23 +690,23 @@
 
                 if (!response.ok) {
                     const errorData = await response.json();
-                    alert(errorData.message || 'Lỗi khi xóa kỹ năng');
+                    showErrorToast(errorData.message || 'Lỗi khi xóa kỹ năng', 3000);
                     return;
                 }
 
                 const result = await response.json();
                 if (result.success) {
-                    alert('Xóa kỹ năng thành công');
+                    showSuccessToast('Xóa kỹ năng thành công ✓', 2000);
                     closeEditSkillModal();
                     // Reload skills
                     await loadUserSkills();
                     displaySkills();
                 } else {
-                    alert(result.message || 'Lỗi khi xóa kỹ năng');
+                    showErrorToast(result.message || 'Lỗi khi xóa kỹ năng', 3000);
                 }
             } catch (error) {
                 console.error('Error deleting skill:', error);
-                alert('Lỗi khi xóa kỹ năng');
+                showErrorToast('Lỗi khi xóa kỹ năng', 3000);
             }
         }
 
@@ -769,14 +772,16 @@
                 });
 
                 if (updateSuccess) {
-                    alert('Cập nhật giới thiệu thành công');
                     closeEditSummaryModal();
-                    // Reload page to get fresh data
-                    location.reload();
+                    showSuccessNotificationBanner('Cập nhật giới thiệu thành công ✓', 5000);
+                    // Reload page after notification
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
                 }
             } catch (error) {
                 console.error('Error saving summary:', error);
-                alert('Có lỗi xảy ra khi lưu giới thiệu');
+                showErrorToast('Có lỗi xảy ra khi lưu giới thiệu', 4000);
             }
         }
 

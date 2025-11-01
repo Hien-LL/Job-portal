@@ -22,7 +22,7 @@ const API_CONFIG = {
         UPDATE_PROFILE: '/users/profile/me',
         UPLOAD_AVATAR: '/users/avatar',
         GET_SKILLS: '/users/skills',
-        ADD_SKILL: '/users/skills',
+        ADD_SKILL: '/users/skills/:skillSlug',
         DELETE_SKILL: '/users/skills/:skillSlug',
         UPDATE_SKILL_YEARS: '/users/skills/:skillSlug',
     },
@@ -35,6 +35,13 @@ const API_CONFIG = {
         CHECK_APPLIED: '/applications/isApplied/:jobId',
         APPLY: '/applications/:jobId/apply',
         GET_RELATED: '/jobs?category.slug=:categorySlug&perPage=3&published=true',
+        CREATE_MY_COMPANY: '/jobs/my-company/:companyId',
+        GET_MY_JOB: '/jobs/my-company/:companyId/job/:jobId',
+        UPDATE_MY_JOB: '/jobs/my-company/:companyId/job/:jobId',
+        DELETE_MY_COMPANY: '/jobs/my-company/:companyId/job/:jobId',
+        SAVE: '/jobs/:jobSlug/save',
+        UNSAVE: '/jobs/:jobSlug/unsave',
+        CHECK_SAVED: '/jobs/:jobSlug/is-saved',
     },
     
     // Resume/CV Endpoints
@@ -55,6 +62,11 @@ const API_CONFIG = {
     COMPANIES: {
         LIST: '/companies/list',
         GET_DETAIL: '/companies/:slug',
+        GET_DETAIL_BY_ID: '/companies/:companyId',
+        CREATE: '/companies',
+        MY_COMPANIES_LIST: '/companies/my-company/list',
+        UPDATE_MY_COMPANY: '/companies/my-company/:companyId',
+        UPLOAD_LOGO: '/companies/my-company/upload-logo/:companyId',
     },
     
     // Follow/Unfollow Companies Endpoints

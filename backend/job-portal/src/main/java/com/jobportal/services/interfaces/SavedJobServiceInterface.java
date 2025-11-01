@@ -9,4 +9,5 @@ public interface SavedJobServiceInterface {
     void saveJob(Long userId, String jobSlug);
     void removeSavedJob(Long userId, String jobSlug);
     Page<SavedJobResource> getSavedJobsByUserId(Long userId, int page, int size);
+    boolean isJobSavedByUser(Long userId, String jobSlug);
 }

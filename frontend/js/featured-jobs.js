@@ -141,7 +141,7 @@
             // Check if user is logged in
             const token = localStorage.getItem('authToken');
             if (!token) {
-                alert('Vui lòng đăng nhập để ứng tuyển');
+                showErrorToast('Vui lòng đăng nhập để ứng tuyển', 3000);
                 window.location.href = 'login.html';
                 return;
             }
@@ -149,7 +149,7 @@
             // Redirect to job detail page or application form
             console.log(`Apply to job: ${slug} (ID: ${jobId})`);
             // TODO: Implement job application logic
-            alert(`Tính năng ứng tuyển cho "${slug}" sẽ được triển khai soon!`);
+            showErrorToast(`Tính năng ứng tuyển sẽ được triển khai sớm`, 3000);
         }
 
         function showJobsError(message) {

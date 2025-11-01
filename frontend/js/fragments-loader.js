@@ -160,6 +160,8 @@ function clearAuthData() {
     localStorage.removeItem('refresh_token');
     localStorage.removeItem('user_id');
     localStorage.removeItem('login_time');
+    localStorage.removeItem('login_expiry');
+    localStorage.removeItem('user_type');
 }
 
 // Check token expiration (12 hours)
@@ -281,7 +283,7 @@ async function handleRefreshToken() {
             modal.remove();
         }
         
-        alert('Không thể làm mới phiên đăng nhập. Vui lòng đăng nhập lại.');
+        showErrorToast('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.', 3000);
         logout();
     }
 }

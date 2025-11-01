@@ -44,5 +44,7 @@ public interface SavedJobRepository extends JpaRepository<SavedJob, SavedJobId> 
             """
     )
     Page<SavedJobResource> findPageByUserId(Long userId, Pageable pageable);
+
+    boolean existsByUserIdAndJobSlug(Long userId, String jobSlug);
 }
 

@@ -301,11 +301,11 @@ async function markAsRead(notificationId) {
             displayNotifications();
             updateNotificationCount();
         } else {
-            alert('Lỗi khi đánh dấu thông báo đã đọc');
+            showErrorToast('Lỗi khi đánh dấu thông báo đã đọc', 3000);
         }
     } catch (error) {
         console.error('Error marking notification as read:', error);
-        alert('Lỗi khi đánh dấu thông báo đã đọc');
+        showErrorToast('Lỗi khi đánh dấu thông báo đã đọc', 3000);
     }
 }
 
@@ -313,7 +313,7 @@ async function markAsRead(notificationId) {
 async function markAllAsRead() {
     const unreadCount = notifications.filter(n => !n.readAt).length;
     if (unreadCount === 0) {
-        alert('Tất cả thông báo đã được đọc');
+        showErrorToast('Tất cả thông báo đã được đọc', 2000);
         return;
     }
     
@@ -332,11 +332,11 @@ async function confirmMarkAllRead() {
             displayNotifications();
             updateNotificationCount();
         } else {
-            alert('Lỗi khi đánh dấu tất cả thông báo đã đọc');
+            showErrorToast('Lỗi khi đánh dấu tất cả thông báo đã đọc', 3000);
         }
     } catch (error) {
         console.error('Error marking all notifications as read:', error);
-        alert('Lỗi khi đánh dấu tất cả thông báo đã đọc');
+        showErrorToast('Lỗi khi đánh dấu tất cả thông báo đã đọc', 3000);
     }
 }
 

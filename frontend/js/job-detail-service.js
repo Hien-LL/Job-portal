@@ -26,6 +26,13 @@
             try {
                 const url = buildApiUrl(API_CONFIG.JOBS.GET_DETAIL, { jobSlug });
                 const response = await fetch(url);
+                
+                if (!response.ok) {
+                    console.error('API error:', response.status, response.statusText);
+                    showError('Lỗi khi tải thông tin việc làm');
+                    return;
+                }
+                
                 const result = await response.json();
 
                 if (result.success && result.data) {
@@ -35,10 +42,12 @@
                     // Check if user has applied for this job (only if logged in)
                     if (authService.isAuthenticated()) {
                         checkJobApplied(result.data.id);
+                        checkJobSaved(result.data.slug);
                     }
                     
                     hideLoading();
                 } else {
+                    console.error('Invalid API response:', result);
                     showError('Không tìm thấy việc làm này');
                 }
             } catch (error) {
@@ -157,7 +166,7 @@
         // Check if user has already applied for this job
         async function checkJobApplied(jobId) {
             try {
-                const token = authService.getToken();
+                const token = getStoredToken();
                 if (!token) return;
 
                 const url = buildApiUrl(API_CONFIG.JOBS.CHECK_APPLIED, { jobId });
@@ -178,6 +187,33 @@
                 }
             } catch (error) {
                 console.error('Error checking application status:', error);
+            }
+        }
+
+        // Check if user has saved this job
+        async function checkJobSaved(jobSlug) {
+            try {
+                const token = getStoredToken();
+                if (!token) return;
+
+                const url = buildApiUrl(API_CONFIG.JOBS.CHECK_SAVED, { jobSlug });
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        isJobSaved = result.data === true;
+                        updateSaveButton();
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking saved job status:', error);
             }
         }
 
@@ -241,118 +277,16 @@
             container.innerHTML = html;
         }
 
-        // Utility functions
-        function formatSalary(min, max) {
-            if (!min && !max) return 'Thỏa thuận';
-            
-            const formatAmount = (amount) => {
-                if (amount >= 1000000) {
-                    return (amount / 1000000).toFixed(0) + ' triệu';
-                }
-                return amount.toLocaleString('vi-VN');
-            };
-
-            if (min && max) {
-                return `${formatAmount(min)} - ${formatAmount(max)}`;
-            } else if (min) {
-                return `Từ ${formatAmount(min)}`;
-            } else {
-                return `Lên đến ${formatAmount(max)}`;
-            }
+        // Utility functions - Delegated to markdown-service.js
+        // These are wrappers for markdown-service functions to maintain backward compatibility
+        const formatSalary = formatSalaryRange;
+        const formatPublishedDate = formatPublishedDateRelative;
+        const formatDate = formatDateDisplay;
+        const formatCompanySize = formatCompanySizeDisplay;
+        // Use parseMarkdown directly for formatting job descriptions
+        function formatDescription(text) {
+            return parseMarkdown(text);
         }
-
-        function formatPublishedDate(dateString) {
-            if (!dateString) return 'Không xác định';
-
-            const publishedDate = new Date(dateString);
-            const now = new Date();
-
-            // reset giờ để chỉ so sánh theo ngày
-            publishedDate.setHours(0, 0, 0, 0);
-            now.setHours(0, 0, 0, 0);
-
-            const diffTime = now - publishedDate;
-            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-
-            if (diffDays === 0) return 'Đăng hôm nay';
-            if (diffDays === 1) return 'Đăng hôm qua';
-            if (diffDays < 7) return `Đăng ${diffDays} ngày trước`;
-            if (diffDays < 30) return `Đăng ${Math.floor(diffDays / 7)} tuần trước`;
-            return `Đăng ${Math.floor(diffDays / 30)} tháng trước`;
-        }
-
-        function formatDate(dateString) {
-            if (!dateString) return 'Không xác định';
-            
-            const date = new Date(dateString);
-            return date.toLocaleDateString('vi-VN', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric'
-            });
-        }
-
-        function formatCompanySize(sizeMin, sizeMax) {
-            if (!sizeMin && !sizeMax) return 'Quy mô không xác định';
-            if (sizeMin === 0 && sizeMax === 0) return 'Quy mô không xác định';
-            
-            if (sizeMin && sizeMax) {
-                if (sizeMin === sizeMax) {
-                    return `${sizeMin} nhân viên`;
-                }
-                return `${sizeMin} - ${sizeMax} nhân viên`;
-            } else if (sizeMin) {
-                return `Từ ${sizeMin} nhân viên`;
-            } else {
-                return `Lên đến ${sizeMax} nhân viên`;
-            }
-        }
-
-        function formatDescription(md) {
-        if (!md) return '';
-
-        let html = md
-            // Escape ký tự đặc biệt
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-
-            // Heading (##, ###, ####, etc.)
-            .replace(/^###### (.*)$/gm, '<h6>$1</h6>')
-            .replace(/^##### (.*)$/gm, '<h5>$1</h5>')
-            .replace(/^#### (.*)$/gm, '<h4>$1</h4>')
-            .replace(/^### (.*)$/gm, '<h3>$1</h3>')
-            .replace(/^## (.*)$/gm, '<h2>$1</h2>')
-            .replace(/^# (.*)$/gm, '<h1>$1</h1>')
-
-            // Horizontal line
-            .replace(/^---$/gm, '<hr>')
-
-            // Bold, italic, code inline
-            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\*(.+?)\*/g, '<em>$1</em>')
-            .replace(/`([^`]+)`/g, '<code>$1</code>')
-
-            // Links [text](url)
-            .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">$1</a>')
-
-            // Blockquote
-            .replace(/^> (.+)$/gm, '<blockquote class="border-l-4 border-gray-300 pl-4 italic text-gray-600">$1</blockquote>')
-
-            // Unordered lists (- item)
-            .replace(/^\s*[-*] (.+)$/gm, '<li>$1</li>')
-            .replace(/(<li>[\s\S]+?<\/li>)/gm, '<ul class="list-disc pl-6">$1</ul>')
-
-            // Line breaks
-            .replace(/\n{2,}/g, '</p><p>')
-            .replace(/\n/g, '<br>');
-
-        // Gói lại toàn bộ trong <p> nếu chưa có block
-        html = `<p>${html}</p>`;
-        
-        return html;
-        }
-
 
         function getCategoryIcon(categoryName) {
             const categoryIcons = {
@@ -374,8 +308,8 @@
         function applyToJob(slug, jobId) {
             // Check if user is logged in
             if (!authService.isAuthenticated()) {
-                alert('Vui lòng đăng nhập để ứng tuyển');
-                window.location.href = 'login.html';
+                showErrorNotification('Vui lòng đăng nhập để ứng tuyển', 4000);
+                redirectToUrl('login.html', 1000);
                 return;
             }
             
@@ -392,7 +326,7 @@
                 const response = await fetch(url, {
                     method: 'GET',
                     headers: {
-                        'Authorization': `Bearer ${authService.getToken()}`,
+                        'Authorization': `Bearer ${getStoredToken()}`,
                         'Content-Type': 'application/json'
                     }
                 });
@@ -409,7 +343,7 @@
                 return false;
             } catch (error) {
                 console.error('Error loading resumes:', error);
-                alert('Lỗi khi tải danh sách CV');
+                showErrorNotification('Lỗi khi tải danh sách CV', 4000);
                 return false;
             }
         }
@@ -448,20 +382,20 @@
             currentJobId = jobId;
 
             // Populate job info in modal
-            document.getElementById('modal-job-title').textContent = document.getElementById('job-title').textContent;
-            document.getElementById('modal-job-company').textContent = document.getElementById('company-name').textContent;
+            setTextContent('modal-job-title', document.getElementById('job-title').textContent);
+            setTextContent('modal-job-company', document.getElementById('company-name').textContent);
 
             // Clear form
-            document.getElementById('resume-select').value = '';
-            document.getElementById('cover-letter').value = '';
-            document.getElementById('cover-letter-count').textContent = '0/1000 ký tự';
+            setElementValue('resume-select', '');
+            setElementValue('cover-letter', '');
+            setTextContent('cover-letter-count', '0/1000 ký tự');
 
-            document.getElementById('apply-modal').classList.remove('hidden');
+            openModal('apply-modal');
         }
 
         // Close apply modal
         function closeApplyModal() {
-            document.getElementById('apply-modal').classList.add('hidden');
+            closeModal('apply-modal');
         }
 
         // Handle cover letter character count
@@ -482,17 +416,17 @@
         // Submit application
         async function submitApplication() {
             try {
-                const resumeId = document.getElementById('resume-select').value;
-                const coverLetter = document.getElementById('cover-letter').value.trim();
+                const resumeId = getElementValue('resume-select');
+                const coverLetter = getElementValue('cover-letter').trim();
 
                 // Validation
                 if (!resumeId) {
-                    alert('Vui lòng chọn CV');
+                    showErrorNotification('Vui lòng chọn CV', 4000);
                     return;
                 }
 
                 if (!currentJobId) {
-                    alert('Không có thông tin việc làm');
+                    showErrorNotification('Không có thông tin việc làm', 4000);
                     return;
                 }
 
@@ -506,7 +440,7 @@
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${authService.getToken()}`,
+                        'Authorization': `Bearer ${getStoredToken()}`,
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
@@ -522,7 +456,7 @@
 
                 const result = await response.json();
                 if (result.success) {
-                    alert('Ứng tuyển thành công! Chúc bạn may mắn.');
+                    showSuccessNotification('Ứng tuyển thành công! Chúc bạn may mắn.', 5000);
                     closeApplyModal();
                     
                     // Update application status
@@ -533,7 +467,7 @@
                 }
             } catch (error) {
                 console.error('Error submitting application:', error);
-                alert(`Lỗi: ${error.message}`);
+                showErrorNotification(`Lỗi: ${error.message}`, 5000);
             } finally {
                 const submitBtn = event.target;
                 submitBtn.disabled = false;
@@ -542,13 +476,13 @@
         }
 
         function hideLoading() {
-            document.getElementById('loading-container').style.display = 'none';
-            document.getElementById('job-detail-container').style.display = 'block';
+            hideElement('loading-container');
+            showElement('job-detail-container');
         }
 
         function showError(message) {
-            document.getElementById('loading-container').style.display = 'none';
-            document.getElementById('error-container').style.display = 'block';
+            hideElement('loading-container');
+            showElement('error-container');
             
             const errorTitle = document.querySelector('#error-container h2');
             const errorText = document.querySelector('#error-container p');
@@ -564,35 +498,48 @@
 
         // Toggle save job functionality
         async function toggleSaveJob() {
-            const token = localStorage.getItem('access_token');
+            const token = getStoredToken();
             if (!token) {
-                alert('Vui lòng đăng nhập để lưu việc làm');
-                window.location.href = 'login.html';
+                showErrorNotification('Vui lòng đăng nhập để lưu việc làm', 4000);
+                redirectToUrl('login.html', 1000);
                 return;
             }
 
             if (!currentJobSlug) {
-                alert('Không thể lưu việc làm này');
+                showErrorNotification('Không thể lưu việc làm này', 4000);
                 return;
             }
 
             try {
                 const method = isJobSaved ? 'DELETE' : 'POST';
+                // API expects slug, not ID
                 const endpoint = isJobSaved ? `/jobs/${currentJobSlug}/unsave` : `/jobs/${currentJobSlug}/save`;
-
-                const response = await window.authUtils.apiRequest(endpoint, {
-                    method: method
+                const url = `${API_CONFIG.BASE_URL}${endpoint}`;
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
                 });
 
-                if (response && response.ok) {
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result?.message || 'Failed to save/unsave job');
+                }
+                
+                if (result.success) {
                     isJobSaved = !isJobSaved;
                     updateSaveButton();
+                    showSuccessNotification(isJobSaved ? 'Đã lưu việc làm' : 'Đã bỏ lưu việc làm', 3000);
                 } else {
-                    throw new Error('Failed to save/unsave job');
+                    throw new Error(result.message || 'Failed to save/unsave job');
                 }
             } catch (error) {
                 console.error('Error saving/unsaving job:', error);
-                alert('Có lỗi xảy ra khi lưu việc làm');
+                showErrorNotification(error.message || 'Có lỗi xảy ra khi lưu việc làm', 4000);
             }
         }
 

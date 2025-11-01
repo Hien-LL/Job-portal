@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý công ty - jobPortal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+        }
+        .company-card {
+            transition: all 0.3s ease;
+        }
+        .company-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen">
+    <!-- Header Fragment -->
+    <div data-fragment="fragments/header.html" data-header-type="auto"></div>
+
+    <!-- Main Section -->
+    <section class="py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <!-- Page Header -->
+            <div class="mb-12">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-4xl font-bold text-gray-900 mb-2">🏢 Quản lý công ty</h1>
+                        <p class="text-gray-600 text-lg">Quản lý thông tin công ty, tải lên logo và cập nhật thông tin</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Companies Grid -->
+            <div id="companies-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Loading State -->
+                <div id="loading-state" class="col-span-full text-center py-20">
+                    <div class="inline-block">
+                        <svg class="animate-spin h-16 w-16 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </div>
+                    <p class="text-gray-600 mt-6 text-lg">Đang tải danh sách công ty...</p>
+                </div>
+
+                <!-- Error State -->
+                <div id="error-state" class="col-span-full bg-red-50 border-l-4 border-red-500 rounded-lg p-6 hidden">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm font-medium text-red-700" id="error-message"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Empty State -->
+                <div id="empty-state" class="col-span-full text-center py-20 hidden">
+                    <svg class="mx-auto h-16 w-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                    </svg>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Chưa có công ty nào</h3>
+                    <p class="text-gray-600 mb-6">Hãy tạo công ty đầu tiên của bạn để bắt đầu</p>
+                    <a href="register.html" class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
+                        Tạo công ty ngay
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Edit Company Modal -->
+    <div id="edit-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full transform transition">
+            <!-- Modal Header -->
+            <div class="px-8 py-6 border-b border-gray-200 flex justify-between items-center">
+                <h2 class="text-2xl font-bold text-gray-900">Chỉnh sửa công ty</h2>
+                <button id="close-modal" class="text-gray-500 hover:text-gray-700 text-3xl leading-none">&times;</button>
+            </div>
+
+            <!-- Modal Body -->
+            <form id="edit-company-form" class="p-8 space-y-5 max-h-96 overflow-y-auto">
+                <input type="hidden" id="company-id-input">
+
+                <!-- Company Name -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Tên công ty</label>
+                    <input 
+                        type="text" 
+                        id="edit-company-name"
+                        placeholder="Nhập tên công ty"
+                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                        required
+                    >
+                </div>
+
+                <!-- Description -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Mô tả công ty</label>
+                    <textarea 
+                        id="edit-company-description"
+                        placeholder="Mô tả về công ty của bạn"
+                        rows="3"
+                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition resize-none"
+                        required
+                    ></textarea>
+                </div>
+
+                <!-- Size Min -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Số nhân viên tối thiểu</label>
+                        <input 
+                            type="number" 
+                            id="edit-size-min"
+                            placeholder="1"
+                            min="1"
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                            required
+                        >
+                    </div>
+
+                    <!-- Size Max -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Số nhân viên tối đa</label>
+                        <input 
+                            type="number" 
+                            id="edit-size-max"
+                            placeholder="100"
+                            min="1"
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="flex gap-3 pt-6 border-t border-gray-200">
+                    <button type="submit" class="flex-1 bg-blue-600 text-white py-2.5 rounded-lg font-semibold hover:bg-blue-700 transition">
+                        Cập nhật
+                    </button>
+                    <button type="button" id="cancel-modal" class="flex-1 bg-gray-200 text-gray-700 py-2.5 rounded-lg font-semibold hover:bg-gray-300 transition">
+                        Hủy
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer Fragment -->
+    <div data-fragment="fragments/footer.html"></div>
+
+    <!-- Scripts -->
+    <script src="js/fragments-loader.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/recruiter-company-service.js"></script>
+</body>
+</html>

@@ -6,12 +6,12 @@
         // Load applications
         async function loadApplications(page = 1, status = 'all') {
             try {
-                document.getElementById('loading').classList.remove('hidden');
-                document.getElementById('content').classList.add('hidden');
-                document.getElementById('error-state').classList.add('hidden');
+                showElement('loading');
+                hideElement('content');
+                hideElement('error-state');
 
                 if (!authService.isAuthenticated()) {
-                    window.location.href = 'login.html';
+                    redirectToUrl('login.html');
                     return;
                 }
 
@@ -23,7 +23,7 @@
                 const response = await fetch(url, {
                     method: 'GET',
                     headers: {
-                        'Authorization': `Bearer ${authService.getToken()}`,
+                        'Authorization': `Bearer ${getStoredToken()}`,
                         'Content-Type': 'application/json'
                     }
                 });
@@ -41,15 +41,15 @@
                     displayApplications(status);
                     displayPagination();
                     
-                    document.getElementById('loading').classList.add('hidden');
-                    document.getElementById('content').classList.remove('hidden');
+                    hideElement('loading');
+                    showElement('content');
                 } else {
                     throw new Error('Invalid response');
                 }
             } catch (error) {
                 console.error('Error loading applications:', error);
-                document.getElementById('loading').classList.add('hidden');
-                document.getElementById('error-state').classList.remove('hidden');
+                hideElement('loading');
+                showElement('error-state');
             }
         }
 
@@ -65,13 +65,13 @@
             }
 
             if (filteredApps.length === 0) {
-                container.classList.add('hidden');
-                emptyState.classList.remove('hidden');
+                hideElement(container);
+                showElement(emptyState);
                 return;
             }
 
-            container.classList.remove('hidden');
-            emptyState.classList.add('hidden');
+            showElement(container);
+            hideElement(emptyState);
 
             container.innerHTML = filteredApps.map(app => {
                 const statusClass = getStatusClass(app.applicationStatus?.code);
@@ -133,7 +133,7 @@
             const container = document.getElementById('pagination');
             
             if (totalPages <= 1) {
-                container.style.display = 'none';
+                hideElement(container);
                 return;
             }
 
@@ -159,7 +159,7 @@
             }
 
             container.innerHTML = html;
-            container.style.display = 'flex';
+            showElement(container);
         }
 
         // Go to page

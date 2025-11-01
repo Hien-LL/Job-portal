@@ -14,6 +14,7 @@ import com.jobportal.repositories.*;
 import com.jobportal.securities.filters.FilterParameter;
 import com.jobportal.services.interfaces.JobServiceInterface;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,6 +24,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,6 +41,7 @@ public class JobService extends BaseService implements JobServiceInterface {
     private final LocationRepository locationRepository;
     private final CompanyMapper companyMapper;
     private final FollowCompanyRepository followCompanyRepository;
+    private final SkillRepository skillRepository;
 
     @Override
     public JobResource createJobForMyCompany(Long userId, Long companyId, JobCreationRequest request) {
@@ -62,12 +65,14 @@ public class JobService extends BaseService implements JobServiceInterface {
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy vị trí công việc"));
 
         List<Benefit> benefits = benefitRepository.findAllById(request.getBenefitIds());
+        List<Skill> skills =skillRepository.findAllById(request.getSkillIds());
 
         Job job = jobMapper.tEntity(request);
         job.setCompany(company);
         job.setCategory(category);
         job.setLocation(location);
         job.setBenefits(benefits);
+        job.setSkills(new LinkedHashSet<>(skills));
 
         String unique = generateUniqueSlug(request.getTitle().toLowerCase());
         job.setSlug(unique);
@@ -124,6 +129,13 @@ public class JobService extends BaseService implements JobServiceInterface {
                     ? List.of()
                     : benefitRepository.findAllById(request.getBenefitIds());
             job.setBenefits(benefits);
+        }
+
+        if (request.getSkillIds() != null) {
+            Set<Skill> skills = request.getSkillIds().isEmpty()
+                    ? new LinkedHashSet<>()
+                    : new LinkedHashSet<>(skillRepository.findAllById(request.getSkillIds()));
+            job.setSkills(skills);
         }
 
         // 3) Parse thời gian nếu có (tránh đè khi null)
@@ -218,6 +230,19 @@ public class JobService extends BaseService implements JobServiceInterface {
         return jobRepository.findAll(spec, pageable);
     }
 
+    @Override
+    public JobResource getJobForMyCompany(Long userId, Long companyId, Long jobId) {
+        assertCompanyAdmin(userId, companyId);
+
+        Job job = jobRepository.findDetailById(jobId)
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy việc làm với id: " + jobId));
+        if (!job.getCompany().getId().equals(companyId)) {
+            throw new SecurityException("Việc làm không thuộc công ty của bạn");
+        }
+
+        return jobMapper.tResource(job);
+    }
+
     private String generateUniqueSlug(String base) {
         String slug = Slugifier.slugify(base);
 
@@ -234,4 +259,6 @@ public class JobService extends BaseService implements JobServiceInterface {
             }
         }
     }
+
+
 }

@@ -2,6 +2,7 @@
         let currentPage = 1;
         let totalPages = 1;
         let isLoading = false;
+        let savedJobsMap = {}; // Track saved status for each job
         let currentFilters = {
             keyword: '',
             locations: [],
@@ -277,12 +278,19 @@
                                     ).join('') : ''}
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 `;
             }).join('');
 
             container.innerHTML = html;
+
+            // Check saved status for each job if user is logged in
+            if (authService.isAuthenticated()) {
+                jobs.forEach(job => {
+                    checkJobSavedStatus(job.slug);
+                });
+            }
         }
 
         // Utility functions (similar to index.html)
@@ -405,7 +413,7 @@
         function viewJobDetail(slug, jobId) {
             console.log(`View job detail: ${slug} (ID: ${jobId})`);
             // TODO: Implement job detail page
-            alert(`Tính năng xem chi tiết việc làm "${slug}" sẽ được triển khai soon!`);
+            showErrorToast(`Tính năng xem chi tiết việc làm sẽ được triển khai sớm`, 3000);
         }
 
         function clearAllFilters() {
@@ -436,41 +444,94 @@
 
         // Save/Unsave job functionality
         async function toggleSaveJob(slug, buttonElement) {
-            const token = localStorage.getItem('access_token');
+            const token = getStoredToken();
             if (!token) {
-                alert('Vui lòng đăng nhập để lưu việc làm');
-                window.location.href = 'login.html';
+                showErrorToast('Vui lòng đăng nhập để lưu việc làm', 3000);
+                redirectToUrl('login.html', 1000);
                 return;
             }
 
             try {
                 const isSaved = buttonElement.classList.contains('text-red-500');
                 const method = isSaved ? 'DELETE' : 'POST';
-                const endpoint = isSaved ? `/jobs/${slug}/unsave` : `/jobs/${slug}/save`;
+                const url = `${API_CONFIG.BASE_URL}/jobs/${slug}/${isSaved ? 'unsave' : 'save'}`;
 
-                const response = await window.authUtils.apiRequest(endpoint, {
-                    method: method
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
                 });
 
-                if (response && response.ok) {
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result?.message || 'Failed to save/unsave job');
+                }
+
+                if (result.success) {
+                    // Update saved status
+                    savedJobsMap[slug] = !isSaved;
+
                     // Toggle button state
                     if (isSaved) {
                         buttonElement.classList.remove('text-red-500');
                         buttonElement.classList.add('text-gray-400');
                         buttonElement.textContent = '♡';
                         buttonElement.title = 'Lưu việc làm';
+                        showSuccessToast('Đã bỏ lưu việc làm ✓', 2000);
                     } else {
                         buttonElement.classList.remove('text-gray-400');
                         buttonElement.classList.add('text-red-500');
                         buttonElement.textContent = '♥';
                         buttonElement.title = 'Bỏ lưu việc làm';
+                        showSuccessToast('Đã lưu việc làm ✓', 2000);
                     }
                 } else {
-                    throw new Error('Failed to save/unsave job');
+                    throw new Error(result.message || 'Failed to save/unsave job');
                 }
             } catch (error) {
                 console.error('Error saving/unsaving job:', error);
-                alert('Có lỗi xảy ra khi lưu việc làm');
+                showErrorToast(error.message || 'Có lỗi xảy ra khi lưu việc làm', 3000);
+            }
+        }
+
+        // Check if a job is saved
+        async function checkJobSavedStatus(slug) {
+            try {
+                const token = getStoredToken();
+                if (!token) return;
+
+                const url = buildApiUrl(API_CONFIG.JOBS.CHECK_SAVED, { jobSlug: slug });
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        const isSaved = result.data === true;
+                        savedJobsMap[slug] = isSaved;
+
+                        // Update button UI if saved
+                        if (isSaved) {
+                            const button = document.querySelector(`[data-slug="${slug}"]`);
+                            if (button) {
+                                button.classList.remove('text-gray-400');
+                                button.classList.add('text-red-500');
+                                button.textContent = '♥';
+                                button.title = 'Bỏ lưu việc làm';
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking saved job status:', error);
             }
         }
 

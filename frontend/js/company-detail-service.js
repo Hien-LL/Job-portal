@@ -20,6 +20,13 @@
             try {
                 const url = buildApiUrl(API_CONFIG.COMPANIES.GET_DETAIL, { slug: companySlug });
                 const response = await fetch(url);
+                
+                if (!response.ok) {
+                    console.error('API error:', response.status, response.statusText);
+                    showError('Lỗi khi tải thông tin công ty');
+                    return;
+                }
+                
                 const result = await response.json();
 
                 if (result.success && result.data) {
@@ -34,6 +41,7 @@
                     
                     hideLoading();
                 } else {
+                    console.error('Invalid API response:', result);
                     showError('Không tìm thấy công ty này');
                 }
             } catch (error) {
@@ -120,13 +128,13 @@
             const noJobsElement = document.getElementById('no-jobs');
 
             if (!jobs || jobs.length === 0) {
-                jobsList.classList.add('hidden');
-                noJobsElement.classList.remove('hidden');
+                hideElement(jobsList);
+                showElement(noJobsElement);
                 return;
             }
 
-            noJobsElement.classList.add('hidden');
-            jobsList.classList.remove('hidden');
+            hideElement(noJobsElement);
+            showElement(jobsList);
 
             jobsList.innerHTML = jobs.map(job => {
                 const salaryText = formatSalary(job.salaryMin, job.salaryMax);
@@ -168,78 +176,34 @@
             }).join('');
         }
 
-        // Utility functions
-        function formatCompanySize(sizeMin, sizeMax) {
-            if (!sizeMin && !sizeMax) return 'Quy mô không xác định';
-            if (sizeMin === 0 && sizeMax === 0) return 'Quy mô không xác định';
-            
-            if (sizeMin && sizeMax) {
-                if (sizeMin === sizeMax) {
-                    return `${sizeMin} nhân viên`;
-                }
-                return `${sizeMin} - ${sizeMax} nhân viên`;
-            } else if (sizeMin) {
-                return `Từ ${sizeMin} nhân viên`;
-            } else {
-                return `Lên đến ${sizeMax} nhân viên`;
-            }
-        }
-
-        function formatSalary(min, max) {
-            if (!min && !max) return 'Thỏa thuận';
-            
-            const formatAmount = (amount) => {
-                if (amount >= 1000000) {
-                    return (amount / 1000000).toFixed(0) + ' triệu';
-                }
-                return amount.toLocaleString('vi-VN');
-            };
-
-            if (min && max) {
-                return `${formatAmount(min)} - ${formatAmount(max)}`;
-            } else if (min) {
-                return `Từ ${formatAmount(min)}`;
-            } else {
-                return `Lên đến ${formatAmount(max)}`;
-            }
-        }
-
-        function formatPublishedDate(dateString) {
-            if (!dateString) return 'Không xác định';
-            
-            const publishedDate = new Date(dateString);
-            const now = new Date();
-            const diffTime = Math.abs(now - publishedDate);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            
-            if (diffDays === 1) return 'Đăng hôm qua';
-            if (diffDays < 7) return `Đăng ${diffDays} ngày trước`;
-            if (diffDays < 30) return `Đăng ${Math.ceil(diffDays / 7)} tuần trước`;
-            return `Đăng ${Math.ceil(diffDays / 30)} tháng trước`;
-        }
+        // Utility functions - Delegated to markdown-service.js
+        // These are wrappers for markdown-service functions to maintain backward compatibility
+        const formatCompanySize = formatCompanySizeDisplay;
+        const formatSalary = formatSalaryRange;
+        const formatPublishedDate = formatPublishedDateRelative;
 
         function updateJobsCount(count) {
             document.getElementById('jobs-count').textContent = `${count} việc làm`;
         }
 
         function hideLoading() {
-            document.getElementById('loading-container').style.display = 'none';
-            document.getElementById('company-detail-container').style.display = 'block';
+            hideElement('loading-container');
+            showElement('company-detail-container');
         }
 
         function hideJobsLoading() {
-            document.getElementById('jobs-loading').classList.add('hidden');
+            hideElement('jobs-loading');
         }
 
         function showNoJobs() {
-            document.getElementById('jobs-loading').classList.add('hidden');
-            document.getElementById('jobs-list').classList.add('hidden');
-            document.getElementById('no-jobs').classList.remove('hidden');
+            hideElement('jobs-loading');
+            hideElement('jobs-list');
+            showElement('no-jobs');
         }
 
         function showError(message) {
-            document.getElementById('loading-container').style.display = 'none';
-            document.getElementById('error-container').style.display = 'block';
+            hideElement('loading-container');
+            showElement('error-container');
             
             const errorTitle = document.querySelector('#error-container h2');
             const errorText = document.querySelector('#error-container p');
@@ -256,8 +220,8 @@
         // Follow company
         async function followCompany() {
             if (!authService.isAuthenticated()) {
-                alert('Vui lòng đăng nhập để theo dõi công ty');
-                window.location.href = 'login.html';
+                showErrorNotification('Vui lòng đăng nhập để theo dõi công ty', 4000);
+                redirectToUrl('login.html', 1000);
                 return;
             }
 
@@ -268,7 +232,7 @@
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${authService.getToken()}`,
+                        'Authorization': `Bearer ${getStoredToken()}`,
                         'Content-Type': 'application/json'
                     }
                 });
@@ -278,20 +242,20 @@
                 if (result.success) {
                     isFollowing = true;
                     updateFollowButton();
-                    alert(result.message || 'Theo dõi công ty thành công');
+                    showSuccessNotification(result.message || 'Theo dõi công ty thành công', 4000);
                 } else {
-                    alert(result.message || 'Lỗi khi theo dõi công ty');
+                    showErrorNotification(result.message || 'Lỗi khi theo dõi công ty', 4000);
                 }
             } catch (error) {
                 console.error('Error following company:', error);
-                alert('Lỗi khi theo dõi công ty');
+                showErrorNotification('Lỗi khi theo dõi công ty', 4000);
             }
         }
 
         // Unfollow company
         async function unfollowCompany() {
             if (!authService.isAuthenticated()) {
-                alert('Vui lòng đăng nhập');
+                showErrorNotification('Vui lòng đăng nhập', 4000);
                 return;
             }
 
@@ -302,7 +266,7 @@
                 const response = await fetch(url, {
                     method: 'DELETE',
                     headers: {
-                        'Authorization': `Bearer ${authService.getToken()}`,
+                        'Authorization': `Bearer ${getStoredToken()}`,
                         'Content-Type': 'application/json'
                     }
                 });
@@ -312,13 +276,13 @@
                 if (result.success) {
                     isFollowing = false;
                     updateFollowButton();
-                    alert(result.message || 'Bỏ theo dõi công ty thành công');
+                    showSuccessNotification(result.message || 'Bỏ theo dõi công ty thành công', 4000);
                 } else {
-                    alert(result.message || 'Lỗi khi bỏ theo dõi công ty');
+                    showErrorNotification(result.message || 'Lỗi khi bỏ theo dõi công ty', 4000);
                 }
             } catch (error) {
                 console.error('Error unfollowing company:', error);
-                alert('Lỗi khi bỏ theo dõi công ty');
+                showErrorNotification('Lỗi khi bỏ theo dõi công ty', 4000);
             }
         }
 
@@ -329,7 +293,7 @@
                 const response = await fetch(url, {
                     method: 'GET',
                     headers: {
-                        'Authorization': `Bearer ${authService.getToken()}`,
+                        'Authorization': `Bearer ${getStoredToken()}`,
                         'Content-Type': 'application/json'
                     }
                 });

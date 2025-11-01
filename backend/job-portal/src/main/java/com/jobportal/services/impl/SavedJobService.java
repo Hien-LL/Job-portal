@@ -72,4 +72,9 @@ public class SavedJobService implements SavedJobServiceInterface {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "savedAt"));
         return savedJobRepository.findPageByUserId(userId, pageable);
     }
+
+    @Override
+    public boolean isJobSavedByUser(Long userId, String jobSlug) {
+        return savedJobRepository.existsByUserIdAndJobSlug(userId, jobSlug);
+    }
 }
