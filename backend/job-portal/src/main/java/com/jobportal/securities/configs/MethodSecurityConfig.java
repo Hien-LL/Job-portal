@@ -9,17 +9,16 @@ import org.springframework.security.access.expression.method.MethodSecurityExpre
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
 @Configuration
-@EnableMethodSecurity // chỉ cần xuất hiện 1 lần trong app
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class MethodSecurityConfig {
 
     private final CustomPermissionEvaluator customPermissionEvaluator;
 
-    // TÊN BEAN PHẢI LÀ "methodSecurityExpressionHandler"
     @Bean(name = "methodSecurityExpressionHandler")
     public MethodSecurityExpressionHandler methodSecurityExpressionHandler() {
-        DefaultMethodSecurityExpressionHandler h = new DefaultMethodSecurityExpressionHandler();
-        h.setPermissionEvaluator(customPermissionEvaluator);
-        return h;
+        DefaultMethodSecurityExpressionHandler handler = new DefaultMethodSecurityExpressionHandler();
+        handler.setPermissionEvaluator(customPermissionEvaluator);
+        return handler;
     }
 }

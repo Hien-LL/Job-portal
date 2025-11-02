@@ -20,6 +20,14 @@ public class CustomUserDetails implements UserDetails {
 
     private final User user;
 
+    public CustomUserDetails(Long uid, String email, String password, Set<GrantedAuthority> authorities) {
+        this.user = new User();
+        this.user.setId(uid);
+        this.user.setEmail(email);
+        this.user.setPassword(password);
+        // Không set roles/permissions vì constructor này chỉ để test
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         // Dùng LinkedHashSet để giữ thứ tự predictable khi log

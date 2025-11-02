@@ -14,7 +14,6 @@ import com.jobportal.repositories.*;
 import com.jobportal.securities.filters.FilterParameter;
 import com.jobportal.services.interfaces.JobServiceInterface;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -169,9 +168,9 @@ public class JobService extends BaseService implements JobServiceInterface {
 
 
     @Override
-    public Page<Job> paginationJob(Map<String, String[]> params) {
+    public Page<Job> paginationJob(Map<String, String[]> params, boolean includeAll) {
         int page = params.containsKey("page") ? Integer.parseInt(params.get("page")[0]) - 1 : 0;
-        int size = params.containsKey("size") ? Integer.parseInt(params.get("size")[0]) : 10;
+        int size = params.containsKey("size") ? Integer.parseInt(params.get("size")[0]) : 12;
         Sort sort = sortParam(params);
         Pageable pageable = PageRequest.of(page, size, sort);
 
@@ -179,21 +178,24 @@ public class JobService extends BaseService implements JobServiceInterface {
         Map<String, String> filterSimple = FilterParameter.filterSimple(params);
         Map<String, Map<String, String>> filterComplex = FilterParameter.filterComplex(params);
 
-        Specification<Job> spec = Specification.where(
-                        BaseSpecification.<Job>keyword(
-                                keyword,
-                                "title", "description", "seniority", "employmentType", "currency", "remote"
-                        )
-                )
+        Specification<Job> spec = Specification
+                .where(BaseSpecification.<Job>keyword(
+                        keyword, "title", "description", "seniority", "employmentType", "currency", "remote"))
                 .and(BaseSpecification.whereSpec(filterSimple))
                 .and(BaseSpecification.complexWhereSpec(filterComplex));
 
-        // NEW: lọc benefits nếu có
+        // benefits
         Set<Long> benefitIds = FilterParameter.getSetLong(params, "benefitIds");
         spec = spec.and(BaseSpecification.hasAnyBenefit(benefitIds));
 
+        // ép published=true cho public
+        if (!includeAll) {
+            spec = spec.and((root, q, cb) -> cb.isTrue(root.get("published")));
+        }
+
         return jobRepository.findAll(spec, pageable);
     }
+
 
     public void deleteJobForMyCompany(Long userId, Long companyId, Long jobId) {
         assertCompanyAdmin(userId, companyId);

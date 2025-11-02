@@ -16,10 +16,7 @@ import org.springframework.stereotype.Service;
 import java.security.Key;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Base64;
-import java.util.Date;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 
 @Service
@@ -168,5 +165,41 @@ public class JwtService {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public String getStringClaim(String jwt, String roles) {
+        Claims claims = getAllClaimsFromToken(jwt);
+        Object claimObj = claims.get(roles);
+        if (claimObj instanceof String) {
+            return (String) claimObj;
+        }
+        return null;
+    }
+
+    public List<String> getStringListClaim(String jwt, String roles) {
+        Claims claims = getAllClaimsFromToken(jwt);
+        Object claimObj = claims.get(roles);
+        if (claimObj instanceof List<?>) {
+            List<?> rawList = (List<?>) claimObj;
+            List<String> stringList = new ArrayList<>();
+            for (Object obj : rawList) {
+                if (obj instanceof String) {
+                    stringList.add((String) obj);
+                }
+            }
+            return stringList;
+        }
+        return null;
+    }
+
+    public Long getLongClaim(String jwt, String uid) {
+        Claims claims = getAllClaimsFromToken(jwt);
+        Object claimObj = claims.get(uid);
+        if (claimObj instanceof Integer) {
+            return ((Integer) claimObj).longValue();
+        } else if (claimObj instanceof Long) {
+            return (Long) claimObj;
+        }
+        return null;
     }
 }

@@ -26,21 +26,70 @@
     <!-- Main Content -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Page Header -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900 mb-2">Danh sách công ty</h1>
-            <p class="text-gray-600">Khám phá các công ty hàng đầu và cơ hội nghề nghiệp tuyệt vời</p>
+        <div class="mb-8 text-center">
+            <h1 class="text-4xl font-bold text-gray-900 mb-3">Danh sách công ty</h1>
+            <p class="text-gray-600 text-lg">Khám phá các công ty hàng đầu và cơ hội nghề nghiệp tuyệt vời</p>
         </div>
 
         <!-- Search and Filter -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Tìm kiếm công ty</label>
-                    <input type="text" id="search-company" placeholder="Tên công ty..." class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <div class="bg-gradient-to-br from-blue-50 to-indigo-50 border border-gray-200 rounded-2xl shadow-lg p-6 mb-8">
+            <!-- Search Bar -->
+            <div class="mb-6">
+                <div class="bg-white rounded-full shadow-md border border-gray-200 p-2 flex items-center gap-2">
+                    <div class="flex-1 flex items-center px-4">
+                        <svg class="w-5 h-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                        <input 
+                            type="text" 
+                            id="search-company" 
+                            placeholder="Tìm kiếm công ty theo tên..."
+                            class="w-full py-2 text-sm focus:outline-none border-none"
+                        >
+                    </div>
+                    <button 
+                        onclick="searchCompanies()" 
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full font-medium text-sm transition-all flex items-center gap-2"
+                    >
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                        Tìm kiếm
+                    </button>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Quy mô</label>
-                    <select id="filter-size" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <!-- Filters -->
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <div class="bg-blue-600 p-2 rounded-xl">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-base font-bold text-gray-800">Bộ lọc</h3>
+                </div>
+                <button 
+                    onclick="clearFilters()" 
+                    class="px-4 py-2 bg-white hover:bg-red-50 text-red-600 hover:text-red-700 rounded-full font-medium text-sm flex items-center gap-2 border border-red-200 hover:border-red-300 transition-all shadow-sm"
+                >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                    Xóa bộ lọc
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Size Filter -->
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
+                    <label class="flex items-center gap-2 text-sm font-medium text-gray-700 mb-3">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                        <span>Quy mô công ty</span>
+                    </label>
+                    <select id="filter-size" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
                         <option value="">Tất cả quy mô</option>
                         <option value="1-10">1-10 nhân viên</option>
                         <option value="11-50">11-50 nhân viên</option>
@@ -49,35 +98,41 @@
                         <option value="500+">500+ nhân viên</option>
                     </select>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Sắp xếp</label>
-                    <select id="sort-companies" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+                <!-- Sort Filter -->
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
+                    <label class="flex items-center gap-2 text-sm font-medium text-gray-700 mb-3">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+                        </svg>
+                        <span>Sắp xếp theo</span>
+                    </label>
+                    <select id="sort-companies" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
                         <option value="followerCount,desc">Nhiều người theo dõi nhất</option>
                         <option value="name,asc">Tên A-Z</option>
                         <option value="name,desc">Tên Z-A</option>
                     </select>
                 </div>
-                <div class="flex items-end">
-                    <button onclick="searchCompanies()" class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">
-                        Tìm kiếm
-                    </button>
+
+                <!-- Verified Filter -->
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-200 flex items-center">
+                    <label class="flex items-center gap-3 cursor-pointer">
+                        <input type="checkbox" id="filter-verified" class="w-5 h-5 rounded text-blue-600 focus:ring-blue-500">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-sm font-medium text-gray-700">Đã xác thực</span>
+                        </div>
+                    </label>
                 </div>
-            </div>
-            <div class="mt-4 flex items-center gap-4">
-                <label class="flex items-center text-sm">
-                    <input type="checkbox" id="filter-verified" class="mr-2 rounded">
-                    Chỉ hiển thị công ty đã xác thực
-                </label>
-                <button onclick="clearFilters()" class="text-blue-600 text-sm hover:underline">
-                    Xóa bộ lọc
-                </button>
             </div>
         </div>
 
         <!-- Results Summary -->
         <div class="flex items-center justify-between mb-6">
-            <p class="text-gray-600 text-sm">
-                <span id="total-companies">0</span> công ty được tìm thấy
+            <p class="text-gray-600 text-base">
+                Tìm thấy <span id="total-companies" class="font-bold text-blue-600">0</span> công ty
             </p>
         </div>
 
@@ -93,24 +148,26 @@
 
         <!-- Empty State -->
         <div id="empty-state" class="hidden text-center py-20">
-            <div class="text-6xl mb-4">🏢</div>
-            <h3 class="text-lg font-medium text-gray-900 mb-2">Không tìm thấy công ty</h3>
-            <p class="text-gray-600 mb-4">Thử điều chỉnh bộ lọc hoặc từ khóa tìm kiếm</p>
-            <button onclick="clearFilters()" class="bg-blue-600 text-white px-4 py-2 rounded font-medium hover:bg-blue-700 transition">
+            <div class="bg-gray-100 w-32 h-32 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span class="text-6xl">🏢</span>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-3">Không tìm thấy công ty</h3>
+            <p class="text-gray-600 mb-6">Thử điều chỉnh bộ lọc hoặc từ khóa tìm kiếm</p>
+            <button onclick="clearFilters()" class="bg-blue-600 text-white px-6 py-3 rounded-full font-medium hover:bg-blue-700 transition-all shadow-md hover:shadow-lg">
                 Xóa bộ lọc
             </button>
         </div>
 
         <!-- Error State -->
         <div id="error-state" class="hidden text-center py-20">
-            <div class="text-red-500 mb-4">
-                <svg class="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+            <div class="bg-red-100 w-32 h-32 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg class="w-16 h-16 text-red-500" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
                 </svg>
             </div>
-            <h3 class="text-lg font-medium text-gray-900 mb-2">Lỗi khi tải dữ liệu</h3>
-            <p class="text-gray-600 mb-4">Vui lòng thử lại sau</p>
-            <button onclick="loadCompanies()" class="bg-blue-600 text-white px-4 py-2 rounded font-medium hover:bg-blue-700 transition">
+            <h3 class="text-2xl font-bold text-gray-900 mb-3">Lỗi khi tải dữ liệu</h3>
+            <p class="text-gray-600 mb-6">Vui lòng thử lại sau</p>
+            <button onclick="loadCompanies()" class="bg-blue-600 text-white px-6 py-3 rounded-full font-medium hover:bg-blue-700 transition-all shadow-md hover:shadow-lg">
                 Thử lại
             </button>
         </div>

@@ -6,7 +6,7 @@ import com.jobportal.dtos.requests.NotificationRequest;
 import com.jobportal.dtos.resources.*;
 import com.jobportal.entities.Job;
 import com.jobportal.mappers.JobMapper;
-import com.jobportal.services.impl.JobService;
+import org.springframework.security.core.Authentication;
 import com.jobportal.services.interfaces.AuthServiceInterface;
 import com.jobportal.services.interfaces.JobServiceInterface;
 import com.jobportal.services.interfaces.NotificationServiceInterface;
@@ -20,10 +20,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
+import static org.springframework.security.authorization.AuthorityReactiveAuthorizationManager.hasAuthority;
+
+@Validated
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("api/jobs")
@@ -89,14 +94,25 @@ public class JobController {
         }
     }
 
-    @GetMapping()
-    public ResponseEntity<?> getAllJobs(HttpServletRequest request) {
+    @GetMapping
+    public ResponseEntity<?> getAllJobs(HttpServletRequest request, Authentication auth) {
         Map<String, String[]> params = request.getParameterMap();
-        Page<Job> jobs = jobService.paginationJob(params);
-        Page<JobListItemResource>  jobResources = jobMapper.tListResourcePage(jobs);
-        ApiResource<Page<JobListItemResource>> resource = ApiResource.ok(jobResources, "Success");
-        return ResponseEntity.ok(resource);
+
+        Page<Job> jobs = jobService.paginationJob(params, false);
+        Page<JobListItemResource> jobResources = jobMapper.tListResourcePage(jobs);
+        return ResponseEntity.ok(ApiResource.ok(jobResources, "Success"));
     }
+
+    @GetMapping("/admin/all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getAllJobsForAdmin(HttpServletRequest request, Authentication auth) {
+        Map<String, String[]> params = request.getParameterMap();
+
+        Page<Job> jobs = jobService.paginationJob(params, true);
+        Page<JobListItemResource> jobResources = jobMapper.tListResourcePage(jobs);
+        return ResponseEntity.ok(ApiResource.ok(jobResources, "Success" + (auth == null ? "null" : auth.getAuthorities().toString())));
+    }
+
 
     @GetMapping("/my-company/{companyId}/job/{jobId}")
     public ResponseEntity<?> getJobForMyCompany(@Positive(message = "id phải lớn hơn 0") @PathVariable Long companyId,@Positive(message = "id phải lớn hơn 0") @PathVariable Long jobId) {

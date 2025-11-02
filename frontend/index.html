@@ -24,39 +24,73 @@
     <div data-fragment="fragments/header.html" data-header-type="auto"></div>
 
     <!-- Hero Section -->
-    <section class="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-16 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-7xl mx-auto">
-            <div class="text-center mb-8">
-                <h1 class="text-3xl md:text-4xl font-bold mb-2">Tìm việc làm phù hợp với bạn</h1>
-                <p class="text-blue-100 text-sm md:text-base">Hàng ngàn cơ hội tuyệt vời đang chờ bạn</p>
-            </div>
+    <section class="bg-white py-16 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-5xl mx-auto text-center">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                Tìm việc làm phù hợp với bạn
+            </h1>
+            <p class="text-gray-600 text-lg mb-8">
+                Hàng ngàn cơ hội việc làm đang chờ đón bạn
+            </p>
             
             <!-- Search Bar -->
-            <div class="flex flex-col sm:flex-row gap-2 max-w-2xl mx-auto">
-                <input 
-                    type="text" 
-                    placeholder="Tìm kiếm vị trí, công ty..." 
-                    class="flex-1 px-4 py-3 rounded text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm"
-                >
-                <button class="bg-white text-blue-600 px-6 py-3 rounded font-semibold hover:bg-blue-50 transition">
-                    Tìm kiếm
-                </button>
+            <div class="max-w-3xl mx-auto">
+                <div class="bg-white rounded-lg shadow-lg border-2 border-gray-200 p-2">
+                    <div class="flex flex-col md:flex-row gap-2">
+                        <!-- Keyword Input -->
+                        <div class="flex-1 flex items-center px-4 py-2 bg-gray-50 rounded-md">
+                            <svg class="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                            <input 
+                                type="text" 
+                                id="home-keyword-search"
+                                placeholder="Vị trí tuyển dụng, tên công ty..." 
+                                class="flex-1 bg-transparent text-gray-900 focus:outline-none text-sm"
+                            >
+                        </div>
+
+                        <!-- Location Input -->
+                        <div class="flex-1 flex items-center px-4 py-2 bg-gray-50 rounded-md">
+                            <svg class="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                            <input 
+                                type="text" 
+                                id="home-location-search"
+                                placeholder="Địa điểm" 
+                                class="flex-1 bg-transparent text-gray-900 focus:outline-none text-sm"
+                            >
+                        </div>
+
+                        <!-- Search Button -->
+                        <button 
+                            onclick="handleSearch()"
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-md font-medium text-sm transition-all flex items-center justify-center gap-2"
+                        >
+                            Tìm kiếm
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- Featured Jobs Section -->
-    <section class="py-12 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-7xl mx-auto">
+    <section class="py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
+        <div class="max-w-6xl mx-auto">
             <div class="flex justify-between items-center mb-8">
-                <h2 class="text-2xl font-bold text-gray-900">Việc làm nổi bật</h2>
-                <a href="#" class="text-blue-600 hover:text-blue-700 font-semibold text-sm">Xem tất cả</a>
+                <h2 class="text-2xl font-bold text-gray-900">Việc làm mới nhất</h2>
+                <a href="job.html" class="text-blue-600 hover:text-blue-700 font-medium text-sm">
+                    Xem tất cả →
+                </a>
             </div>
 
             <!-- Job Cards Grid -->
-            <div id="featured-jobs-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div id="featured-jobs-grid" class="space-y-4">
                 <!-- Loading state -->
-                <div class="col-span-full text-center py-8">
+                <div class="text-center py-8">
                     <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                     <p class="text-gray-600 text-sm mt-2">Đang tải việc làm...</p>
                 </div>
@@ -65,12 +99,14 @@
     </section>
 
     <!-- Categories Section -->
-    <section class="py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
-        <div class="max-w-7xl mx-auto">
-            <h2 class="text-2xl font-bold text-gray-900 mb-8">Danh mục phổ biến</h2>
-            <p class="text-gray-600 text-sm mb-8">Khám phá những ngành nghề được tìm kiếm nhiều nhất trên toàn nền tảng</p>
+    <section class="py-12 px-4 sm:px-6 lg:px-8 bg-white">
+        <div class="max-w-6xl mx-auto">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">Danh mục phổ biến</h2>
+                <p class="text-gray-600 text-sm">Khám phá các ngành nghề đang có nhiều cơ hội việc làm nhất trên nền tảng</p>
+            </div>
             
-            <div id="featured-categories-grid" class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div id="featured-categories-grid" class="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <!-- Loading state -->
                 <div class="col-span-full text-center py-8">
                     <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -80,12 +116,138 @@
         </div>
     </section>
 
+    <!-- Popular Locations Section -->
+    <section class="py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
+        <div class="max-w-6xl mx-auto">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">Việc làm theo địa điểm</h2>
+                <p class="text-gray-600 text-sm">Tìm kiếm công việc tại các thành phố lớn</p>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <a href="job.html?location=Hà Nội" class="bg-white rounded-lg p-5 hover:shadow-md hover:border-blue-500 transition border border-gray-200 group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-100 transition">
+                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-semibold text-gray-900 text-sm mb-1">Hà Nội</h3>
+                            <p class="text-gray-500 text-xs">5,234 việc làm</p>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="job.html?location=Hồ Chí Minh" class="bg-white rounded-lg p-5 hover:shadow-md hover:border-blue-500 transition border border-gray-200 group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-100 transition">
+                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-semibold text-gray-900 text-sm mb-1">Hồ Chí Minh</h3>
+                            <p class="text-gray-500 text-xs">8,127 việc làm</p>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="job.html?location=Đà Nẵng" class="bg-white rounded-lg p-5 hover:shadow-md hover:border-blue-500 transition border border-gray-200 group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-100 transition">
+                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-semibold text-gray-900 text-sm mb-1">Đà Nẵng</h3>
+                            <p class="text-gray-500 text-xs">1,892 việc làm</p>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="job.html?location=Cần Thơ" class="bg-white rounded-lg p-5 hover:shadow-md hover:border-blue-500 transition border border-gray-200 group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-100 transition">
+                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-semibold text-gray-900 text-sm mb-1">Cần Thơ</h3>
+                            <p class="text-gray-500 text-xs">645 việc làm</p>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="job.html?location=Hải Phòng" class="bg-white rounded-lg p-5 hover:shadow-md hover:border-blue-500 transition border border-gray-200 group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-100 transition">
+                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-semibold text-gray-900 text-sm mb-1">Hải Phòng</h3>
+                            <p class="text-gray-500 text-xs">923 việc làm</p>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="job.html?location=Bình Dương" class="bg-white rounded-lg p-5 hover:shadow-md hover:border-blue-500 transition border border-gray-200 group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-100 transition">
+                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-semibold text-gray-900 text-sm mb-1">Bình Dương</h3>
+                            <p class="text-gray-500 text-xs">1,567 việc làm</p>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="job.html?location=Đồng Nai" class="bg-white rounded-lg p-5 hover:shadow-md hover:border-blue-500 transition border border-gray-200 group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-100 transition">
+                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-semibold text-gray-900 text-sm mb-1">Đồng Nai</h3>
+                            <p class="text-gray-500 text-xs">834 việc làm</p>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="job.html?isRemote=true" class="bg-white rounded-lg p-5 hover:shadow-md hover:border-blue-500 transition border border-gray-200 group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-100 transition">
+                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-semibold text-gray-900 text-sm mb-1">Remote</h3>
+                            <p class="text-gray-500 text-xs">2,341 việc làm</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
     <!-- Featured Companies Section -->
-    <section class="py-12 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-7xl mx-auto">
+    <section class="py-12 px-4 sm:px-6 lg:px-8 bg-white">
+        <div class="max-w-6xl mx-auto">
             <div class="flex justify-between items-center mb-8">
                 <h2 class="text-2xl font-bold text-gray-900">Công ty hàng đầu</h2>
-                <a href="#" class="text-blue-600 hover:text-blue-700 font-semibold text-sm">Xem tất cả</a>
+                <a href="companies.html" class="text-blue-600 hover:text-blue-700 font-medium text-sm">
+                    Xem tất cả →
+                </a>
             </div>
 
             <div id="featured-companies-grid" class="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -98,16 +260,230 @@
         </div>
     </section>
 
+    <!-- Why Choose Us Section -->
+    <section class="py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">Tại sao chọn JobPortal?</h2>
+                <p class="text-gray-600 text-sm">Nền tảng tuyển dụng toàn diện cho mọi nhu cầu nghề nghiệp</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="bg-white rounded-lg p-6 text-center hover:shadow-md transition">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 text-lg mb-2">Tìm kiếm thông minh</h3>
+                    <p class="text-gray-600 text-sm">Công cụ tìm kiếm mạnh mẽ với bộ lọc chi tiết giúp bạn tìm được công việc phù hợp nhất</p>
+                </div>
+                
+                <!-- Feature 2 -->
+                <div class="bg-white rounded-lg p-6 text-center hover:shadow-md transition">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 text-lg mb-2">Công ty uy tín</h3>
+                    <p class="text-gray-600 text-sm">Hợp tác với hàng ngàn doanh nghiệp đã được xác minh và đánh giá cao</p>
+                </div>
+                
+                <!-- Feature 3 -->
+                <div class="bg-white rounded-lg p-6 text-center hover:shadow-md transition">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 text-lg mb-2">Ứng tuyển nhanh chóng</h3>
+                    <p class="text-gray-600 text-sm">Quy trình ứng tuyển đơn giản, chỉ với vài cú click để gửi hồ sơ</p>
+                </div>
+                
+                <!-- Feature 4 -->
+                <div class="bg-white rounded-lg p-6 text-center hover:shadow-md transition">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 text-lg mb-2">Thông báo việc làm</h3>
+                    <p class="text-gray-600 text-sm">Nhận thông báo ngay khi có việc làm mới phù hợp với tiêu chí của bạn</p>
+                </div>
+                
+                <!-- Feature 5 -->
+                <div class="bg-white rounded-lg p-6 text-center hover:shadow-md transition">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 text-lg mb-2">Thống kê chi tiết</h3>
+                    <p class="text-gray-600 text-sm">Theo dõi tình trạng hồ sơ, số lượt xem và phản hồi từ nhà tuyển dụng</p>
+                </div>
+                
+                <!-- Feature 6 -->
+                <div class="bg-white rounded-lg p-6 text-center hover:shadow-md transition">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 text-lg mb-2">Tài nguyên nghề nghiệp</h3>
+                    <p class="text-gray-600 text-sm">Blog hướng dẫn viết CV, phỏng vấn và phát triển sự nghiệp</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-12 px-4 sm:px-6 lg:px-8 bg-white">
+        <div class="max-w-6xl mx-auto">
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-8 md:p-12">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center text-white">
+                    <div>
+                        <div class="text-3xl md:text-4xl font-bold mb-2">12,500+</div>
+                        <div class="text-blue-100 text-sm">Việc làm đang tuyển</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl md:text-4xl font-bold mb-2">3,200+</div>
+                        <div class="text-blue-100 text-sm">Công ty đối tác</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl md:text-4xl font-bold mb-2">85,000+</div>
+                        <div class="text-blue-100 text-sm">Ứng viên đã tìm được việc</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl md:text-4xl font-bold mb-2">98%</div>
+                        <div class="text-blue-100 text-sm">Độ hài lòng</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">Câu chuyện thành công</h2>
+                <p class="text-gray-600 text-sm">Hàng nghìn người đã tìm được công việc mơ ước qua JobPortal</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-6">
+                <!-- Testimonial 1 -->
+                <div class="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center gap-1 mb-3">
+                        <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                        <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                        <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                        <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                        <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4 italic">"Tôi đã tìm được công việc mơ ước chỉ sau 2 tuần đăng ký. Giao diện dễ sử dụng và có rất nhiều cơ hội việc làm chất lượng!"</p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                            <span class="text-blue-600 font-semibold">NH</span>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-gray-900 text-sm">Nguyễn Hoàng</p>
+                            <p class="text-gray-500 text-xs">Frontend Developer</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Testimonial 2 -->
+                <div class="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center gap-1 mb-3">
+                        <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                        <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                        <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                        <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                        <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4 italic">"Là nhà tuyển dụng, tôi rất hài lòng với chất lượng ứng viên. Nền tảng giúp tôi tìm đúng người một cách nhanh chóng."</p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                            <span class="text-blue-600 font-semibold">TL</span>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-gray-900 text-sm">Trần Linh</p>
+                            <p class="text-gray-500 text-xs">HR Manager</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Testimonial 3 -->
+                <div class="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center gap-1 mb-3">
+                        <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                        <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                        <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                        <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                        <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4 italic">"Công cụ lọc việc làm rất tiện lợi. Tôi có thể tìm kiếm theo mức lương, địa điểm và kinh nghiệm một cách dễ dàng."</p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                            <span class="text-blue-600 font-semibold">PA</span>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-gray-900 text-sm">Phạm Anh</p>
+                            <p class="text-gray-500 text-xs">Marketing Specialist</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- CTA Section -->
-    <section class="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12 px-4 sm:px-6 lg:px-8">
+    <section class="bg-blue-600 text-white py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-4xl mx-auto text-center">
-            <h2 class="text-2xl md:text-3xl font-bold mb-2">Bạn là nhà tuyển dụng?</h2>
-            <p class="text-blue-100 text-sm md:text-base mb-6">
-                Đăng tuyển dụng và tìm kiếm ứng viên phù hợp ngay hôm nay
+            <h2 class="text-3xl font-bold mb-3">Bạn là nhà tuyển dụng?</h2>
+            <p class="text-blue-100 text-lg mb-6">
+                Đăng tin tuyển dụng ngay để tiếp cận hàng ngàn ứng viên tiềm năng
             </p>
-            <button class="bg-white text-blue-600 px-8 py-3 rounded font-semibold hover:bg-blue-50 transition text-sm">
-                Đăng tuyển dụng
-            </button>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="register.html" class="inline-block bg-white text-blue-600 px-8 py-3 rounded-md font-semibold hover:bg-gray-100 transition-all">
+                    Đăng tin tuyển dụng
+                </a>
+                <a href="about.html" class="inline-block bg-blue-700 text-white px-8 py-3 rounded-md font-semibold hover:bg-blue-800 transition-all border-2 border-white">
+                    Tìm hiểu thêm
+                </a>
+            </div>
         </div>
     </section>
 
@@ -123,8 +499,33 @@
 
     <!-- Featured Jobs API Script -->
     <script>
-        // Load featured jobs when page loads
+        // Handle search from home page
+        function handleSearch() {
+            const keyword = document.getElementById('home-keyword-search').value.trim();
+            const location = document.getElementById('home-location-search').value.trim();
+            
+            const params = new URLSearchParams();
+            if (keyword) params.set('keyword', keyword);
+            if (location) params.set('location', location);
+            
+            const url = params.toString() ? `job.html?${params.toString()}` : 'job.html';
+            window.location.href = url;
+        }
+
+        // Allow Enter key to search
         document.addEventListener('DOMContentLoaded', () => {
+            const keywordInput = document.getElementById('home-keyword-search');
+            const locationInput = document.getElementById('home-location-search');
+            
+            [keywordInput, locationInput].forEach(input => {
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        handleSearch();
+                    }
+                });
+            });
+
+            // Load featured content
             loadFeaturedJobs();
             loadFeaturedCategories();
             loadFeaturedCompanies();

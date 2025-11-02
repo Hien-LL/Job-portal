@@ -28,40 +28,44 @@
                 return;
             }
 
-            // Show max 4 companies on homepage
-            const displayCompanies = companies.slice(0, 4);
+            // Show max 8 companies on homepage
+            const displayCompanies = companies.slice(0, 8);
             
             grid.innerHTML = displayCompanies.map(company => {
-                // Format company size
-                const companySizeText = formatCompanySize(company.size_min, company.size_max);
+                // Get job count
+                const jobCount = company.jobCount || 0;
                 
                 // Get company logo or use default
                 const logoUrl = company.logoUrl ? 
                     window.APP_CONFIG.API_BASE + company.logoUrl : null;
 
                 return `
-                    <div class="bg-white rounded-lg border border-gray-200 p-6 text-center hover:shadow-md transition cursor-pointer" 
-                         onclick="viewCompany('${company.slug}', ${company.id})">
-                        <div class="w-16 h-16 bg-gray-100 rounded mx-auto mb-4 flex items-center justify-center">
-                            ${logoUrl ? 
-                                `<img src="${logoUrl}" alt="${company.name}" class="w-full h-full object-contain rounded">` :
-                                `<span class="text-2xl">🏢</span>`
-                            }
+                    <a href="company-detail.html?slug=${company.slug}" 
+                       class="block bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition group">
+                        <div class="flex flex-col items-center text-center">
+                            <!-- Company Logo (circular) -->
+                            <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 mb-3 flex items-center justify-center overflow-hidden">
+                                ${logoUrl ? 
+                                    `<img src="${logoUrl}" alt="${company.name}" class="w-full h-full object-cover">` :
+                                    `<svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                    </svg>`
+                                }
+                            </div>
+                            
+                            <!-- Company Name with Verified Badge -->
+                            <div class="flex items-center gap-1 mb-2">
+                                <h3 class="font-semibold text-gray-900 text-sm truncate max-w-[140px]">${company.name}</h3>
+                                ${company.verified ? 
+                                    '<svg class="w-4 h-4 text-blue-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" title="Công ty đã xác thực"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>' : 
+                                    ''
+                                }
+                            </div>
+                            
+                            <!-- Job Count -->
+                            <p class="text-blue-600 text-xs font-medium">${jobCount} việc làm đang tuyển</p>
                         </div>
-                        <div class="flex items-center justify-center gap-1 mb-1">
-                            <h3 class="font-semibold text-gray-900 text-sm">${company.name}</h3>
-                            ${company.verified ? 
-                                '<span class="inline-block w-3 h-3 bg-blue-500 rounded-full" title="Công ty đã xác thực"></span>' : 
-                                ''
-                            }
-                        </div>
-                        <p class="text-gray-600 text-xs mb-2">${companySizeText}</p>
-                        <p class="text-gray-600 text-xs mb-3">${company.followerCount} người theo dõi</p>
-                        <a href="#" class="text-blue-600 text-xs font-semibold hover:underline" 
-                           onclick="event.stopPropagation(); viewCompany('${company.slug}', ${company.id})">
-                            Xem chi tiết →
-                        </a>
-                    </div>
+                    </a>
                 `;
             }).join('');
         }

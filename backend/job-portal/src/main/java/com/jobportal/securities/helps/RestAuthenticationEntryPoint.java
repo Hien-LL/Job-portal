@@ -13,16 +13,17 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-@RequiredArgsConstructor
 @Component
+@RequiredArgsConstructor
 public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
     private final ObjectMapper om;
+
     @Override
     public void commence(HttpServletRequest req, HttpServletResponse res, AuthenticationException ex) throws IOException {
         var body = ApiResource.error("401", "Xác thực thất bại", HttpStatus.UNAUTHORIZED);
         res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         res.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        res.setCharacterEncoding("UTF-8");
         om.writeValue(res.getOutputStream(), body);
     }
 }
+

@@ -28,115 +28,46 @@
                 return;
             }
 
-            // Show max 4 categories on homepage (top categories by job count)
-            const displayCategories = categories.slice(0, 4);
+            // Show max 6 categories on homepage (top categories by job count)
+            const displayCategories = categories.slice(0, 6);
             
             grid.innerHTML = displayCategories.map(category => {
                 // Get category icon based on name
                 const categoryIcon = getCategoryIcon(category.name);
+                const jobCount = category.jobCount || 0;
 
                 return `
-                    <div class="bg-white rounded-lg p-6 text-center hover:shadow-md transition border border-gray-100 cursor-pointer" 
-                         onclick="viewCategory('${category.slug}', ${category.id})">
-                        <div class="text-3xl mb-3">${categoryIcon}</div>
-                        <h3 class="font-semibold text-gray-900 text-sm mb-1">${category.name}</h3>
-                        <p class="text-gray-600 text-xs">Xem việc làm →</p>
-                    </div>
+                    <a href="job.html?category=${category.slug}" 
+                       class="block bg-white rounded-lg p-5 hover:shadow-md hover:border-blue-500 transition border border-gray-200 group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-100 transition">
+                                ${categoryIcon}
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="font-semibold text-gray-900 text-sm mb-1 truncate">${category.name}</h3>
+                                <p class="text-gray-500 text-xs">${jobCount} việc làm</p>
+                            </div>
+                        </div>
+                    </a>
                 `;
             }).join('');
         }
 
         function getCategoryIcon(categoryName) {
-            // Map category names to appropriate emojis
-            const categoryIcons = {
-                // Tech/Programming
-                'Digital Marketing': '📊',
-                'Lập trình Backend': '⚙️',
-                'Lập trình Frontend': '💻',
-                'Lập trình Fullstack': '🔧',
-                'Phát triển phần mềm': '💻',
-                'Web Development': '🌐',
-                'Mobile Development': '📱',
-                'Game Development': '🎮',
-                'Embedded Systems': '🔌',
-                'DevOps': '⚡',
-                'Cloud Engineering': '☁️',
-                'System Administration': '🖥️',
-                'Database Administration': '🗄️',
-                
-                // Testing
-                'Automation Testing': '🤖',
-                'Manual Testing': '🔍',
-                
-                // Data & AI
-                'Phân tích dữ liệu (Data Analysis)': '📈',
-                'Khoa học dữ liệu (Data Science)': '🔬',
-                'Machine Learning': '🧠',
-                'Deep Learning': '🤖',
-                'AI Engineering': '🧠',
-                'Data Engineering': '🏗️',
-                'Big Data': '📊',
-                'Business Intelligence': '📊',
-                
-                // Marketing
-                'Content Marketing': '✍️',
-                'SEO / SEM': '🔍',
-                'Social Media Marketing': '📱',
-                'Email Marketing': '📧',
-                'Brand Management': '🏷️',
-                'Public Relations (PR)': '📢',
-                
-                // Design
-                'UI/UX Design': '🎨',
-                'Graphic Design': '🖌️',
-                'Product Design': '🎨',
-                '3D Modeling / Animation': '🎬',
-                'Video Editing': '🎬',
-                'Motion Graphic Design': '📹',
-                
-                // Business
-                'Quản trị kinh doanh': '💼',
-                'Quản lý dự án (Project Management)': '📋',
-                'Khởi nghiệp / Startup': '🚀',
-                'Phân tích kinh doanh (Business Analyst)': '📊',
-                'Chăm sóc khách hàng': '👥',
-                'Bán hàng (Sales)': '💰',
-                'E-commerce': '🛒',
-                'Logistics / Supply Chain': '📦',
-                
-                // Finance
-                'Kế toán / Kiểm toán': '💰',
-                'Phân tích tài chính': '📈',
-                'Ngân hàng / Tín dụng': '🏦',
-                'Đầu tư / Chứng khoán': '📊',
-                'Bảo hiểm / Tài sản': '🛡️',
-                
-                // Education
-                'Giảng dạy / Đào tạo': '🎓',
-                'Phát triển chương trình học': '📚',
-                'Tư vấn hướng nghiệp': '🎯',
-                'Giáo dục trực tuyến (E-learning)': '💻',
-                'Ngôn ngữ / Phiên dịch': '🗣️',
-                
-                // Engineering
-                'Kỹ thuật cơ khí': '⚙️',
-                'Điện - Điện tử': '⚡',
-                'Tự động hóa (Automation)': '🤖',
-                'Xây dựng / Kết cấu': '🏗️',
-                'Kiến trúc / Thiết kế công trình': '🏛️',
-                'Kỹ thuật ô tô': '🚗',
-                'Kỹ thuật môi trường': '🌱',
-                
-                // Healthcare
-                'Y tế / Điều dưỡng': '⚕️',
-                'Dược phẩm / Hóa sinh': '💊',
-                'Chẩn đoán hình ảnh': '🔬',
-                'Quản lý bệnh viện': '🏥',
-                'Thể dục / Dinh dưỡng': '💪',
-                'Tư vấn sức khỏe': '❤️'
+            // Map category names to appropriate SVG icons
+            const iconMap = {
+                'Digital Marketing': '<svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>',
+                'Lập trình Backend': '<svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>',
+                'Lập trình Frontend': '<svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>',
+                'Lập trình Fullstack': '<svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>',
+                'UI/UX Design': '<svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>',
+                'Quản trị kinh doanh': '<svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>',
+                'Phân tích dữ liệu (Data Analysis)': '<svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>',
+                'Bán hàng (Sales)': '<svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
             };
             
-            return categoryIcons[categoryName] || '💼';
+            // Return matched icon or default briefcase icon
+            return iconMap[categoryName] || '<svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>';
         }
 
         function viewCategory(slug, categoryId) {
