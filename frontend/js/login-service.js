@@ -18,7 +18,7 @@
         });
 
         // API Configuration
-        const API_BASE_URL = 'http://localhost:8080/api';
+        const API_BASE_URL = 'https://cvxn08rn-8080.asse.devtunnels.ms/api';
         const LOGIN_ENDPOINT = `${API_BASE_URL}/auth/login`;
 
         // Show loading state
