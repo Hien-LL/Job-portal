@@ -41,8 +41,11 @@ public class JobService extends BaseService implements JobServiceInterface {
     private final CompanyMapper companyMapper;
     private final FollowCompanyRepository followCompanyRepository;
     private final SkillRepository skillRepository;
+    private final SavedJobRepository savedJobRepository;
+
 
     @Override
+    @Transactional
     public JobResource createJobForMyCompany(Long userId, Long companyId, JobCreationRequest request) {
         if (!companyAdminRepository.existsById(new CompanyAdminId(userId, companyId))) {
             throw new SecurityException("Bạn không có quyền tạo việc làm cho công ty này");
@@ -197,6 +200,8 @@ public class JobService extends BaseService implements JobServiceInterface {
     }
 
 
+    @Override
+    @Transactional
     public void deleteJobForMyCompany(Long userId, Long companyId, Long jobId) {
         assertCompanyAdmin(userId, companyId);
 
@@ -205,7 +210,7 @@ public class JobService extends BaseService implements JobServiceInterface {
         if (!job.getCompany().getId().equals(companyId)) {
             throw new SecurityException("Việc làm không thuộc công ty của bạn");
         }
-
+        savedJobRepository.deleteAllByJob_Id(jobId);
         jobRepository.delete(job);
     }
 
@@ -241,7 +246,6 @@ public class JobService extends BaseService implements JobServiceInterface {
         if (!job.getCompany().getId().equals(companyId)) {
             throw new SecurityException("Việc làm không thuộc công ty của bạn");
         }
-
         return jobMapper.tResource(job);
     }
 
