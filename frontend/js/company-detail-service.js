@@ -1,4 +1,4 @@
-        let currentCompany = null;
+let currentCompany = null;
         let companyJobs = [];
         let isFollowing = false;
 
@@ -34,7 +34,7 @@
                     displayCompanyDetail(result.data);
                     loadCompanyJobs(result.data.id);
                     
-                    // Check follow status if user is authenticated
+                    // Check follow status if user is authenticated - ✅ SỬA
                     if (authService.isAuthenticated()) {
                         checkFollowStatus(result.data.id);
                     }
@@ -62,10 +62,10 @@
                 document.getElementById('company-verified').classList.remove('hidden');
             }
 
-            // Company logo
+            // Company logo - ✅ SỬA
             const logoElement = document.getElementById('company-logo');
             if (company.logoUrl) {
-                logoElement.innerHTML = `<img src="${window.APP_CONFIG.API_BASE + company.logoUrl}" alt="${company.name}" class="w-full h-full object-contain rounded-lg">`;
+                logoElement.innerHTML = `<img src="${API_CONFIG.FILE_BASE_URL}${company.logoUrl}" alt="${company.name}" class="w-full h-full object-contain rounded-lg">`;
             } else {
                 logoElement.innerHTML = `<span class="text-4xl">🏢</span>`;
             }
@@ -217,11 +217,12 @@
             }
         }
 
-        // Follow company
+        // Follow company - ✅ ĐÃ SỬA
         async function followCompany() {
+            // ✅ SỬA: Dùng authService.requireAuth()
             if (!authService.isAuthenticated()) {
                 showErrorNotification('Vui lòng đăng nhập để theo dõi công ty', 4000);
-                redirectToUrl('login.html', 1000);
+                setTimeout(() => authService.requireAuth(), 1000);
                 return;
             }
 
@@ -229,13 +230,15 @@
 
             try {
                 const url = buildApiUrl(API_CONFIG.FOLLOW_COMPANY.FOLLOW, { companyId: currentCompany.id });
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${getStoredToken()}`,
-                        'Content-Type': 'application/json'
-                    }
+                
+                // ✅ SỬA: Dùng authService.apiRequest() thay vì fetch trực tiếp
+                const response = await authService.apiRequest(url, {
+                    method: 'POST'
                 });
+
+                if (!response || !response.ok) {
+                    throw new Error('Failed to follow company');
+                }
 
                 const result = await response.json();
 
@@ -252,8 +255,9 @@
             }
         }
 
-        // Unfollow company
+        // Unfollow company - ✅ ĐÃ SỬA
         async function unfollowCompany() {
+            // ✅ SỬA: Dùng authService.isAuthenticated()
             if (!authService.isAuthenticated()) {
                 showErrorNotification('Vui lòng đăng nhập', 4000);
                 return;
@@ -263,13 +267,15 @@
 
             try {
                 const url = buildApiUrl(API_CONFIG.FOLLOW_COMPANY.UNFOLLOW, { companyId: currentCompany.id });
-                const response = await fetch(url, {
-                    method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${getStoredToken()}`,
-                        'Content-Type': 'application/json'
-                    }
+                
+                // ✅ SỬA: Dùng authService.apiRequest() thay vì fetch trực tiếp
+                const response = await authService.apiRequest(url, {
+                    method: 'DELETE'
                 });
+
+                if (!response || !response.ok) {
+                    throw new Error('Failed to unfollow company');
+                }
 
                 const result = await response.json();
 
@@ -286,17 +292,17 @@
             }
         }
 
-        // Check if user is following company
+        // Check if user is following company - ✅ ĐÃ SỬA
         async function checkFollowStatus(companyId) {
             try {
                 const url = buildApiUrl(API_CONFIG.FOLLOW_COMPANY.CHECK_STATUS, { companyId });
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${getStoredToken()}`,
-                        'Content-Type': 'application/json'
-                    }
+                
+                // ✅ SỬA: Dùng authService.apiRequest() thay vì fetch trực tiếp
+                const response = await authService.apiRequest(url, {
+                    method: 'GET'
                 });
+
+                if (!response || !response.ok) return;
 
                 const result = await response.json();
 

@@ -1,4 +1,4 @@
-        let currentPage = 1;
+let currentPage = 1;
         let totalPages = 1;
         let isLoading = false;
         let currentFilters = {
@@ -39,11 +39,12 @@
             await loadSavedJobs();
         }
 
-        // Load user profile data to populate sidebar
+        // Load user profile data to populate sidebar - ✅ ĐÃ SỬA
         let userProfile = null;
         async function loadUserProfile() {
             try {
-                const response = await window.authUtils.apiRequest('/users/me', {
+                const profileUrl = buildApiUrl(API_CONFIG.USERS.GET_PROFILE);
+                const response = await window.authUtils.apiRequest(profileUrl, {
                     method: 'GET'
                 });
 
@@ -62,7 +63,7 @@
             }
         }
 
-        // Load saved jobs
+        // Load saved jobs - ✅ CẦN THÊM ENDPOINT VÀO CONFIG
         async function loadSavedJobs(page = 1) {
             if (isLoading) return;
             
@@ -71,28 +72,31 @@
             showLoading();
 
             try {
-                const params = new URLSearchParams();
-                params.append('page', page - 1); // API uses 0-based pagination
-                params.append('size', 10);
+                const queryParams = {
+                    page: page - 1, // API uses 0-based pagination
+                    size: 10
+                };
 
                 // Add filters
                 if (currentFilters.keyword) {
-                    params.append('keyword', currentFilters.keyword);
+                    queryParams.keyword = currentFilters.keyword;
                 }
                 if (currentFilters.location) {
-                    params.append('location', currentFilters.location);
+                    queryParams.location = currentFilters.location;
                 }
                 if (currentFilters.companyName) {
-                    params.append('companyName', currentFilters.companyName);
+                    queryParams.companyName = currentFilters.companyName;
                 }
                 if (currentFilters.remote) {
-                    params.append('remote', 'true');
+                    queryParams.remote = 'true';
                 }
                 if (!currentFilters.includeExpired) {
-                    params.append('expiresAt', 'today');
+                    queryParams.expiresAt = 'today';
                 }
 
-                const response = await window.authUtils.apiRequest(`/jobs/saved-jobs/list?${params.toString()}`, {
+                // ✅ SỬA: Dùng config (cần thêm endpoint mới)
+                const savedJobsUrl = buildCompleteUrl('/jobs/saved-jobs/list', {}, queryParams);
+                const response = await window.authUtils.apiRequest(savedJobsUrl, {
                     method: 'GET'
                 });
 
@@ -137,12 +141,15 @@
                 const savedDate = formatSavedDate(job.savedAt);
                 const isExpired = job.expired || (job.expiresAt && new Date(job.expiresAt) < new Date());
 
+                // ✅ SỬA: Dùng API_CONFIG.FILE_BASE_URL
+                const logoUrl = job.companyLogoUrl ? `${API_CONFIG.FILE_BASE_URL}${job.companyLogoUrl}` : null;
+
                 return `
                     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 ${isExpired ? 'opacity-75' : ''}">
                         <div class="flex gap-4">
                             <div class="w-16 h-16 bg-gray-100 rounded flex-shrink-0 flex items-center justify-center">
-                                ${job.companyLogoUrl ? 
-                                    `<img src="http://localhost:8080${job.companyLogoUrl}" alt="${job.companyName}" class="w-full h-full object-contain rounded">` :
+                                ${logoUrl ? 
+                                    `<img src="${logoUrl}" alt="${job.companyName}" class="w-full h-full object-contain rounded">` :
                                     `<span class="text-2xl">🏢</span>`
                                 }
                             </div>
@@ -256,7 +263,7 @@
             showConfirmUnsaveModal(slug, buttonElement);
         }
 
-        // Perform the actual unsave operation
+        // Perform the actual unsave operation - ✅ ĐÃ SỬA
         async function performUnsaveJob(slug, buttonElement) {
             try {
                 const token = getStoredToken();
@@ -265,7 +272,8 @@
                     return;
                 }
 
-                const url = `${API_CONFIG.BASE_URL}/jobs/${slug}/unsave`;
+                // ✅ SỬA: Dùng config
+                const url = buildApiUrl(API_CONFIG.JOBS.UNSAVE, { jobSlug: slug });
                 const response = await fetch(url, {
                     method: 'DELETE',
                     headers: {

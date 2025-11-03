@@ -1,4 +1,4 @@
-        let currentTab = 'all';
+let currentTab = 'all';
         let resumes = [];
         let editingResumeId = null;
         let uploadingResumeId = null;
@@ -16,8 +16,8 @@
         });
 
         async function initializePage() {
-            if (!window.authUtils.isLoggedIn()) {
-                window.location.href = 'login.html';
+            // ✅ SỬA: Dùng authService.requireAuth() thay vì window.authUtils.isLoggedIn()
+            if (!authService.requireAuth()) {
                 return;
             }
 
@@ -35,11 +35,12 @@
             await loadResumes();
         }
 
-        // Load user profile data to populate sidebar
+        // Load user profile data to populate sidebar - ✅ ĐÃ SỬA
         let userProfile = null;
         async function loadUserProfile() {
             try {
-                const response = await window.authUtils.apiRequest('/users/me', {
+                const profileUrl = buildApiUrl(API_CONFIG.USERS.GET_PROFILE);
+                const response = await authService.apiRequest(profileUrl, {
                     method: 'GET'
                 });
 
@@ -58,11 +59,12 @@
             }
         }
 
-        // Load all resumes
+        // Load all resumes - ✅ ĐÃ SỬA
         async function loadResumes() {
             try {
                 showLoading();
-                const response = await window.authUtils.apiRequest('/resumes/me', {
+                const url = buildApiUrl(API_CONFIG.RESUMES.LIST);
+                const response = await authService.apiRequest(url, {
                     method: 'GET'
                 });
 
@@ -140,7 +142,7 @@
                                 </span>
                             </div>
 
-                            <!-- Files -->
+                            <!-- Files - ✅ SỬA: Dùng API_CONFIG.FILE_BASE_URL -->
                             ${resume.files && resume.files.length > 0 ? `
                                 <div class="mb-4">
                                     <p class="text-sm font-medium text-gray-700 mb-2">File đính kèm:</p>
@@ -155,7 +157,7 @@
                                                     <span class="text-gray-500">- ${getFileName(file.fileUrl)}</span>
                                                 </div>
                                                 <div class="flex items-center gap-1">
-                                                    <a href="${window.APP_CONFIG.API_BASE + file.fileUrl}" target="_blank" class="text-blue-600 hover:text-blue-800 p-1" title="Xem/Tải file">
+                                                    <a href="${API_CONFIG.FILE_BASE_URL}${file.fileUrl}" target="_blank" class="text-blue-600 hover:text-blue-800 p-1" title="Xem/Tải file">
                                                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                                             <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"></path>
                                                         </svg>
@@ -327,7 +329,7 @@
             document.querySelector(`[data-education="${index}"]`).remove();
         }
 
-        // Form submission
+        // Form submission - ✅ ĐÃ SỬA
         document.getElementById('cv-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -373,10 +375,18 @@
 
             try {
                 const isEditing = editingResumeId !== null;
-                const url = isEditing ? `/resumes/me/${editingResumeId}` : '/resumes/me';
-                const method = isEditing ? 'PUT' : 'POST';
+                let url;
+                let method;
+                
+                if (isEditing) {
+                    url = buildApiUrl(API_CONFIG.RESUMES.GET_DETAIL, { resumeId: editingResumeId });
+                    method = 'PUT';
+                } else {
+                    url = buildApiUrl(API_CONFIG.RESUMES.LIST);
+                    method = 'POST';
+                }
 
-                const response = await window.authUtils.apiRequest(url, {
+                const response = await authService.apiRequest(url, {
                     method: method,
                     headers: {
                         'Content-Type': 'application/json'
@@ -398,10 +408,11 @@
             }
         });
 
-        // Edit resume
+        // Edit resume - ✅ ĐÃ SỬA
         async function editResume(resumeId) {
             try {
-                const response = await window.authUtils.apiRequest(`/resumes/me/${resumeId}`, {
+                const url = buildApiUrl(API_CONFIG.RESUMES.GET_DETAIL, { resumeId });
+                const response = await authService.apiRequest(url, {
                     method: 'GET'
                 });
 
@@ -475,6 +486,7 @@
             document.getElementById('file-input').value = '';
         }
 
+        // Upload file - ✅ ĐÃ SỬA
         async function uploadFile() {
             const fileInput = document.getElementById('file-input');
             const fileType = document.getElementById('file-type').value;
@@ -488,9 +500,10 @@
             formData.append('file', fileInput.files[0]);
 
             try {
-                // Don't use authUtils.apiRequest for file upload to avoid Content-Type header conflict
-                const token = localStorage.getItem('access_token');
+                // ✅ SỬA: Dùng authService.getToken() thay vì localStorage
+                const token = authService.getToken();
                 const uploadUrl = buildApiUrl(API_CONFIG.RESUMES.UPLOAD, { resumeId: uploadingResumeId });
+                
                 const response = await fetch(`${uploadUrl}?fileType=${fileType}`, {
                     method: 'POST',
                     headers: {
@@ -516,12 +529,13 @@
             }
         }
 
-        // Delete file
+        // Delete file - ✅ ĐÃ SỬA
         async function deleteFile(fileId) {
             if (!confirm('Bạn có chắc chắn muốn xóa file này?')) return;
 
             try {
-                const response = await window.authUtils.apiRequest(`/resumes/me/files/${fileId}`, {
+                const url = buildApiUrl(API_CONFIG.RESUMES.DELETE_FILE, { fileId });
+                const response = await authService.apiRequest(url, {
                     method: 'DELETE'
                 });
 
@@ -535,10 +549,11 @@
             }
         }
 
-        // View resume details
+        // View resume details - ✅ ĐÃ SỬA
         async function viewResumeDetails(resumeId) {
             try {
-                const response = await window.authUtils.apiRequest(`/resumes/me/${resumeId}`, {
+                const url = buildApiUrl(API_CONFIG.RESUMES.GET_DETAIL, { resumeId });
+                const response = await authService.apiRequest(url, {
                     method: 'GET'
                 });
 
@@ -554,12 +569,13 @@
             }
         }
 
-        // Delete resume
+        // Delete resume - ✅ ĐÃ SỬA
         async function deleteResume(resumeId) {
             if (!confirm('Bạn có chắc chắn muốn xóa CV này?')) return;
 
             try {
-                const response = await window.authUtils.apiRequest(`/resumes/me/${resumeId}`, {
+                const url = buildApiUrl(API_CONFIG.RESUMES.GET_DETAIL, { resumeId });
+                const response = await authService.apiRequest(url, {
                     method: 'DELETE'
                 });
 

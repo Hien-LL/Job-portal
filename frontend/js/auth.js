@@ -4,13 +4,6 @@
  */
 
 const AUTH_CONFIG = {
-    API_BASE_URL: 'http://localhost:8080/api',
-    ENDPOINTS: {
-        LOGIN: '/auth/login',
-        LOGOUT: '/auth/logout',
-        REFRESH: '/auth/refresh',
-        PROFILE: '/user/profile'
-    },
     STORAGE_KEYS: {
         ACCESS_TOKEN: 'access_token',
         REFRESH_TOKEN: 'refresh_token',
@@ -18,15 +11,15 @@ const AUTH_CONFIG = {
         USER_TYPE: 'user_type',
         LOGIN_TIME: 'login_time',
         LOGIN_EXPIRY: 'login_expiry'
-    }
-    ,
+    },
     // Duration (ms) for login_time: 12 hours
     LOGIN_DURATION_MS: 12 * 60 * 60 * 1000
 };
 
 class AuthService {
     constructor() {
-        this.baseURL = AUTH_CONFIG.API_BASE_URL;
+        // ✅ SỬA: Không cần hardcode baseURL nữa, dùng từ API_CONFIG
+        // this.baseURL sẽ được lấy từ API_CONFIG.BASE_URL khi cần
     }
 
     // Check if user is authenticated
@@ -91,22 +84,28 @@ class AuthService {
         console.log('Auth data cleared');
     }
 
-    // Login API call
-    async login(email, password) {
+    // Login API call - ✅ ĐÃ SỬA
+    async login(email, password, userType = 'candidate') {
         try {
-            const response = await fetch(`${this.baseURL}${AUTH_CONFIG.ENDPOINTS.LOGIN}`, {
+            const loginUrl = buildApiUrl(API_CONFIG.AUTH.LOGIN);
+            const response = await fetch(loginUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json'
                 },
-                body: JSON.stringify({ email, password })
+                body: JSON.stringify({ 
+                    email, 
+                    password,
+                    user_type: userType // ✅ Gửi user_type lên backend
+                })
             });
 
             const data = await response.json();
 
             if (response.ok && data.success) {
-                this.storeAuthData(data.data);
+                // ✅ SỬA: Truyền userType vào storeAuthData
+                this.storeAuthData(data.data, userType);
                 return {
                     success: true,
                     data: data.data,
@@ -127,14 +126,15 @@ class AuthService {
         }
     }
 
-    // Logout (optional API call)
+    // Logout (optional API call) - ✅ ĐÃ SỬA
     async logout() {
         try {
             const token = this.getToken();
             if (token) {
-                // Optional: Call logout API
-                await fetch(`${this.baseURL}${AUTH_CONFIG.ENDPOINTS.LOGOUT}`, {
-                    method: 'POST',
+                // ✅ SỬA: Dùng config
+                const logoutUrl = buildApiUrl(API_CONFIG.AUTH.LOGOUT);
+                await fetch(logoutUrl, {
+                    method: 'GET', // Hoặc POST tùy API của bạn
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
@@ -162,7 +162,7 @@ class AuthService {
         };
     }
 
-    // Make authenticated API request
+    // Make authenticated API request - ✅ ĐÃ SỬA
     async apiRequest(endpoint, options = {}) {
         const token = this.getToken();
         
@@ -184,13 +184,27 @@ class AuthService {
         };
 
         try {
-            const response = await fetch(`${this.baseURL}${endpoint}`, finalOptions);
+            // ✅ SỬA: Dùng API_CONFIG.BASE_URL thay vì this.baseURL
+            const url = endpoint.startsWith('http') 
+                ? endpoint 
+                : `${API_CONFIG.BASE_URL}${endpoint}`;
+                
+            const response = await fetch(url, finalOptions);
             
             // Handle unauthorized
             if (response.status === 401) {
-                this.clearAuthData();
-                window.location.href = 'login.html';
-                return null;
+                // Try to refresh token first
+                const refreshed = await this.refreshToken();
+                if (refreshed) {
+                    // Retry request with new token
+                    const newToken = this.getToken();
+                    finalOptions.headers['Authorization'] = `Bearer ${newToken}`;
+                    return await fetch(url, finalOptions);
+                } else {
+                    this.clearAuthData();
+                    window.location.href = 'login.html';
+                    return null;
+                }
             }
 
             return response;
@@ -200,7 +214,7 @@ class AuthService {
         }
     }
 
-    // Refresh token (if needed)
+    // Refresh token (if needed) - ✅ ĐÃ SỬA
     async refreshToken() {
         const refreshToken = this.getRefreshToken();
         if (!refreshToken) {
@@ -209,7 +223,8 @@ class AuthService {
         }
 
         try {
-            const response = await fetch(`${this.baseURL}${AUTH_CONFIG.ENDPOINTS.REFRESH}`, {
+            const refreshUrl = buildApiUrl(API_CONFIG.AUTH.REFRESH);
+            const response = await fetch(refreshUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -220,7 +235,16 @@ class AuthService {
             const data = await response.json();
 
             if (response.ok && data.success) {
-                this.storeAuthData(data.data);
+                // Update tokens and expiry
+                localStorage.setItem(AUTH_CONFIG.STORAGE_KEYS.ACCESS_TOKEN, data.data.token);
+                if (data.data.refreshToken) {
+                    localStorage.setItem(AUTH_CONFIG.STORAGE_KEYS.REFRESH_TOKEN, data.data.refreshToken);
+                }
+                localStorage.setItem(AUTH_CONFIG.STORAGE_KEYS.LOGIN_TIME, Date.now().toString());
+                const expiry = Date.now() + AUTH_CONFIG.LOGIN_DURATION_MS;
+                localStorage.setItem(AUTH_CONFIG.STORAGE_KEYS.LOGIN_EXPIRY, expiry.toString());
+                
+                console.log('Token refreshed successfully');
                 return true;
             } else {
                 this.clearAuthData();
@@ -242,10 +266,11 @@ class AuthService {
         return true;
     }
 
-    // Get user profile
+    // Get user profile - ✅ ĐÃ SỬA
     async getUserProfile() {
         try {
-            const response = await this.apiRequest(AUTH_CONFIG.ENDPOINTS.PROFILE);
+            const profileUrl = buildApiUrl(API_CONFIG.USERS.GET_PROFILE_FULL);
+            const response = await this.apiRequest(profileUrl);
             if (response && response.ok) {
                 const data = await response.json();
                 return data.success ? data.data : null;

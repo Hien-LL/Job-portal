@@ -13,6 +13,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,7 +29,8 @@ public class ResumeController {
     private final AuthServiceInterface authService;
     private final ResumeFileServiceInterface resumeFileService;
 
-    @GetMapping("/me")
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping()
     public ResponseEntity<?> getList(@RequestParam(required = false) Boolean isDefault) {
         try {
             String email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -45,7 +47,7 @@ public class ResumeController {
         }
     }
 
-    @GetMapping("/me/{resumeId}")
+    @GetMapping("/{resumeId}")
     public ResponseEntity<?> getDetail(@PathVariable Long resumeId) {
         try {
             String email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -62,7 +64,7 @@ public class ResumeController {
         }
     }
 
-    @PostMapping("/me")
+    @PostMapping()
     public ResponseEntity<?> create(@RequestBody @Valid ResumeCreationRequest request) {
         try {
             String email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -79,7 +81,7 @@ public class ResumeController {
         }
     }
 
-    @PutMapping("/me/{resumeId}")
+    @PutMapping("/{resumeId}")
     public ResponseEntity<?> update(@PathVariable Long resumeId, @RequestBody @Valid ResumeUpdationRequest request) {
         try {
             String email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -96,7 +98,7 @@ public class ResumeController {
     }
 
     @PostMapping(
-            value = "/me/{resumeId}/upload",
+            value = "/{resumeId}/upload",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
@@ -119,7 +121,7 @@ public class ResumeController {
         }
     }
 
-    @DeleteMapping("/me/files/{resumeId}")
+    @DeleteMapping("/files/{resumeId}")
     public ResponseEntity<?> deleteFile(@PathVariable Long resumeId) {
         try {
             String email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -135,7 +137,7 @@ public class ResumeController {
         }
     }
 
-    @DeleteMapping("/me/{resumeId}")
+    @DeleteMapping("/{resumeId}")
     public ResponseEntity<?> delete(@PathVariable Long resumeId) {
         try {
             String email = SecurityContextHolder.getContext().getAuthentication().getName();

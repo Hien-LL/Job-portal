@@ -1,27 +1,25 @@
-        let followedCompanies = [];
+let followedCompanies = [];
 
-        // Load followed companies
+        // Load followed companies - ✅ ĐÃ SỬA
         async function loadFollowedCompanies() {
             try {
-                document.getElementById('loading').classList.remove('hidden');
-                document.getElementById('content').classList.add('hidden');
-                document.getElementById('error-state').classList.add('hidden');
+                showElement('loading');
+                hideElement('content');
+                hideElement('error-state');
 
-                if (!authService.isAuthenticated()) {
-                    window.location.href = 'login.html';
+                // ✅ SỬA: Dùng authService.requireAuth()
+                if (!authService.requireAuth()) {
                     return;
                 }
 
                 const url = buildApiUrl(API_CONFIG.FOLLOW_COMPANY.LIST_FOLLOWED);
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${authService.getToken()}`,
-                        'Content-Type': 'application/json'
-                    }
+                
+                // ✅ SỬA: Dùng authService.apiRequest()
+                const response = await authService.apiRequest(url, {
+                    method: 'GET'
                 });
 
-                if (!response.ok) {
+                if (!response || !response.ok) {
                     throw new Error('Failed to load followed companies');
                 }
 
@@ -30,15 +28,15 @@
                     followedCompanies = result.data;
                     displayFollowedCompanies();
                     
-                    document.getElementById('loading').classList.add('hidden');
-                    document.getElementById('content').classList.remove('hidden');
+                    hideElement('loading');
+                    showElement('content');
                 } else {
                     throw new Error('Invalid response');
                 }
             } catch (error) {
                 console.error('Error loading followed companies:', error);
-                document.getElementById('loading').classList.add('hidden');
-                document.getElementById('error-state').classList.remove('hidden');
+                hideElement('loading');
+                showElement('error-state');
             }
         }
 
@@ -48,16 +46,19 @@
             const emptyState = document.getElementById('empty-state');
 
             if (followedCompanies.length === 0) {
-                container.classList.add('hidden');
-                emptyState.classList.remove('hidden');
+                hideElement(container);
+                showElement(emptyState);
                 return;
             }
 
-            container.classList.remove('hidden');
-            emptyState.classList.add('hidden');
+            showElement(container);
+            hideElement(emptyState);
 
             container.innerHTML = followedCompanies.map(company => {
-                const logoUrl = company.logoUrl ? window.APP_CONFIG.API_BASE + company.logoUrl : 'https://via.placeholder.com/200/6B7280/FFFFFF?text=No+Logo';
+                // ✅ SỬA: Dùng API_CONFIG.FILE_BASE_URL
+                const logoUrl = company.logoUrl ? 
+                    `${API_CONFIG.FILE_BASE_URL}${company.logoUrl}` : 
+                    'https://via.placeholder.com/200/6B7280/FFFFFF?text=No+Logo';
                 
                 return `
                     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition">
@@ -89,7 +90,7 @@
             }).join('');
         }
 
-        // Unfollow company
+        // Unfollow company - ✅ ĐÃ SỬA
         async function unfollowCompany(companyId, buttonElement) {
             try {
                 if (!confirm('Bạn có chắc chắn muốn bỏ theo dõi công ty này?')) {
@@ -97,15 +98,13 @@
                 }
 
                 const url = buildApiUrl(API_CONFIG.FOLLOW_COMPANY.UNFOLLOW, { companyId });
-                const response = await fetch(url, {
-                    method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${authService.getToken()}`,
-                        'Content-Type': 'application/json'
-                    }
+                
+                // ✅ SỬA: Dùng authService.apiRequest()
+                const response = await authService.apiRequest(url, {
+                    method: 'DELETE'
                 });
 
-                if (!response.ok) {
+                if (!response || !response.ok) {
                     throw new Error('Failed to unfollow company');
                 }
 

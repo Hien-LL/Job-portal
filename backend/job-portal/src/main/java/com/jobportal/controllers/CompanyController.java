@@ -137,4 +137,18 @@ public class CompanyController {
                     .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
         }
     }
+
+    @GetMapping("/detail/{companyId}" )
+    public ResponseEntity<?> getCompanyById(@PathVariable Long companyId) {
+        try {
+            CompanyResource companyResource = companyService.getCompanyById(companyId);
+            return ResponseEntity.ok(ApiResource.ok(companyResource, "Lấy thông tin công ty thành công"));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
+        }
+    }
 }

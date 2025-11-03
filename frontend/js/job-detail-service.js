@@ -1,6 +1,7 @@
-        // Global variables
+// Global variables
         let currentJobSlug = '';
         let currentJobId = null;
+        let currentCompanySlug = ''; // ✅ THÊM: Khai báo biến này
         let isJobSaved = false;
         let isJobApplied = false;
 
@@ -74,7 +75,7 @@
                 document.getElementById('company-verified').classList.remove('hidden');
             }
 
-            // Company logo
+            // Company logo - ✅ SỬA: Dùng API_CONFIG.FILE_BASE_URL
             const logoElements = [
                 document.getElementById('company-logo'),
                 document.getElementById('company-sidebar-logo')
@@ -82,7 +83,7 @@
             
             logoElements.forEach(element => {
                 if (job.company?.logoUrl) {
-                    element.innerHTML = `<img src="${window.APP_CONFIG.API_BASE + job.company.logoUrl}" alt="${job.company.name}" class="w-full h-full object-contain rounded">`;
+                    element.innerHTML = `<img src="${API_CONFIG.FILE_BASE_URL}${job.company.logoUrl}" alt="${job.company.name}" class="w-full h-full object-contain rounded">`;
                 } else {
                     element.innerHTML = `<span class="text-2xl">${getCategoryIcon(job.category?.name)}</span>`;
                 }
@@ -105,7 +106,8 @@
                 document.getElementById('job-requirements').innerHTML = formatDescription(job.requirements);
             } else {
                 // Hide requirements section if not available
-                document.querySelector('.bg-white:has(#job-requirements)').style.display = 'none';
+                const reqSection = document.querySelector('.bg-white:has(#job-requirements)');
+                if (reqSection) reqSection.style.display = 'none';
             }
 
             // Benefits
@@ -118,7 +120,8 @@
                 `).join('');
                 document.getElementById('job-benefits').innerHTML = benefitsHTML;
             } else {
-                document.getElementById('benefits-section').style.display = 'none';
+                const benefitsSection = document.getElementById('benefits-section');
+                if (benefitsSection) benefitsSection.style.display = 'none';
             }
 
             // Skills
@@ -130,7 +133,8 @@
                 `).join('');
                 document.getElementById('job-skills').innerHTML = skillsHTML;
             } else {
-                document.getElementById('skills-section').style.display = 'none';
+                const skillsSection = document.getElementById('skills-section');
+                if (skillsSection) skillsSection.style.display = 'none';
             }
 
             // Sidebar info
@@ -151,7 +155,8 @@
                 websiteLink.href = job.company.website.startsWith('http') ? job.company.website : `https://${job.company.website}`;
                 websiteLink.textContent = job.company.website;
             } else {
-                document.getElementById('company-website').style.display = 'none';
+                const websiteSection = document.getElementById('company-website');
+                if (websiteSection) websiteSection.style.display = 'none';
             }
 
             document.getElementById('company-followers').innerHTML = `
@@ -163,22 +168,15 @@
             // Initial state will be updated after checking application status
         }
 
-        // Check if user has already applied for this job
+        // Check if user has already applied for this job - ✅ ĐÃ SỬA
         async function checkJobApplied(jobId) {
             try {
-                const token = getStoredToken();
-                if (!token) return;
-
                 const url = buildApiUrl(API_CONFIG.JOBS.CHECK_APPLIED, { jobId });
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
+                const response = await authService.apiRequest(url, {
+                    method: 'GET'
                 });
 
-                if (response.ok) {
+                if (response && response.ok) {
                     const result = await response.json();
                     if (result.success) {
                         isJobApplied = result.data === true;
@@ -190,22 +188,15 @@
             }
         }
 
-        // Check if user has saved this job
+        // Check if user has saved this job - ✅ ĐÃ SỬA
         async function checkJobSaved(jobSlug) {
             try {
-                const token = getStoredToken();
-                if (!token) return;
-
                 const url = buildApiUrl(API_CONFIG.JOBS.CHECK_SAVED, { jobSlug });
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
+                const response = await authService.apiRequest(url, {
+                    method: 'GET'
                 });
 
-                if (response.ok) {
+                if (response && response.ok) {
                     const result = await response.json();
                     if (result.success) {
                         isJobSaved = result.data === true;
@@ -306,10 +297,10 @@
         }
 
         function applyToJob(slug, jobId) {
-            // Check if user is logged in
+            // Check if user is logged in - ✅ SỬA
             if (!authService.isAuthenticated()) {
                 showErrorNotification('Vui lòng đăng nhập để ứng tuyển', 4000);
-                redirectToUrl('login.html', 1000);
+                setTimeout(() => authService.requireAuth(), 1000);
                 return;
             }
             
@@ -319,19 +310,15 @@
             });
         }
 
-        // Load user resumes for selection
+        // Load user resumes for selection - ✅ ĐÃ SỬA
         async function loadUserResumes() {
             try {
                 const url = buildApiUrl(API_CONFIG.RESUMES.LIST);
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${getStoredToken()}`,
-                        'Content-Type': 'application/json'
-                    }
+                const response = await authService.apiRequest(url, {
+                    method: 'GET'
                 });
 
-                if (!response.ok) {
+                if (!response || !response.ok) {
                     throw new Error('Failed to load resumes');
                 }
 
@@ -413,8 +400,8 @@
             }
         });
 
-        // Submit application
-        async function submitApplication() {
+        // Submit application - ✅ ĐÃ SỬA
+        async function submitApplication(event) { // ✅ THÊM event parameter
             try {
                 const resumeId = getElementValue('resume-select');
                 const coverLetter = getElementValue('cover-letter').trim();
@@ -437,10 +424,9 @@
                 submitBtn.textContent = 'Đang ứng tuyển...';
 
                 const url = buildApiUrl(API_CONFIG.JOBS.APPLY, { jobId: currentJobId });
-                const response = await fetch(url, {
+                const response = await authService.apiRequest(url, {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${getStoredToken()}`,
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
@@ -449,7 +435,7 @@
                     })
                 });
 
-                if (!response.ok) {
+                if (!response || !response.ok) {
                     const errorData = await response.json();
                     throw new Error(errorData.message || 'Ứng tuyển thất bại');
                 }
@@ -469,9 +455,11 @@
                 console.error('Error submitting application:', error);
                 showErrorNotification(`Lỗi: ${error.message}`, 5000);
             } finally {
-                const submitBtn = event.target;
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Ứng tuyển ngay';
+                if (event && event.target) {
+                    const submitBtn = event.target;
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Ứng tuyển ngay';
+                }
             }
         }
 
@@ -496,12 +484,12 @@
             }
         }
 
-        // Toggle save job functionality
+        // Toggle save job functionality - ✅ ĐÃ SỬA
         async function toggleSaveJob() {
-            const token = getStoredToken();
-            if (!token) {
+            // ✅ SỬA: Dùng authService.requireAuth()
+            if (!authService.isAuthenticated()) {
                 showErrorNotification('Vui lòng đăng nhập để lưu việc làm', 4000);
-                redirectToUrl('login.html', 1000);
+                setTimeout(() => authService.requireAuth(), 1000);
                 return;
             }
 
@@ -512,23 +500,22 @@
 
             try {
                 const method = isJobSaved ? 'DELETE' : 'POST';
-                // API expects slug, not ID
-                const endpoint = isJobSaved ? `/jobs/${currentJobSlug}/unsave` : `/jobs/${currentJobSlug}/save`;
-                const url = `${API_CONFIG.BASE_URL}${endpoint}`;
+                // ✅ SỬA: Dùng buildApiUrl với API_CONFIG
+                const endpoint = isJobSaved ? 
+                    API_CONFIG.JOBS.UNSAVE : 
+                    API_CONFIG.JOBS.SAVE;
+                const url = buildApiUrl(endpoint, { jobSlug: currentJobSlug });
                 
-                const response = await fetch(url, {
-                    method: method,
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
+                const response = await authService.apiRequest(url, {
+                    method: method
                 });
 
-                const result = await response.json();
-
-                if (!response.ok) {
+                if (!response || !response.ok) {
+                    const result = await response.json();
                     throw new Error(result?.message || 'Failed to save/unsave job');
                 }
+                
+                const result = await response.json();
                 
                 if (result.success) {
                     isJobSaved = !isJobSaved;
@@ -562,8 +549,11 @@
             loadJobDetail();
 
             // Add favorite functionality
-            document.querySelector('.favorite-btn').addEventListener('click', function() {
-                this.classList.toggle('text-red-500');
-                this.textContent = this.classList.contains('text-red-500') ? '♥' : '♡';
-            });
+            const favoriteBtn = document.querySelector('.favorite-btn');
+            if (favoriteBtn) {
+                favoriteBtn.addEventListener('click', function() {
+                    this.classList.toggle('text-red-500');
+                    this.textContent = this.classList.contains('text-red-500') ? '♥' : '♡';
+                });
+            }
         });

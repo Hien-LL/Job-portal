@@ -1,4 +1,4 @@
-        let currentApplicationId = null;
+let currentApplicationId = null;
 
         // Get application ID from URL
         function getApplicationIdFromURL() {
@@ -17,21 +17,19 @@
 
                 currentApplicationId = appId;
 
+                // ✅ SỬA: Dùng authService thay vì kiểm tra trực tiếp
                 if (!authService.isAuthenticated()) {
-                    redirectToUrl('login.html');
+                    authService.requireAuth();
                     return;
                 }
 
+                // ✅ SỬA: Dùng authService.apiRequest() thay vì fetch trực tiếp
                 const url = buildApiUrl(API_CONFIG.APPLICATIONS.GET_DETAIL, { applicationId: appId });
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${getStoredToken()}`,
-                        'Content-Type': 'application/json'
-                    }
+                const response = await authService.apiRequest(url, {
+                    method: 'GET'
                 });
 
-                if (!response.ok) {
+                if (!response || !response.ok) {
                     throw new Error('Failed to load application');
                 }
 
@@ -68,8 +66,9 @@
                 document.getElementById('candidate-summary').textContent = 'Chưa có tóm tắt';
             }
             
+            // ✅ SỬA: Dùng API_CONFIG.FILE_BASE_URL thay vì window.APP_CONFIG.API_BASE
             if (data.avatarUrl) {
-                document.getElementById('candidate-avatar').src = window.APP_CONFIG.API_BASE + data.avatarUrl;
+                document.getElementById('candidate-avatar').src = `${API_CONFIG.FILE_BASE_URL}${data.avatarUrl}`;
             } else {
                 document.getElementById('candidate-avatar').src = 'https://via.placeholder.com/128/6B7280/FFFFFF?text=' + (data.name ? data.name.charAt(0) : 'U');
             }
@@ -138,11 +137,11 @@
                     document.getElementById('education-container').innerHTML = '<p class="text-gray-500 text-sm">Chưa có thông tin học vấn</p>';
                 }
 
-                // Files
+                // Files - ✅ SỬA: Dùng API_CONFIG.FILE_BASE_URL
                 if (resume.files && resume.files.length > 0) {
                     showElement('files-section');
                     setHtmlContent('files-container', resume.files.map(file => `
-                        <a href="${window.APP_CONFIG.API_BASE + file.fileUrl}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition">
+                        <a href="${API_CONFIG.FILE_BASE_URL}${file.fileUrl}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition">
                             <svg class="w-5 h-5 text-purple-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M4 4a2 2 0 012-2h6a1 1 0 10-1 1v12a1 1 0 11-2 0V4zm10 0a2 2 0 012-2h6a2 2 0 012 2v12a2 2 0 01-2 2h-6a2 2 0 01-2-2V4zm4 10a1 1 0 100-2 1 1 0 000 2z"></path>
                             </svg>
@@ -176,16 +175,13 @@
         // Load application timeline
         async function loadApplicationTimeline(appId) {
             try {
+                // ✅ SỬA: Dùng authService.apiRequest() thay vì fetch trực tiếp
                 const url = buildApiUrl(API_CONFIG.APPLICATIONS.GET_TIMELINE, { applicationId: appId });
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${getStoredToken()}`,
-                        'Content-Type': 'application/json'
-                    }
+                const response = await authService.apiRequest(url, {
+                    method: 'GET'
                 });
 
-                if (!response.ok) return;
+                if (!response || !response.ok) return;
 
                 const result = await response.json();
                 if (result.success && result.data) {

@@ -1,4 +1,4 @@
-        let currentPage = 1;
+let currentPage = 1;
         let totalPages = 1;
         let currentStatusFilter = 'all';
         let applications = [];
@@ -10,25 +10,22 @@
                 hideElement('content');
                 hideElement('error-state');
 
-                if (!authService.isAuthenticated()) {
-                    redirectToUrl('login.html');
+                // ✅ SỬA: Dùng authService.requireAuth() thay vì kiểm tra thủ công
+                if (!authService.requireAuth()) {
                     return;
                 }
 
+                // ✅ SỬA: Dùng authService.apiRequest() thay vì fetch trực tiếp
                 const url = buildCompleteUrl(API_CONFIG.APPLICATIONS.LIST, {}, { 
                     page: page - 1, 
                     perPage: 10 
                 });
 
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${getStoredToken()}`,
-                        'Content-Type': 'application/json'
-                    }
+                const response = await authService.apiRequest(url, {
+                    method: 'GET'
                 });
 
-                if (!response.ok) {
+                if (!response || !response.ok) {
                     throw new Error('Failed to load applications');
                 }
 
@@ -87,7 +84,7 @@
                                         ${app.applicationStatus?.name || 'Chưa xác định'}
                                     </span>
                                 </div>
-                                <p class="text-gray-600 text-sm" id="app-company-${app.id}">Công ty</p>
+                                <p class="text-gray-600 text-sm">${app.companyName || 'Công ty'}</p>
                                 <p class="text-gray-500 text-xs mt-1">Ứng tuyển: ${appliedDate}</p>
                             </div>
                             <div class="text-right">

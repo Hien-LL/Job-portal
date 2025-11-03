@@ -3,6 +3,12 @@
             try {
                 const url = buildCompleteUrl(API_CONFIG.JOBS.LIST, {}, { sort: 'title,desc', published: true, page: 1 });
                 const response = await fetch(url);
+                
+                // ✅ THÊM: Error handling
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
                 const result = await response.json();
                 
                 if (result.success && result.data && result.data.content) {
@@ -42,7 +48,7 @@
                 // Format published date
                 const publishedDate = formatPublishedDate(job.publishedAt);
                 
-                // Get company logo or use default
+                // ✅ SỬA: Get company logo với API_CONFIG.FILE_BASE_URL
                 const companyLogo = job.company?.logoUrl;
 
                 return `
@@ -51,7 +57,7 @@
                             <!-- Company Logo (circular) -->
                             <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex-shrink-0 flex items-center justify-center overflow-hidden">
                                 ${companyLogo ? 
-                                    `<img src="${window.APP_CONFIG.API_BASE + companyLogo}" alt="${job.company?.name}" class="w-full h-full object-cover">` :
+                                    `<img src="${API_CONFIG.FILE_BASE_URL}${companyLogo}" alt="${job.company?.name}" class="w-full h-full object-cover">` :
                                     `<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                                     </svg>`
@@ -144,39 +150,11 @@
             return `Đăng ${Math.ceil(diffDays / 30)} tháng trước`;
         }
 
-        function getDefaultCompanyIcon(categoryName) {
-            if (!categoryName) return '🏢';
-            
-            const categoryIcons = {
-                'Digital Marketing': '📊',
-                'Marketing': '📊', 
-                'IT': '💻',
-                'Technology': '💻',
-                'Software': '⚙️',
-                'Design': '🎨',
-                'Sales': '🚀',
-                'HR': '📱',
-                'Finance': '💰',
-                'Education': '🎓'
-            };
-            
-            return categoryIcons[categoryName] || '🏢';
-        }
+        // ✅ XÓA: getDefaultCompanyIcon() - không sử dụng trong file này
+        // function getDefaultCompanyIcon(categoryName) {...}
 
-        function applyToJob(slug, jobId) {
-            // Check if user is logged in
-            const token = localStorage.getItem('authToken');
-            if (!token) {
-                showErrorToast('Vui lòng đăng nhập để ứng tuyển', 3000);
-                window.location.href = 'login.html';
-                return;
-            }
-            
-            // Redirect to job detail page or application form
-            console.log(`Apply to job: ${slug} (ID: ${jobId})`);
-            // TODO: Implement job application logic
-            showErrorToast(`Tính năng ứng tuyển sẽ được triển khai sớm`, 3000);
-        }
+        // ✅ XÓA: applyToJob() - không sử dụng vì dùng href trực tiếp
+        // function applyToJob(slug, jobId) {...}
 
         function showJobsError(message) {
             const grid = document.getElementById('featured-jobs-grid');

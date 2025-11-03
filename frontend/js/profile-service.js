@@ -1,4 +1,4 @@
-        let userProfile = null;
+let userProfile = null;
         let userSkills = [];
         let userResumes = [];
         let allAvailableSkills = []; // Store all available skills from public API
@@ -9,9 +9,8 @@
             try {
                 showLoading();
                 
-                // Check authentication
-                if (!authService.isAuthenticated()) {
-                    window.location.href = 'login.html';
+                // ✅ SỬA: Dùng authService.requireAuth()
+                if (!authService.requireAuth()) {
                     return false;
                 }
 
@@ -38,19 +37,15 @@
             }
         }
 
-        // Load user profile data
+        // Load user profile data - ✅ ĐÃ SỬA
         async function loadUserProfile() {
             try {
                 const url = buildApiUrl(API_CONFIG.USERS.GET_PROFILE);
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${authService.getToken()}`,
-                        'Content-Type': 'application/json'
-                    }
+                const response = await authService.apiRequest(url, {
+                    method: 'GET'
                 });
 
-                if (!response.ok) {
+                if (!response || !response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
@@ -66,19 +61,15 @@
             }
         }
 
-        // Load user skills
+        // Load user skills - ✅ ĐÃ SỬA
         async function loadUserSkills() {
             try {
                 const url = buildApiUrl(API_CONFIG.USERS.GET_SKILLS);
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${authService.getToken()}`,
-                        'Content-Type': 'application/json'
-                    }
+                const response = await authService.apiRequest(url, {
+                    method: 'GET'
                 });
 
-                if (!response.ok) {
+                if (!response || !response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
@@ -94,19 +85,15 @@
             }
         }
 
-        // Load user resumes
+        // Load user resumes - ✅ ĐÃ SỬA
         async function loadUserResumes() {
             try {
                 const url = buildCompleteUrl(API_CONFIG.RESUMES.LIST, {}, { isDefault: true });
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${authService.getToken()}`,
-                        'Content-Type': 'application/json'
-                    }
+                const response = await authService.apiRequest(url, {
+                    method: 'GET'
                 });
 
-                if (!response.ok) {
+                if (!response || !response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
@@ -187,11 +174,11 @@
                     }
                 }
                 
-                // Avatar - update main avatar and sidebar avatar if they exist
+                // Avatar - ✅ SỬA: update main avatar and sidebar avatar
                 const mainAvatar = document.getElementById('main-avatar');
                 if (mainAvatar) {
                     if (userProfile.avatarUrl) {
-                        mainAvatar.src = window.APP_CONFIG.API_BASE + userProfile.avatarUrl;
+                        mainAvatar.src = `${API_CONFIG.FILE_BASE_URL}${userProfile.avatarUrl}`;
                     } else {
                         mainAvatar.src = 'https://via.placeholder.com/80/6B7280/FFFFFF?text=' + (userProfile.name ? userProfile.name.charAt(0) : 'U');
                     }
@@ -200,7 +187,7 @@
                 const sidebarAvatar = document.getElementById('sidebar-user-avatar');
                 if (sidebarAvatar) {
                     if (userProfile.avatarUrl) {
-                        sidebarAvatar.src = window.APP_CONFIG.API_BASE + userProfile.avatarUrl;
+                        sidebarAvatar.src = `${API_CONFIG.FILE_BASE_URL}${userProfile.avatarUrl}`;
                     } else {
                         sidebarAvatar.src = 'https://via.placeholder.com/80/6B7280/FFFFFF?text=' + (userProfile.name ? userProfile.name.charAt(0) : 'U');
                     }
@@ -353,21 +340,21 @@
 
         // UI helper functions
         function showLoading() {
-            document.getElementById('loading').classList.remove('hidden');
-            document.getElementById('profile-content').classList.add('hidden');
-            document.getElementById('error-state').classList.add('hidden');
+            showElement('loading');
+            hideElement('profile-content');
+            hideElement('error-state');
         }
 
         function hideLoading() {
-            document.getElementById('loading').classList.add('hidden');
-            document.getElementById('profile-content').classList.remove('hidden');
-            document.getElementById('error-state').classList.add('hidden');
+            hideElement('loading');
+            showElement('profile-content');
+            hideElement('error-state');
         }
 
         function showError() {
-            document.getElementById('loading').classList.add('hidden');
-            document.getElementById('profile-content').classList.add('hidden');
-            document.getElementById('error-state').classList.remove('hidden');
+            hideElement('loading');
+            hideElement('profile-content');
+            showElement('error-state');
         }
 
         // Initialize page
@@ -440,12 +427,12 @@
             document.getElementById('edit-address').value = userProfile.address || '';
             document.getElementById('edit-headline').value = userProfile.headline || '';
 
-            document.getElementById('edit-profile-modal').classList.remove('hidden');
+            openModal('edit-profile-modal');
         }
 
         // Close edit profile modal
         function closeEditProfileModal() {
-            document.getElementById('edit-profile-modal').classList.add('hidden');
+            closeModal('edit-profile-modal');
         }
 
         // Open edit summary modal
@@ -458,15 +445,15 @@
             // Update preview
             updateEditSummaryPreview();
 
-            document.getElementById('edit-summary-modal').classList.remove('hidden');
+            openModal('edit-summary-modal');
         }
 
         // Close edit summary modal
         function closeEditSummaryModal() {
-            document.getElementById('edit-summary-modal').classList.add('hidden');
+            closeModal('edit-summary-modal');
         }
 
-        // Save profile changes
+        // Save profile changes - ✅ ĐÃ SỬA
         async function saveProfile() {
             try {
                 const name = document.getElementById('edit-name').value.trim();
@@ -502,17 +489,20 @@
             }
         }
 
-        // Upload avatar
+        // Upload avatar - ✅ ĐÃ SỬA
         async function uploadAvatar(file) {
             try {
                 const url = buildApiUrl(API_CONFIG.USERS.UPLOAD_AVATAR);
                 const formData = new FormData();
                 formData.append('file', file);
 
+                // ✅ SỬA: Dùng authService.getToken() cho FormData
+                const token = authService.getToken();
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${authService.getToken()}`
+                        'Authorization': `Bearer ${token}`
+                        // No Content-Type for FormData
                     },
                     body: formData
                 });
@@ -540,20 +530,19 @@
             }
         }
 
-        // Update profile
+        // Update profile - ✅ ĐÃ SỬA
         async function updateProfile(profileData) {
             try {
                 const url = buildApiUrl(API_CONFIG.USERS.UPDATE_PROFILE);
-                const response = await fetch(url, {
+                const response = await authService.apiRequest(url, {
                     method: 'PUT',
                     headers: {
-                        'Authorization': `Bearer ${authService.getToken()}`,
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(profileData)
                 });
 
-                if (!response.ok) {
+                if (!response || !response.ok) {
                     const errorData = await response.json();
                     showErrorToast(errorData.message || 'Lỗi khi cập nhật hồ sơ', 4000);
                     return false;
@@ -597,15 +586,15 @@
         function openAddSkillModal() {
             populateSkillSelect();
             document.getElementById('skill-select').value = '';
-            document.getElementById('add-skill-modal').classList.remove('hidden');
+            openModal('add-skill-modal');
         }
 
         // Close add skill modal
         function closeAddSkillModal() {
-            document.getElementById('add-skill-modal').classList.add('hidden');
+            closeModal('add-skill-modal');
         }
 
-        // Save new skill
+        // Save new skill - ✅ ĐÃ SỬA
         async function saveSkill() {
             try {
                 const skillSlug = document.getElementById('skill-select').value.trim();
@@ -616,15 +605,14 @@
                 }
 
                 const url = buildApiUrl(API_CONFIG.USERS.ADD_SKILL, { skillSlug });
-                const response = await fetch(url, {
+                const response = await authService.apiRequest(url, {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${authService.getToken()}`,
                         'Content-Type': 'application/json'
                     }
                 });
 
-                if (!response.ok) {
+                if (!response || !response.ok) {
                     const errorData = await response.json();
                     showErrorToast(errorData.message || 'Lỗi khi thêm kỹ năng', 3000);
                     return;
@@ -650,13 +638,13 @@
         function openEditSkillModal(skillSlug, skillName) {
             currentEditingSkillSlug = skillSlug;
             document.getElementById('delete-skill-name').textContent = skillName;
-            document.getElementById('edit-skill-modal').classList.remove('hidden');
+            openModal('edit-skill-modal');
         }
 
         // Close edit skill modal
         function closeEditSkillModal() {
             currentEditingSkillSlug = null;
-            document.getElementById('edit-skill-modal').classList.add('hidden');
+            closeModal('edit-skill-modal');
         }
 
         // Delete skill directly from tag
@@ -676,19 +664,15 @@
             await performDeleteSkill(currentEditingSkillSlug);
         }
 
-        // Perform the actual delete operation
+        // Perform the actual delete operation - ✅ ĐÃ SỬA
         async function performDeleteSkill(skillSlug) {
             try {
                 const url = buildApiUrl(API_CONFIG.USERS.DELETE_SKILL, { skillSlug });
-                const response = await fetch(url, {
-                    method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${authService.getToken()}`,
-                        'Content-Type': 'application/json'
-                    }
+                const response = await authService.apiRequest(url, {
+                    method: 'DELETE'
                 });
 
-                if (!response.ok) {
+                if (!response || !response.ok) {
                     const errorData = await response.json();
                     showErrorToast(errorData.message || 'Lỗi khi xóa kỹ năng', 3000);
                     return;
@@ -712,23 +696,19 @@
 
         // Close modal when clicking outside
         document.addEventListener('click', function(event) {
-            const addSkillModal = document.getElementById('add-skill-modal');
-            const editSkillModal = document.getElementById('edit-skill-modal');
-            const editProfileModal = document.getElementById('edit-profile-modal');
+            const modals = [
+                'add-skill-modal',
+                'edit-skill-modal',
+                'edit-profile-modal',
+                'edit-summary-modal'
+            ];
             
-            if (event.target === addSkillModal) {
-                closeAddSkillModal();
-            }
-            if (event.target === editSkillModal) {
-                closeEditSkillModal();
-            }
-            if (event.target === editProfileModal) {
-                closeEditProfileModal();
-            }
-            const editSummaryModal = document.getElementById('edit-summary-modal');
-            if (event.target === editSummaryModal) {
-                closeEditSummaryModal();
-            }
+            modals.forEach(modalId => {
+                const modal = document.getElementById(modalId);
+                if (modal && event.target === modal) {
+                    closeModal(modalId);
+                }
+            });
         });
 
         // Insert markdown syntax in summary textarea
@@ -761,7 +741,7 @@
             }
         }
 
-        // Save summary changes
+        // Save summary changes - ✅ ĐÃ SỬA
         async function saveSummary() {
             try {
                 const summary = document.getElementById('edit-summary-textarea').value.trim();

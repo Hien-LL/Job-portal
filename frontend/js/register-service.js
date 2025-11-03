@@ -1,4 +1,4 @@
-        // API Configuration
+// API Configuration
         const API_BASE_URL = 'http://localhost:8080/api';
         
         // Current step and user data
@@ -124,10 +124,11 @@
             }, 3000);
         }
 
-        // API: Register
+        // API: Register - ✅ ĐÃ SỬA
         async function registerUser(email, password) {
             try {
-                const response = await fetch(`${API_BASE_URL}/auth/register`, {
+                const registerUrl = buildApiUrl(API_CONFIG.AUTH.REGISTER);
+                const response = await fetch(registerUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -150,10 +151,12 @@
             }
         }
 
-        // API: Verify Email
+        // API: Verify Email - ✅ THÊM MỚI VÀO CONFIG
         async function verifyEmail(email, otp) {
             try {
-                const response = await fetch(`${API_BASE_URL}/auth/verify-email`, {
+                // Endpoint này cần thêm vào config.js
+                const verifyUrl = `${API_CONFIG.BASE_URL}/auth/verify-email`;
+                const response = await fetch(verifyUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -175,10 +178,12 @@
             }
         }
 
-        // API: Resend OTP
+        // API: Resend OTP - ✅ THÊM MỚI VÀO CONFIG
         async function resendOTP(email) {
             try {
-                const response = await fetch(`${API_BASE_URL}/auth/resend-otp`, {
+                // Endpoint này cần thêm vào config.js
+                const resendUrl = `${API_CONFIG.BASE_URL}/auth/resend-otp`;
+                const response = await fetch(resendUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -200,10 +205,11 @@
             }
         }
 
-        // API: Login (after email verification)
+        // API: Login (after email verification) - ✅ ĐÃ SỬA
         async function loginUser(email, password) {
             try {
-                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                const loginUrl = buildApiUrl(API_CONFIG.AUTH.LOGIN);
+                const response = await fetch(loginUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -226,10 +232,11 @@
             }
         }
 
-        // API: Update Profile
+        // API: Update Profile - ✅ ĐÃ SỬA
         async function updateProfile(profileData, token) {
             try {
-                const response = await fetch(`${API_BASE_URL}/users/profile/me`, {
+                const profileUrl = buildApiUrl(API_CONFIG.USERS.UPDATE_PROFILE);
+                const response = await fetch(profileUrl, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',

@@ -17,7 +17,8 @@ async function loadFragments() {
             const headerType = fragment.getAttribute('data-header-type') || 'auto';
             
             if (headerType === 'auto') {
-                const userType = localStorage.getItem('user_type');
+                // ✅ SỬA: Dùng authService thay vì localStorage trực tiếp
+                const userType = authService.getUserType();
                 if (userType === 'recruiter') {
                     path = 'fragments/header-recruiter.html';
                 } else if (userType === 'candidate') {
@@ -60,11 +61,8 @@ function updateAuthUI() {
         return;
     }
 
-    // Check token expiration first
-    checkTokenExpiration();
-
-    // Check if user is logged in
-    const isLoggedIn = localStorage.getItem('access_token') && localStorage.getItem('user_id');
+    // ✅ SỬA: Dùng authService thay vì localStorage trực tiếp
+    const isLoggedIn = authService.isAuthenticated();
     
     if (isLoggedIn) {
         // Show logged in menu
@@ -115,59 +113,75 @@ function setupUserMenu() {
         
         newLogoutBtn.addEventListener('click', function(e) {
             e.preventDefault();
+            // ✅ SỬA: Gọi authService.logout() thay vì function riêng
             logout();
         });
     }
 }
 
-// Logout function
+// Logout function - ✅ SỬA: Đơn giản hóa, delegate sang authService
 async function logout() {
-    try {
-        const token = localStorage.getItem('access_token');
-        if (token) {
-            // Call logout API to blacklist token
-            const response = await fetch('http://localhost:8080/api/auth/logout', {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-            
-            if (response.ok) {
-                console.log('Token blacklisted successfully');
-            } else {
-                console.warn('Logout API failed, but continuing with logout');
-            }
-        }
-    } catch (error) {
-        console.error('Logout API error:', error);
-        // Continue with logout even if API fails
-    }
-    
-    // Clear all auth data regardless of API response
-    clearAuthData();
-    
+    await authService.logout();
     console.log('User logged out');
-    
     // Redirect to homepage
     window.location.href = 'index.html';
 }
 
-// Clear authentication data
-function clearAuthData() {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    localStorage.removeItem('user_id');
-    localStorage.removeItem('login_time');
-    localStorage.removeItem('login_expiry');
-    localStorage.removeItem('user_type');
+// Load fragments when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        loadFragments();
+        startTokenExpirationCheck();
+    });
+} else {
+    loadFragments();
+    startTokenExpirationCheck();
+}
+
+// Mobile menu toggle
+document.addEventListener('click', function(e) {
+    if (e.target.closest('.mobile-menu-trigger')) {
+        console.log('Mobile menu toggled');
+    }
+});
+
+// Favorite toggle
+document.addEventListener('click', function(e) {
+    if (e.target.closest('.favorite-btn')) {
+        const btn = e.target.closest('.favorite-btn');
+        btn.classList.toggle('text-red-500');
+    }
+});
+
+// Auth protection for protected pages - ✅ SỬA: Dùng authService
+function requireAuth() {
+    return authService.requireAuth();
+}
+
+// Start periodic token expiration check
+let tokenCheckInterval;
+
+function startTokenExpirationCheck() {
+    // Check every 30 seconds
+    tokenCheckInterval = setInterval(() => {
+        // ✅ SỬA: Dùng authService
+        if (authService.isAuthenticated()) {
+            checkTokenExpiration();
+        }
+    }, 30000);
+}
+
+function stopTokenExpirationCheck() {
+    if (tokenCheckInterval) {
+        clearInterval(tokenCheckInterval);
+        tokenCheckInterval = null;
+    }
 }
 
 // Check token expiration (12 hours)
 function checkTokenExpiration() {
     const loginExpiry = localStorage.getItem('login_expiry');
-    const accessToken = localStorage.getItem('access_token');
+    const accessToken = authService.getToken();
     
     if (!loginExpiry || !accessToken) {
         return;
@@ -179,11 +193,7 @@ function checkTokenExpiration() {
     // If current time has passed expiry time, token is expired
     if (currentTime > expiryTime) {
         // Token expired, clear auth data
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-        localStorage.removeItem('user_id');
-        localStorage.removeItem('login_time');
-        localStorage.removeItem('login_expiry');
+        authService.clearAuthData();
         
         // Show expiration modal or redirect
         showTokenExpirationModal();
@@ -227,50 +237,19 @@ function showTokenExpirationModal() {
     });
 }
 
-// Handle refresh token
+// Handle refresh token - ✅ SỬA: Dùng authService
 async function handleRefreshToken() {
-    const refreshToken = localStorage.getItem('refresh_token');
-    
-    if (!refreshToken) {
-        logout();
-        return;
-    }
-    
     try {
-        const response = await fetch('http://localhost:8080/api/auth/refresh', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                refreshToken: refreshToken
-            })
-        });
+        const refreshed = await authService.refreshToken();
         
-        if (response.ok) {
-            const result = await response.json();
-            
-            if (result.success && result.data) {
-                // Update tokens
-                localStorage.setItem('access_token', result.data.token);
-                if (result.data.refreshToken) {
-                    localStorage.setItem('refresh_token', result.data.refreshToken);
-                }
-                // Update login time and expiry
-                localStorage.setItem('login_time', Date.now().toString());
-                const expiryTime = Date.now() + (12 * 60 * 60 * 1000);
-                localStorage.setItem('login_expiry', expiryTime.toString());
-                
-                // Remove modal
-                const modal = document.getElementById('token-expiration-modal');
-                if (modal) {
-                    modal.remove();
-                }
-                
-                console.log('Token refreshed successfully');
-            } else {
-                throw new Error('Invalid refresh response');
+        if (refreshed) {
+            // Remove modal
+            const modal = document.getElementById('token-expiration-modal');
+            if (modal) {
+                modal.remove();
             }
+            
+            console.log('Token refreshed successfully');
         } else {
             throw new Error('Refresh token expired');
         }
@@ -283,150 +262,23 @@ async function handleRefreshToken() {
             modal.remove();
         }
         
-        showErrorToast('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.', 3000);
+        if (typeof showErrorToast === 'function') {
+            showErrorToast('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.', 3000);
+        }
         logout();
     }
 }
 
-// Load fragments when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        loadFragments();
-        startTokenExpirationCheck();
-    });
-} else {
-    loadFragments();
-    startTokenExpirationCheck();
-}
-
-// Mobile menu toggle
-document.addEventListener('click', function(e) {
-    if (e.target.closest('.mobile-menu-trigger')) {
-        console.log('Mobile menu toggled');
-    }
-});
-
-// Favorite toggle
-document.addEventListener('click', function(e) {
-    if (e.target.closest('.favorite-btn')) {
-        const btn = e.target.closest('.favorite-btn');
-        btn.classList.toggle('text-red-500');
-    }
-});
-
-// Auth protection for protected pages
-function requireAuth() {
-    const isLoggedIn = localStorage.getItem('access_token') && localStorage.getItem('user_id');
-    if (!isLoggedIn) {
-        window.location.href = 'login.html';
-        return false;
-    }
-    return true;
-}
-
-// API helper function
-async function apiRequest(endpoint, options = {}) {
-    const token = localStorage.getItem('access_token');
-    
-    const defaultOptions = {
-        headers: {
-            'Content-Type': 'application/json',
-            ...(token && { 'Authorization': `Bearer ${token}` })
-        }
-    };
-
-    const finalOptions = {
-        ...defaultOptions,
-        ...options,
-        headers: {
-            ...defaultOptions.headers,
-            ...options.headers
-        }
-    };
-
-    try {
-        const response = await fetch(`http://localhost:8080/api${endpoint}`, finalOptions);
-        
-        // Handle unauthorized - token might be expired
-        if (response.status === 401) {
-            const refreshToken = localStorage.getItem('refresh_token');
-            
-            // Try to refresh token first
-            if (refreshToken) {
-                try {
-                    const refreshResponse = await fetch('http://localhost:8080/api/auth/refresh', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            refreshToken: refreshToken
-                        })
-                    });
-                    
-                    if (refreshResponse.ok) {
-                        const refreshResult = await refreshResponse.json();
-                        
-                        if (refreshResult.success && refreshResult.data) {
-                            // Update tokens
-                            localStorage.setItem('access_token', refreshResult.data.token);
-                            if (refreshResult.data.refreshToken) {
-                                localStorage.setItem('refresh_token', refreshResult.data.refreshToken);
-                            }
-                            localStorage.setItem('login_time', Date.now().toString());
-                            
-                            // Retry original request with new token
-                            finalOptions.headers['Authorization'] = `Bearer ${refreshResult.data.token}`;
-                            return await fetch(`http://localhost:8080/api${endpoint}`, finalOptions);
-                        }
-                    }
-                } catch (refreshError) {
-                    console.error('Token refresh failed:', refreshError);
-                }
-            }
-            
-            // If refresh failed or no refresh token, logout
-            logout();
-            return null;
-        }
-
-        return response;
-    } catch (error) {
-        console.error('API Request Error:', error);
-        throw error;
-    }
-}
-
-// Start periodic token expiration check
-let tokenCheckInterval;
-
-function startTokenExpirationCheck() {
-    // Check every 30 seconds
-    tokenCheckInterval = setInterval(() => {
-        const accessToken = localStorage.getItem('access_token');
-        if (accessToken) {
-            checkTokenExpiration();
-        }
-    }, 30000);
-}
-
-function stopTokenExpirationCheck() {
-    if (tokenCheckInterval) {
-        clearInterval(tokenCheckInterval);
-        tokenCheckInterval = null;
-    }
-}
-
-// Export functions for global use
+// Export functions for global use - ✅ SỬA: Sử dụng authService
 window.authUtils = {
     logout,
     requireAuth,
-    apiRequest,
+    apiRequest: (endpoint, options) => authService.apiRequest(endpoint, options), // Delegate to authService
     updateAuthUI,
     checkTokenExpiration,
     handleRefreshToken,
-    clearAuthData,
+    clearAuthData: () => authService.clearAuthData(), // Delegate to authService
     startTokenExpirationCheck,
     stopTokenExpirationCheck,
-    isLoggedIn: () => !!(localStorage.getItem('access_token') && localStorage.getItem('user_id'))
+    isLoggedIn: () => authService.isAuthenticated() // Delegate to authService
 };

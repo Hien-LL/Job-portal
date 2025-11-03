@@ -1,6 +1,6 @@
-        const API_BASE_URL = 'http://localhost:8080/api';
-        const SEND_OTP_ENDPOINT = `${API_BASE_URL}/password/otp/send`;
-        const RESET_PASSWORD_ENDPOINT = `${API_BASE_URL}/password/reset`;
+        // ✅ SỬA: Dùng config thay vì hardcode
+        const SEND_OTP_ENDPOINT = buildApiUrl(API_CONFIG.PASSWORD.SEND_OTP);
+        const RESET_PASSWORD_ENDPOINT = buildApiUrl(API_CONFIG.PASSWORD.RESET);
 
         let currentEmail = '';
         let otpSent = false;

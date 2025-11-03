@@ -1,4 +1,4 @@
-        let isLoading = false;
+let isLoading = false;
         let currentFilters = {
             keyword: '',
             size: '',
@@ -157,8 +157,9 @@
             grid.classList.remove('hidden');
 
             grid.innerHTML = filteredCompanies.map(company => {
+                // ✅ SỬA: Dùng API_CONFIG.FILE_BASE_URL thay vì window.APP_CONFIG.API_BASE
                 const logoUrl = company.logoUrl ? 
-                    window.APP_CONFIG.API_BASE + company.logoUrl : null;
+                    `${API_CONFIG.FILE_BASE_URL}${company.logoUrl}` : null;
                 const companySizeText = formatCompanySize(company.size_min, company.size_max);
 
                 return `
@@ -334,13 +335,14 @@
             document.getElementById('error-state').classList.remove('hidden');
         }
 
-        // Toggle follow company
+        // Toggle follow company - ✅ ĐÃ SỬA
         async function toggleFollowCompany(event, companyId) {
             event.stopPropagation();
 
+            // ✅ SỬA: Dùng authService.requireAuth()
             if (!authService.isAuthenticated()) {
                 alert('Vui lòng đăng nhập để theo dõi công ty');
-                window.location.href = 'login.html';
+                authService.requireAuth();
                 return;
             }
 
@@ -352,13 +354,14 @@
                 const method = isFollowing ? 'DELETE' : 'POST';
                 const url = buildApiUrl(API_CONFIG.FOLLOW_COMPANY[endpoint], { companyId });
 
-                const response = await fetch(url, {
-                    method: method,
-                    headers: {
-                        'Authorization': `Bearer ${authService.getToken()}`,
-                        'Content-Type': 'application/json'
-                    }
+                // ✅ SỬA: Dùng authService.apiRequest() thay vì fetch trực tiếp
+                const response = await authService.apiRequest(url, {
+                    method: method
                 });
+
+                if (!response || !response.ok) {
+                    throw new Error('Failed to toggle follow');
+                }
 
                 const result = await response.json();
 
@@ -381,17 +384,17 @@
             }
         }
 
-        // Check if user is following a company
+        // Check if user is following a company - ✅ ĐÃ SỬA
         async function checkCompanyFollowStatus(companyId) {
             try {
                 const url = buildApiUrl(API_CONFIG.FOLLOW_COMPANY.CHECK_STATUS, { companyId });
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${authService.getToken()}`,
-                        'Content-Type': 'application/json'
-                    }
+                
+                // ✅ SỬA: Dùng authService.apiRequest() thay vì fetch trực tiếp
+                const response = await authService.apiRequest(url, {
+                    method: 'GET'
                 });
+
+                if (!response || !response.ok) return;
 
                 const result = await response.json();
 

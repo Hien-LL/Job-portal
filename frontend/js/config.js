@@ -4,8 +4,8 @@
 
 const API_CONFIG = {
     // Base URL for all API requests
-    BASE_URL: 'https://cvxn08rn-8080.asse.devtunnels.ms/api',
-    FILE_BASE_URL: 'https://cvxn08rn-8080.asse.devtunnels.ms',
+    BASE_URL: 'http://localhost:8080/api',
+    FILE_BASE_URL: 'http://localhost:8080',
     
     // Authentication Endpoints
     AUTH: {
@@ -13,6 +13,8 @@ const API_CONFIG = {
         REGISTER: '/auth/register',
         LOGOUT: '/auth/logout',
         REFRESH: '/auth/refresh',
+        VERIFY_EMAIL: '/auth/verify-email',      // ✅ THÊM MỚI
+        RESEND_OTP: '/auth/resend-otp',          // ✅ THÊM MỚI
     },
     
     // User Endpoints
@@ -42,12 +44,15 @@ const API_CONFIG = {
         SAVE: '/jobs/:jobSlug/save',
         UNSAVE: '/jobs/:jobSlug/unsave',
         CHECK_SAVED: '/jobs/:jobSlug/is-saved',
+        SAVED_JOBS_LIST: '/jobs/saved-jobs/list',  // ✅ THÊM MỚI
     },
     
     // Resume/CV Endpoints
     RESUMES: {
-        LIST: '/resumes/me',
-        UPLOAD: '/resumes/me/:resumeId/upload',
+        LIST: '/resumes',
+        GET_DETAIL: '/resumes/:resumeId',
+        UPLOAD: '/resumes/:resumeId/upload',
+        DELETE_FILE: '/resumes/files/:fileId',  // ✅ THÊM MỚI
     },
     
     // Applications Endpoints
@@ -62,7 +67,7 @@ const API_CONFIG = {
     COMPANIES: {
         LIST: '/companies/list',
         GET_DETAIL: '/companies/:slug',
-        GET_DETAIL_BY_ID: '/companies/:companyId',
+        GET_DETAIL_BY_ID: '/companies/detail/:companyId',
         CREATE: '/companies',
         MY_COMPANIES_LIST: '/companies/my-company/list',
         UPDATE_MY_COMPANY: '/companies/my-company/:companyId',
@@ -174,7 +179,9 @@ if (typeof window !== 'undefined') {
     window.buildQueryString = buildQueryString;
     window.buildCompleteUrl = buildCompleteUrl;
 }
-window.APP_CONFIG = {
-  API_BASE: "https://cvxn08rn-8080.asse.devtunnels.ms" // File base URL - điều chỉnh khi deploy
-};
+
+// ❌ XÓA DÒNG NÀY - Đã deprecated, dùng API_CONFIG.FILE_BASE_URL
+// window.APP_CONFIG = {
+//   API_BASE: "http://localhost:8080"
+// };
 

@@ -1,6 +1,5 @@
-        const API_BASE_URL = 'http://localhost:8080/api';
         // Assumption: endpoint to confirm/reset password
-        const CONFIRM_ENDPOINT = `${API_BASE_URL}/password/reset/confirm`;
+        const CONFIRM_ENDPOINT = buildApiUrl(API_CONFIG.PASSWORD.RESET);
 
         function showMessage(container, message, type = 'error') {
             container.innerHTML = '';

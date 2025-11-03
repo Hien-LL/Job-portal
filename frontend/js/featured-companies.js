@@ -1,8 +1,15 @@
 // Load featured companies from API
         async function loadFeaturedCompanies() {
             try {
+                // ✅ SỬA: Đã dùng buildCompleteUrl và API_CONFIG (OK)
                 const url = buildCompleteUrl(API_CONFIG.COMPANIES.LIST, {}, { sort: 'followerCount,desc' });
                 const response = await fetch(url);
+                
+                // ✅ THÊM: Error handling
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
                 const result = await response.json();
                 
                 if (result.success && result.data) {
@@ -35,9 +42,9 @@
                 // Get job count
                 const jobCount = company.jobCount || 0;
                 
-                // Get company logo or use default
+                // ✅ SỬA: Dùng API_CONFIG.FILE_BASE_URL thay vì window.APP_CONFIG.API_BASE
                 const logoUrl = company.logoUrl ? 
-                    window.APP_CONFIG.API_BASE + company.logoUrl : null;
+                    `${API_CONFIG.FILE_BASE_URL}${company.logoUrl}` : null;
 
                 return `
                     <a href="company-detail.html?slug=${company.slug}" 
@@ -70,25 +77,11 @@
             }).join('');
         }
 
-        function formatCompanySize(sizeMin, sizeMax) {
-            if (!sizeMin && !sizeMax) return 'Quy mô không xác định';
-            if (sizeMin === 0 && sizeMax === 0) return 'Quy mô không xác định';
-            
-            if (sizeMin && sizeMax) {
-                if (sizeMin === sizeMax) {
-                    return `${sizeMin} nhân viên`;
-                }
-                return `${sizeMin} - ${sizeMax} nhân viên`;
-            } else if (sizeMin) {
-                return `Từ ${sizeMin} nhân viên`;
-            } else {
-                return `Lên đến ${sizeMax} nhân viên`;
-            }
-        }
+        // ✅ XÓA: formatCompanySize() - không sử dụng trong file này
+        // function formatCompanySize(sizeMin, sizeMax) {...}
 
-        function viewCompany(slug, companyId) {
-            window.location.href = `company-detail.html?slug=${slug}`;
-        }
+        // ✅ XÓA: viewCompany() - không cần vì đã dùng href trực tiếp
+        // function viewCompany(slug, companyId) {...}
 
         function showCompaniesError(message) {
             const grid = document.getElementById('featured-companies-grid');

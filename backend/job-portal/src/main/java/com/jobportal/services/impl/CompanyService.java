@@ -195,6 +195,14 @@ public class CompanyService extends BaseService implements CompanyServiceInterfa
         return resources;
     }
 
+    @Override
+    public CompanyResource getCompanyById(Long companyId) {
+        Company company = companyRepository.findById(companyId)
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy company"));
+        CompanyResource companyResource = companyMapper.tResource(company);
+        companyResource.setFollowerCount((int) followCompanyRepository.countByCompany_Id(company.getId()));
+        return companyResource;
+    }
 
 
     private String generateUniqueSlug(String base) {

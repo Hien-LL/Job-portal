@@ -16,4 +16,5 @@ public interface CompanyServiceInterface {
     Company updateCompany(Long userId, Long companyId, CompanyUpdationRequest request);
     String uploadCompanyLogo(Long userId, Long companyId, MultipartFile file);
     List<CompanyResource> getAllCompanies(Map<String, String[]> parameterMap);
+    CompanyResource getCompanyById(Long companyId);
 }

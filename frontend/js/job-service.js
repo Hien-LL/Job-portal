@@ -1,4 +1,4 @@
-        // Job page global variables
+// Job page global variables
         let currentPage = 1;
         let totalPages = 1;
         let isLoading = false;
@@ -31,17 +31,17 @@
         // Load filter data from APIs
         async function loadFiltersData() {
             try {
-                // Load locations
+                // Load locations - ✅ ĐÃ DÙNG CONFIG
                 const locationsUrl = buildApiUrl(API_CONFIG.LOCATIONS.LIST);
                 const locationsResponse = await fetch(locationsUrl);
                 const locationsResult = await locationsResponse.json();
                 if (locationsResult.success) {
                     filtersData.locations = locationsResult.data;
                     displayLocationFilters();
-                    setupLocationAutocomplete(); // Setup autocomplete for location search
+                    setupLocationAutocomplete();
                 }
 
-                // Load skills
+                // Load skills - ✅ ĐÃ DÙNG CONFIG
                 const skillsUrl = buildApiUrl(API_CONFIG.SKILLS.LIST);
                 const skillsResponse = await fetch(skillsUrl);
                 const skillsResult = await skillsResponse.json();
@@ -50,7 +50,7 @@
                     displaySkillsFilters();
                 }
 
-                // Load benefits
+                // Load benefits - ✅ ĐÃ DÙNG CONFIG
                 const benefitsUrl = buildApiUrl(API_CONFIG.BENEFITS.LIST);
                 const benefitsResponse = await fetch(benefitsUrl);
                 const benefitsResult = await benefitsResponse.json();
@@ -59,7 +59,7 @@
                     displayBenefitsFilters();
                 }
                 
-                // Load categories
+                // Load categories - ✅ ĐÃ DÙNG CONFIG
                 const categoriesUrl = buildApiUrl(API_CONFIG.CATEGORIES.LIST);
                 const categoriesResponse = await fetch(categoriesUrl);
                 const categoriesResult = await categoriesResponse.json();
@@ -68,7 +68,7 @@
                     displayCategoryFilters();
                 }
                 
-                // Load companies (sorted by follower count)
+                // Load companies - ✅ ĐÃ DÙNG CONFIG
                 const companiesUrl = buildCompleteUrl(API_CONFIG.COMPANIES.LIST, {}, { sort: 'followerCount,desc' });
                 const companiesResponse = await fetch(companiesUrl);
                 const companiesResult = await companiesResponse.json();
@@ -78,7 +78,6 @@
                 }
                 
                 // Display employment type filters (no API needed - hardcoded)
-                // Use setTimeout to ensure DOM is ready
                 setTimeout(() => {
                     displayEmploymentTypeFilters();
                 }, 100);
@@ -958,6 +957,8 @@
                 const salaryText = formatSalary(job.salaryMin, job.salaryMax);
                 const locationText = job.isRemote ? 'Remote' : 
                     (job.location?.displayName || 'Không xác định');
+                
+                // ✅ SỬA: Dùng API_CONFIG.FILE_BASE_URL
                 const companyLogo = job.company?.logoUrl;
                 const publishedDate = formatPublishedDate(job.publishedAt);
                 
@@ -984,7 +985,7 @@
                                 <a href="job-detail.html?slug=${job.slug}">
                                     <div class="w-14 h-14 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden border border-gray-200">
                                         ${companyLogo ? 
-                                            `<img src="${window.APP_CONFIG.API_BASE + companyLogo}" alt="${job.company?.name}" class="w-full h-full object-cover">` :
+                                            `<img src="${API_CONFIG.FILE_BASE_URL}${companyLogo}" alt="${job.company?.name}" class="w-full h-full object-cover">` :
                                             `<svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                                             </svg>`
@@ -1007,7 +1008,7 @@
                                                 <!-- Company Logo -->
                                                 <div class="w-16 h-16 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden border border-gray-200">
                                                     ${companyLogo ? 
-                                                        `<img src="${window.APP_CONFIG.API_BASE + companyLogo}" alt="${job.company?.name}" class="w-full h-full object-cover">` :
+                                                        `<img src="${API_CONFIG.FILE_BASE_URL}${companyLogo}" alt="${job.company?.name}" class="w-full h-full object-cover">` :
                                                         `<svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                                                         </svg>`
@@ -1429,11 +1430,13 @@
 
             try {
                 const isSaved = buttonElement.classList.contains('text-red-500');
-                const method = isSaved ? 'DELETE' : 'POST';
-                const url = `${API_CONFIG.BASE_URL}/jobs/${slug}/${isSaved ? 'unsave' : 'save'}`;
+                
+                // ✅ SỬA: Dùng buildApiUrl từ config
+                const endpoint = isSaved ? API_CONFIG.JOBS.UNSAVE : API_CONFIG.JOBS.SAVE;
+                const url = buildApiUrl(endpoint, { jobSlug: slug });
 
                 const response = await fetch(url, {
-                    method: method,
+                    method: isSaved ? 'DELETE' : 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
@@ -1447,10 +1450,8 @@
                 }
 
                 if (result.success) {
-                    // Update saved status
                     savedJobsMap[slug] = !isSaved;
 
-                    // Toggle button state
                     if (isSaved) {
                         buttonElement.classList.remove('text-red-500');
                         buttonElement.classList.add('text-gray-400');
@@ -1473,7 +1474,7 @@
             }
         }
 
-        // Check if a job is saved
+        // Check if a job is saved - ✅ ĐÃ DÙNG CONFIG
         async function checkJobSavedStatus(slug) {
             try {
                 const token = getStoredToken();
@@ -1494,7 +1495,6 @@
                         const isSaved = result.data === true;
                         savedJobsMap[slug] = isSaved;
 
-                        // Update button UI if saved
                         if (isSaved) {
                             const button = document.querySelector(`[data-slug="${slug}"]`);
                             if (button) {
