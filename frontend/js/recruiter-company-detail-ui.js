@@ -238,7 +238,7 @@ function renderCompanyHeader(company) {
         const logoImg = document.getElementById('company-logo');
         const logoPlaceholder = document.getElementById('company-logo-placeholder');
         if (logoImg && logoPlaceholder) {
-            logoImg.src = `${window.APP_CONFIG.API_BASE}${company.logoUrl}`;
+            logoImg.src = `${API_CONFIG.FILE_BASE_URL}${company.logoUrl}`;
             logoImg.classList.remove('hidden');
             logoPlaceholder.classList.add('hidden');
         }
