@@ -105,4 +105,15 @@ public class ApplicationController {
         boolean isApplied = applicationService.existsByJobIdAndUserId(jobId, userId);
         return ApiResource.ok(isApplied, "Kiểm tra ứng tuyển thành công");
     }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/candidate-info/{applicationId}")
+    public ApiResource<CandidateResource> getCandidateInfo(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @PathVariable Long applicationId
+    ) {
+        Long actorUserId = user.getUserId();
+        CandidateResource data = applicationService.getCandidateInfomations(applicationId, actorUserId);
+        return ApiResource.ok(data, "Lấy thông tin ứng viên thành công");
+    }
 }

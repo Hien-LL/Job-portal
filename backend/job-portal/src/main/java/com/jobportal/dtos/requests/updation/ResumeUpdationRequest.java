@@ -12,7 +12,7 @@ public class ResumeUpdationRequest {
     private String title;
     private String summary;
 
-    @JsonProperty("default")
+    @JsonProperty("isDefault")
     private boolean isDefault;
 
     private List<ResumeExperienceUpdateRequest> experiences;

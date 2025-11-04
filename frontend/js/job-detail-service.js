@@ -418,7 +418,11 @@
                 }
 
                 // Show loading state
-                const submitBtn = event.target;
+                const submitBtn =
+                   event?.target
+                    || document.getElementById('apply-submit-btn')
+                    || document.getElementById('apply-btn');
+
                 const originalText = submitBtn.textContent;
                 submitBtn.disabled = true;
                 submitBtn.textContent = 'Đang ứng tuyển...';
@@ -455,10 +459,13 @@
                 console.error('Error submitting application:', error);
                 showErrorNotification(`Lỗi: ${error.message}`, 5000);
             } finally {
-                if (event && event.target) {
-                    const submitBtn = event.target;
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Ứng tuyển ngay';
+                const btn =
+                    event?.target
+                    || document.getElementById('apply-submit-btn')
+                    || document.getElementById('apply-btn');
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = 'Ứng tuyển ngay';
                 }
             }
         }

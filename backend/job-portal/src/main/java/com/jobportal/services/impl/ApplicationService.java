@@ -118,27 +118,29 @@ public class ApplicationService implements ApplicationServiceInterface {
     }
 
     @Override
-    public CandidateResource getCandidateInfomations(Long applicationId) {
-        Application application = applicationRepository.findCandidateById(applicationId)
-                .orElseThrow(() -> new EntityNotFoundException("Application không tồn tại"));
+    @Transactional(readOnly = true)
+    public CandidateResource getCandidateInfomations(Long applicationId, Long actorUserId) {
+        Application application = applicationRepository
+                .findCandidateByIdForOwner(applicationId, actorUserId) // case 1: owner
+                .or(() -> applicationRepository.findCandidateByIdForCompanyAdmin(applicationId, actorUserId)) // case 2: admin
+                .orElseThrow(() -> new EntityNotFoundException("Application không tồn tại hoặc bạn không có quyền"));
 
         User user = application.getUser();
-        CandidateResource.CandidateResourceBuilder candidateResourceBuilder =
-                userMapper.tCandidateResource(user).toBuilder();
+        var builder = userMapper.tCandidateResource(user).toBuilder();
 
         if (user.getUserSkills() != null && !user.getUserSkills().isEmpty()) {
-            candidateResourceBuilder.skills(userSkillMapper.tResourceList(user.getUserSkills()));
+            builder.skills(userSkillMapper.tResourceList(user.getUserSkills()));
         }
 
         Resume resume = resumeRepository.findById(application.getResumeId())
                 .orElseThrow(() -> new EntityNotFoundException("Resume không tồn tại"));
-        candidateResourceBuilder.resume(resumeMapper.tResource(resume));
+        builder.resume(resumeMapper.tResource(resume));
 
         ApplicationStatus status = application.getStatus();
-        candidateResourceBuilder.status(applicationStatusMapper.tResource(status));
-        candidateResourceBuilder.coverLetter(application.getCoverLetter());
-        candidateResourceBuilder.appliedAt(application.getAppliedAt());
-        return candidateResourceBuilder.build();
+        builder.status(applicationStatusMapper.tResource(status));
+        builder.coverLetter(application.getCoverLetter());
+        builder.appliedAt(application.getAppliedAt());
+        return builder.build();
     }
 
     @Override

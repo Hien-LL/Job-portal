@@ -1,230 +1,197 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chi tiết đơn ứng tuyển - JobPortal</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="css/components.css">
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chi tiết đơn ứng tuyển · JobPortal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/components.css"/>
+  <link rel="stylesheet" href="styles.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
 </head>
-<body class="bg-gray-50">
-    <!-- Header Fragment -->
-    <div data-fragment="fragments/header.html" data-header-type="auto"></div>
+<body class="bg-gray-50 text-gray-900">
+  <!-- Header -->
+  <div data-fragment="fragments/header.html" data-header-type="auto"></div>
 
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Breadcrumb -->
-        <nav class="flex items-center space-x-2 text-sm text-gray-500 mb-6">
-            <a href="index.html" class="hover:text-blue-600">Trang chủ</a>
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
-            </svg>
-            <span class="text-gray-900">Dashboard ứng viên</span>
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
-            </svg>
-            <a href="applications.html" class="hover:text-blue-600">Đơn ứng tuyển</a>
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
-            </svg>
-            <span class="text-gray-900">Chi tiết</span>
-        </nav>
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Breadcrumb -->
+    <nav aria-label="Breadcrumb" class="mb-6">
+      <ol class="flex items-center text-sm text-gray-500 gap-2">
+        <li><a href="index.html" class="hover:text-blue-600">Trang chủ</a></li>
+        <li class="select-none">›</li>
+        <li><a href="#" class="hover:text-blue-600">Dashboard ứng viên</a></li>
+        <li class="select-none">›</li>
+        <li><a href="applications.html" class="hover:text-blue-600">Đơn ứng tuyển</a></li>
+        <li class="select-none">›</li>
+        <li class="text-gray-900 font-medium">Chi tiết</li>
+      </ol>
+    </nav>
 
-        <!-- Loading State -->
-        <div id="loading" class="flex justify-center items-center py-20">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-        </div>
+    <!-- Loading -->
+    <div id="loading" class="flex justify-center items-center py-20">
+      <div class="h-10 w-10 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600"></div>
+    </div>
 
-        <!-- Content -->
-        <div id="content" class="hidden">
-            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                <!-- Main Content -->
-                <div class="lg:col-span-3">
-                    <!-- Candidate Info Card -->
-                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-6">
-                        <div class="bg-gradient-to-r from-blue-600 to-blue-400 h-24"></div>
-                        <div class="p-6">
-                            <div class="flex gap-6">
-                                <img id="candidate-avatar" src="" alt="Avatar" class="w-32 h-32 rounded-full object-cover -mt-20 border-4 border-white shadow-lg">
-                                <div class="flex-1 pt-4">
-                                    <h1 id="candidate-name" class="text-3xl font-bold text-gray-900 mb-1"></h1>
-                                    <p id="candidate-headline" class="text-lg text-blue-600 font-medium mb-4"></p>
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-600">
-                                        <div class="flex items-center gap-2">
-                                            <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
-                                            </svg>
-                                            <span id="candidate-email"></span>
-                                        </div>
-                                        <div class="flex items-center gap-2">
-                                            <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path>
-                                            </svg>
-                                            <span id="candidate-phone"></span>
-                                        </div>
-                                        <div class="flex items-center gap-2 col-span-1 md:col-span-2">
-                                            <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
-                                            </svg>
-                                            <span id="candidate-address"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+    <!-- Error -->
+    <div id="error-state" class="hidden text-center py-20">
+      <svg class="w-12 h-12 mx-auto text-red-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-5a1 1 0 11-2 0 1 1 0 012 0zM9 6h2v6H9V6z" clip-rule="evenodd"/>
+      </svg>
+      <h3 class="mt-3 text-base font-semibold">Không tìm thấy đơn ứng tuyển</h3>
+      <p class="mt-1 text-sm text-gray-600">Đơn có thể đã bị xóa hoặc không tồn tại.</p>
+      <button onclick="location.href='applications.html'" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+        Quay lại danh sách
+      </button>
+    </div>
+
+    <!-- Content -->
+    <div id="content" class="hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <!-- Main -->
+        <div class="lg:col-span-3 space-y-6">
+          <!-- Candidate -->
+          <section class="bg-white border rounded-lg shadow-sm overflow-hidden">
+            <div class="h-20 bg-gradient-to-r from-blue-600 to-blue-400"></div>
+            <div class="p-6">
+              <div class="flex items-start gap-4">
+                <img id="candidate-avatar" alt="Avatar"
+                     class="w-24 h-24 -mt-12 rounded-full object-cover border-4 border-white shadow"
+                     src=""/>
+                <div class="flex-1">
+                  <h1 id="candidate-name" class="text-2xl font-bold"></h1>
+                  <p id="candidate-headline" class="text-blue-600 mt-1"></p>
+
+                  <dl class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-700">
+                    <div class="flex items-center gap-2">
+                      <span class="i-mail w-4 h-4 text-gray-400" aria-hidden="true"></span>
+                      <dd id="candidate-email"></dd>
                     </div>
-
-                    <!-- Personal Summary -->
-                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-                        <h2 class="text-lg font-semibold text-gray-900 mb-4">Tóm tắt cá nhân</h2>
-                        <p id="candidate-summary" class="text-gray-700 leading-relaxed">Chưa có tóm tắt</p>
+                    <div class="flex items-center gap-2">
+                      <span class="i-phone w-4 h-4 text-gray-400" aria-hidden="true"></span>
+                      <dd id="candidate-phone"></dd>
                     </div>
-
-                    <!-- Skills -->
-                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-                        <h2 class="text-lg font-semibold text-gray-900 mb-4">Kỹ năng</h2>
-                        <div id="skills-container" class="flex flex-wrap gap-2">
-                            <!-- Skills will be loaded here -->
-                        </div>
+                    <div class="flex items-center gap-2 sm:col-span-2">
+                      <span class="i-pin w-4 h-4 text-gray-400" aria-hidden="true"></span>
+                      <dd id="candidate-address"></dd>
                     </div>
-
-                    <!-- Cover Letter -->
-                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-                        <h2 class="text-lg font-semibold text-gray-900 mb-4">Thư xin việc</h2>
-                        <p id="cover-letter" class="text-gray-700 leading-relaxed line-clamp-4">Chưa có thư xin việc</p>
-                    </div>
-
-                    <!-- Resume Section -->
-                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-                        <h2 class="text-lg font-semibold text-gray-900 mb-6">Thông tin CV</h2>
-                        
-                        <!-- Resume Title & Summary -->
-                        <div id="resume-info" class="mb-6 pb-6 border-b border-gray-200">
-                            <h3 id="resume-title" class="text-base font-semibold text-gray-900 mb-2"></h3>
-                            <p id="resume-summary" class="text-gray-700 text-sm leading-relaxed"></p>
-                        </div>
-
-                        <!-- Experience -->
-                        <div id="experience-section" class="mb-6 pb-6 border-b border-gray-200">
-                            <h3 class="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"></path>
-                                </svg>
-                                Kinh nghiệm làm việc
-                            </h3>
-                            <div id="experience-container" class="space-y-4">
-                                <!-- Experience will be loaded here -->
-                            </div>
-                        </div>
-
-                        <!-- Education -->
-                        <div id="education-section" class="mb-6 pb-6 border-b border-gray-200">
-                            <h3 class="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
-                                </svg>
-                                Học vấn
-                            </h3>
-                            <div id="education-container" class="space-y-4">
-                                <!-- Education will be loaded here -->
-                            </div>
-                        </div>
-
-                        <!-- Files -->
-                        <div id="files-section" style="display: none;">
-                            <h3 class="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                <svg class="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M4 4a2 2 0 012-2h6a1 1 0 10-1 1v12a1 1 0 11-2 0V4zm10 0a2 2 0 012-2h6a2 2 0 012 2v12a2 2 0 01-2 2h-6a2 2 0 01-2-2V4zm4 10a1 1 0 100-2 1 1 0 000 2z"></path>
-                                </svg>
-                                Tệp đính kèm
-                            </h3>
-                            <div id="files-container" class="space-y-2">
-                                <!-- Files will be loaded here -->
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Timeline -->
-                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                        <h2 class="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-                            <svg class="w-5 h-5 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z" clip-rule="evenodd"></path>
-                            </svg>
-                            Lịch sử thay đổi trạng thái
-                        </h2>
-                        <div id="timeline-container" class="space-y-4">
-                            <!-- Timeline will be loaded here -->
-                        </div>
-                    </div>
+                  </dl>
                 </div>
-
-                <!-- Sidebar -->
-                <aside class="lg:col-span-1">
-                    <div class="space-y-6 sticky top-8">
-                        <!-- Status Card -->
-                        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                            <h3 class="text-xs font-semibold text-gray-600 uppercase mb-4 tracking-wider">Trạng thái</h3>
-                            <div id="status-badge" class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-blue-100 text-blue-800 mb-4 w-full justify-center">
-                                Chưa xác định
-                            </div>
-                            <div class="pt-4 border-t border-gray-200">
-                                <p class="text-xs text-gray-600 uppercase font-semibold mb-2 tracking-wider">Ngày ứng tuyển</p>
-                                <p id="applied-date" class="text-gray-900 font-medium">-</p>
-                            </div>
-                        </div>
-
-                        <!-- Job Info -->
-                        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                            <h3 class="text-xs font-semibold text-gray-600 uppercase mb-4 tracking-wider">Vị trí ứng tuyển</h3>
-                            <h4 id="job-title" class="font-semibold text-gray-900 mb-1"></h4>
-                            <p id="job-company" class="text-gray-600 text-sm mb-4"></p>
-                            <a href="#" id="job-link" class="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium text-sm transition">
-                                Xem chi tiết
-                                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                </svg>
-                            </a>
-                        </div>
-
-                        <!-- Action -->
-                        <button onclick="window.location.href='applications.html'" class="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition font-medium flex items-center justify-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                            </svg>
-                            Quay lại
-                        </button>
-                    </div>
-                </aside>
+              </div>
             </div>
+          </section>
+
+          <!-- Summary -->
+          <section class="bg-white border rounded-lg shadow-sm p-6">
+            <h2 class="text-base font-semibold mb-3">Tóm tắt cá nhân</h2>
+            <p id="candidate-summary" class="text-gray-700 leading-relaxed">Chưa có tóm tắt</p>
+          </section>
+
+          <!-- Skills -->
+          <section class="bg-white border rounded-lg shadow-sm p-6">
+            <h2 class="text-base font-semibold mb-3">Kỹ năng</h2>
+            <div id="skills-container" class="flex flex-wrap gap-2"></div>
+          </section>
+
+          <!-- Cover Letter -->
+          <section class="bg-white border rounded-lg shadow-sm p-6">
+            <h2 class="text-base font-semibold mb-3">Thư xin việc</h2>
+            <div id="cover-letter" class="text-gray-700 leading-relaxed line-clamp-5">Chưa có thư xin việc</div>
+          </section>
+
+          <!-- Resume -->
+          <section class="bg-white border rounded-lg shadow-sm p-6 space-y-6">
+            <h2 class="text-base font-semibold">Thông tin CV</h2>
+
+            <div id="resume-info" class="space-y-1">
+              <h3 id="resume-title" class="font-semibold"></h3>
+              <p id="resume-summary" class="text-sm text-gray-700"></p>
+            </div>
+
+            <div id="experience-section" class="pt-4 border-t">
+              <h3 class="font-semibold mb-3">Kinh nghiệm</h3>
+              <div id="experience-container" class="space-y-3"></div>
+            </div>
+
+            <div id="education-section" class="pt-4 border-t">
+              <h3 class="font-semibold mb-3">Học vấn</h3>
+              <div id="education-container" class="space-y-3"></div>
+            </div>
+
+            <div id="files-section" class="hidden pt-4 border-t">
+              <h3 class="font-semibold mb-3">Tệp đính kèm</h3>
+              <div id="files-container" class="space-y-2"></div>
+            </div>
+          </section>
+
+          <!-- Timeline -->
+          <section class="bg-white border rounded-lg shadow-sm p-6">
+            <h2 class="text-base font-semibold mb-4">Lịch sử trạng thái</h2>
+            <div id="timeline-container" class="space-y-3"></div>
+          </section>
         </div>
 
-        <!-- Error State -->
-        <div id="error-state" class="hidden text-center py-20">
-            <div class="text-red-500 mb-4">
-                <svg class="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+        <!-- Sidebar -->
+        <aside class="lg:col-span-1">
+          <div class="space-y-6 lg:sticky lg:top-8">
+            <!-- Status -->
+            <section class="bg-white border rounded-lg shadow-sm p-5 space-y-4">
+              <div>
+                <h3 class="text-xs font-semibold text-gray-600 uppercase tracking-wider">Trạng thái</h3>
+                <div id="status-badge"
+                     class="mt-2 w-full inline-flex items-center justify-center px-3 py-1.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                  Chưa xác định
+                </div>
+              </div>
+              <div class="pt-3 border-t">
+                <p class="text-xs text-gray-600 uppercase font-semibold tracking-wider">Ngày ứng tuyển</p>
+                <p id="applied-date" class="font-medium">-</p>
+              </div>
+            </section>
+
+            <!-- Job -->
+            <section class="bg-white border rounded-lg shadow-sm p-5 space-y-2">
+              <h3 class="text-xs font-semibold text-gray-600 uppercase tracking-wider">Vị trí ứng tuyển</h3>
+              <h4 id="job-title" class="font-semibold"></h4>
+              <p id="job-company" class="text-sm text-gray-600"></p>
+              <a id="job-link" href="#"
+                 class="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-700">
+                Xem chi tiết
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                 </svg>
-            </div>
-            <h3 class="text-lg font-medium text-gray-900 mb-2">Không tìm thấy đơn ứng tuyển</h3>
-            <p class="text-gray-600 mb-4">Đơn ứng tuyển này có thể đã bị xóa hoặc không tồn tại</p>
-            <button onclick="window.location.href='applications.html'" class="bg-blue-600 text-white px-4 py-2 rounded font-medium hover:bg-blue-700 transition">
-                Quay lại danh sách
+              </a>
+            </section>
+
+            <!-- Back -->
+            <button onclick="location.href='applications.html'"
+                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+              ← Quay lại
             </button>
-        </div>
-    </main>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
 
-    <!-- Footer Fragment -->
-    <div data-fragment="fragments/footer.html"></div>
+  <!-- Footer -->
+  <div data-fragment="fragments/footer.html"></div>
 
-    <!-- Scripts -->
-    <script src="js/fragments-loader.js"></script>
-    <script src="js/config.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/markdown-service.js"></script>
-    <script src="js/common-helpers.js"></script>
-    <script src="js/application-detail-service.js"></script>
+  <!-- Scripts -->
+  <script src="js/fragments-loader.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/markdown-service.js"></script>
+  <script src="js/common-helpers.js"></script>
+  <script src="js/application-detail-service.js"></script>
+
+  <!-- Tiny icon set via CSS classes (no extra SVG spam) -->
+  <style>
+    /* Icon masks: nhẹ, tái dùng */
+    .i-mail,.i-phone,.i-pin{display:inline-block;background:currentColor;mask-size:contain;mask-repeat:no-repeat;mask-position:center}
+    .i-mail{mask-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="black" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/></svg>');}
+    .i-phone{mask-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="black" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/></svg>');}
+    .i-pin{mask-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="black" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>');}
+  </style>
 </body>
 </html>

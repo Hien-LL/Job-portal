@@ -14,6 +14,6 @@ public interface ApplicationServiceInterface {
     Page<ApplicationListItemForCompanyResource> getApplicationsForMyCompanyJob(
             Long actorUserId, Long companyId, Long jobId, String status, Pageable pageable);
     ApplicationDetailResource getDetailForActor(Long applicationId, Long actorUserId);
-    CandidateResource getCandidateInfomations(Long applicationId);
+    CandidateResource getCandidateInfomations(Long applicationId, Long actorUserId);
     boolean existsByJobIdAndUserId(Long jobId, Long userId);
 }

@@ -79,14 +79,32 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
     """)
     Optional<Application> findByIdWithJoins(@Param("id") Long id);
 
-    // Optimized query for getCandidateInfomations - fetch tất cả trong 1 lần
+    // 1) Ứng viên (owner) xem hồ sơ mình nộp
     @Query("""
-        select a from Application a
-        join fetch a.status s
-        join fetch a.user u
-        left join fetch u.userSkills
-        where a.id = :id
+        select distinct a from Application a
+          join fetch a.status s
+          join fetch a.user u
+          left join fetch u.userSkills us
+        where a.id = :applicationId
+          and u.id = :actorUserId
     """)
-    Optional<Application> findCandidateById(@Param("id") Long id);
+    Optional<Application> findCandidateByIdForOwner(@Param("applicationId") Long applicationId,
+                                                    @Param("actorUserId") Long actorUserId);
+
+    // 2) Recruiter / CompanyAdmin xem ứng viên nộp vào job thuộc công ty mình
+    @Query("""
+        select distinct a from Application a
+          join fetch a.status s
+          join fetch a.user u
+          left join fetch u.userSkills us
+          join a.job j
+          join j.company c
+          join c.companyAdmins ca
+          join ca.user cau
+        where a.id = :applicationId
+          and cau.id = :actorUserId
+    """)
+    Optional<Application> findCandidateByIdForCompanyAdmin(@Param("applicationId") Long applicationId,
+                                                           @Param("actorUserId") Long actorUserId);
 }
 
