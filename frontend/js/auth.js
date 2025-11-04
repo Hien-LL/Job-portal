@@ -114,8 +114,8 @@ class AuthService {
             } else {
                 return {
                     success: false,
-                    message: data.message || 'Đăng nhập thất bại'
-                };
+                    message: data.error.message || 'Đăng nhập thất bại'
+                };      
             }
         } catch (error) {
             console.error('Login API Error:', error);

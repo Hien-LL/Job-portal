@@ -67,7 +67,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ApiResource<Object>> handleBadCredentials(BadCredentialsException ex) {
-        var body = ApiResource.error("UNAUTHORIZED", "Thông tin đăng nhập không hợp lệ", HttpStatus.UNAUTHORIZED);
+        var body = ApiResource.error("UNAUTHORIZED", ex.getMessage(), HttpStatus.UNAUTHORIZED);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
     }
 
@@ -204,6 +204,12 @@ public class GlobalExceptionHandler {
         if (badAttr != null) errors.put(badAttr, "Không được hỗ trợ");
         var body = ApiResource.errors(errors, "Tham số không hợp lệ", HttpStatus.BAD_REQUEST);
         return ResponseEntity.badRequest().body(body);
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ApiResource<Object>> handleIllegalState(IllegalStateException ex) {
+        var body = ApiResource.error("ILLEGAL_STATE", ex.getMessage(), HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
     // ===== Catch-all fallback =====

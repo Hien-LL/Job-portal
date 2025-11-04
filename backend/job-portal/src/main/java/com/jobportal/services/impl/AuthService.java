@@ -40,8 +40,7 @@ public class AuthService extends BaseService implements AuthServiceInterface {
     private final MailService mailService;
 
     @Override
-    public Object authenticate(LoginRequest request) {
-        try {
+    public LoginResource authenticate(LoginRequest request) {
             User user = userRepository.findByEmailWithRolesAndPermissions(
                     request.getEmail()).orElseThrow(() -> new BadCredentialsException("Email hoặc mật khẩu không đúng"));
 
@@ -57,11 +56,6 @@ public class AuthService extends BaseService implements AuthServiceInterface {
             String token = jwtService.generateToken(user.getId(), user.getEmail(), defaultExpiration);
             String refreshToken = jwtService.generateRefreshToken(user.getId(), user.getEmail());
             return new LoginResource(token, refreshToken, userResource);
-
-        } catch (BadCredentialsException e)
-        {
-            return ApiResource.error("AUTH_ERROR", e.getMessage(), HttpStatus.UNAUTHORIZED);
-        }
     }
 
     @Override

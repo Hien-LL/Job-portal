@@ -406,7 +406,8 @@ let userProfile = null;
                             sidebarAvatar.src = avatar.src;
                         }
                         
-                        showSuccessNotificationBanner('Tải lên ảnh đại diện thành công ✓', 3000);
+                        showSuccessNotification('Tải lên ảnh đại diện thành công ✓', 3000);
+                        
                     } else {
                         avatar.src = originalSrc;
                     }
@@ -477,7 +478,7 @@ let userProfile = null;
 
                 if (updateSuccess) {
                     closeEditProfileModal();
-                    showSuccessNotificationBanner('Cập nhật hồ sơ thành công ✓', 5000);
+                    showSuccessNotification('Cập nhật hồ sơ thành công ✓', 3000);
                     // Reload page after notification
                     setTimeout(() => {
                         location.reload();
@@ -517,7 +518,7 @@ let userProfile = null;
                 if (result.success) {
                     // Update userProfile with new avatar
                     userProfile.avatarUrl = result.data.avatarUrl;
-                    showSuccessNotificationBanner('Tải lên ảnh đại diện thành công ✓', 3000);
+                    showSuccessNotification('Tải lên ảnh đại diện thành công ✓', 3000);
                     return true;
                 } else {
                     showErrorToast(result.message || 'Lỗi khi tải lên ảnh', 4000);
@@ -753,7 +754,7 @@ let userProfile = null;
 
                 if (updateSuccess) {
                     closeEditSummaryModal();
-                    showSuccessNotificationBanner('Cập nhật giới thiệu thành công ✓', 5000);
+                    showSuccessNotification('Cập nhật giới thiệu thành công ✓', 3000);
                     // Reload page after notification
                     setTimeout(() => {
                         location.reload();

@@ -399,7 +399,7 @@ let currentTab = 'all';
                     if (result.success) {
                         closeModal();
                         await loadResumes();
-                        showSuccess(isEditing ? 'Cập nhật CV thành công!' : 'Tạo CV thành công!');
+                        showSuccessNotification(isEditing ? 'Cập nhật CV thành công!' : 'Tạo CV thành công!');
                     }
                 }
             } catch (error) {
@@ -518,7 +518,7 @@ let currentTab = 'all';
                     if (result.success) {
                         closeUploadModal();
                         await loadResumes();
-                        showSuccess('Upload file thành công!');
+                        showSuccessNotification('Upload file thành công!');
                     }
                 } else {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -541,7 +541,7 @@ let currentTab = 'all';
 
                 if (response && response.ok) {
                     await loadResumes();
-                    showSuccess('Xóa file thành công!');
+                    showSuccessNotification('Xóa file thành công!');
                 }
             } catch (error) {
                 console.error('Error deleting file:', error);

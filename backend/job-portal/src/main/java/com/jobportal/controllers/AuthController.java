@@ -63,17 +63,8 @@ public class AuthController {
 
     @PostMapping("login")
     public ApiResource<LoginResource> login(@Valid @RequestBody LoginRequest request) {
-        // Gợi ý: service ném BadCredentialsException/DisabledException thay vì trả Object.
-        Object result = userService.authenticate(request);
-        if (result instanceof LoginResource loginResource) {
-            return ApiResource.ok(loginResource, "SUCCESS");
-        }
-        if (result instanceof ApiResource<?> error) {
-            // để advice set HTTP 422
-            throw new BusinessException("LOGIN_FAILED",
-                    String.valueOf(error.getMessage()), HttpStatus.UNPROCESSABLE_ENTITY);
-        }
-        throw new BusinessException("LOGIN_FAILED", "Không thể đăng nhập", HttpStatus.UNPROCESSABLE_ENTITY);
+        LoginResource loginResource = userService.authenticate(request);
+        return ApiResource.ok(loginResource, "SUCCESS");
     }
 
     @PostMapping("blacklisted_tokens")

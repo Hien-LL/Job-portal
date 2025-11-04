@@ -2,6 +2,7 @@ package com.jobportal.services.interfaces;
 
 import com.jobportal.dtos.requests.LoginRequest;
 import com.jobportal.dtos.requests.RegisterRequest;
+import com.jobportal.dtos.resources.LoginResource;
 import com.jobportal.dtos.resources.UserDetailsResource;
 import com.jobportal.dtos.resources.UserProfileResource;
 import jakarta.validation.Valid;
@@ -9,7 +10,7 @@ import jakarta.validation.Valid;
 import java.util.Set;
 
 public interface AuthServiceInterface {
-    Object authenticate(LoginRequest request);
+    LoginResource authenticate(LoginRequest request);
     UserProfileResource getUserFromEmail(String email);
     UserProfileResource getProfileById(Long id);
     Object createUser(RegisterRequest request);

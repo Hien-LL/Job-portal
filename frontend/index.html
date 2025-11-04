@@ -17,6 +17,37 @@
         h1, h2, h3, h4, h5, h6 {
             font-family: 'Poppins', sans-serif;
         }
+        
+        /* Location dropdown positioning */
+        #home-location-suggestions {
+            position: absolute;
+            top: calc(100% + 0.5rem);
+            left: 0;
+            z-index: 9999;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* Smooth scrollbar for location list */
+        #home-location-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        #home-location-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        #home-location-list::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        
+        #home-location-list::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
     </style>
 </head>
 <body class="bg-white">
@@ -51,7 +82,7 @@
                         </div>
 
                         <!-- Location Input -->
-                        <div class="flex-1 flex items-center px-4 py-2 bg-gray-50 rounded-md">
+                        <div class="flex-1 flex items-center px-4 py-2 bg-gray-50 rounded-md relative">
                             <svg class="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -61,7 +92,22 @@
                                 id="home-location-search"
                                 placeholder="Địa điểm" 
                                 class="flex-1 bg-transparent text-gray-900 focus:outline-none text-sm"
+                                autocomplete="off"
                             >
+                            <!-- Location Suggestions Dropdown -->
+                            <div id="home-location-suggestions" class="absolute top-full left-0 mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg hidden max-h-80 overflow-y-auto z-50">
+                                <div class="p-3">
+                                    <input 
+                                        type="text" 
+                                        id="home-location-filter-input"
+                                        placeholder="Tìm Tỉnh/Thành"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 mb-3"
+                                    >
+                                    <div id="home-location-list" class="space-y-1">
+                                        <!-- Will be populated by JavaScript -->
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Search Button -->
@@ -497,10 +543,95 @@
     <script src="js/featured-jobs.js"></script>
     <script src="js/featured-categories.js"></script>
     <script src="js/featured-companies.js"></script>
+    <script src="js/common-helpers.js"></script>
     <script src="js/auth.js"></script>
 
     <!-- Featured Jobs API Script -->
     <script>
+        // Location data cache
+        let homeLocationsData = [];
+
+        // Load locations from API
+        async function loadHomeLocations() {
+            try {
+                const url = buildApiUrl(API_CONFIG.LOCATIONS.LIST);
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    console.error('Failed to load locations');
+                    return;
+                }
+                
+                const data = await response.json();
+                homeLocationsData = data.data || [];
+                console.log('📍 Loaded locations:', homeLocationsData.length);
+                
+                setupHomeLocationAutocomplete();
+            } catch (error) {
+                console.error('Error loading locations:', error);
+            }
+        }
+
+        // Setup location autocomplete dropdown for home page
+        function setupHomeLocationAutocomplete() {
+            const locationInput = document.getElementById('home-location-search');
+            const locationSuggestions = document.getElementById('home-location-suggestions');
+            const locationList = document.getElementById('home-location-list');
+            const filterInput = document.getElementById('home-location-filter-input');
+
+            if (!locationInput || !locationSuggestions || !locationList) return;
+
+            // Populate initial location list
+            function populateLocationList(locations) {
+                const html = locations.map(loc => `
+                    <div class="location-item px-3 py-2 hover:bg-blue-50 cursor-pointer rounded text-sm text-gray-700 transition" data-city="${loc.city}">
+                        ${loc.displayName}
+                    </div>
+                `).join('');
+                locationList.innerHTML = html;
+
+                // Add click handlers
+                locationList.querySelectorAll('.location-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const city = item.dataset.city;
+                        locationInput.value = city;
+                        locationSuggestions.classList.add('hidden');
+                    });
+                });
+            }
+
+            // Show dropdown on focus
+            locationInput.addEventListener('focus', () => {
+                populateLocationList(homeLocationsData);
+                locationSuggestions.classList.remove('hidden');
+            });
+
+            // Filter locations when typing in filter input
+            if (filterInput) {
+                filterInput.addEventListener('input', (e) => {
+                    const searchTerm = e.target.value.toLowerCase();
+                    const filtered = homeLocationsData.filter(loc => 
+                        loc.city.toLowerCase().includes(searchTerm) ||
+                        loc.displayName.toLowerCase().includes(searchTerm)
+                    );
+                    populateLocationList(filtered);
+                });
+            }
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!locationInput.contains(e.target) && 
+                    !locationSuggestions.contains(e.target)) {
+                    locationSuggestions.classList.add('hidden');
+                }
+            });
+
+            // Prevent dropdown from closing when clicking inside
+            locationSuggestions.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+        }
+
         // Handle search from home page
         function handleSearch() {
             const keyword = document.getElementById('home-keyword-search').value.trim();
@@ -527,7 +658,8 @@
                 });
             });
 
-            // Load featured content
+            // Load locations and featured content
+            loadHomeLocations();
             loadFeaturedJobs();
             loadFeaturedCategories();
             loadFeaturedCompanies();
