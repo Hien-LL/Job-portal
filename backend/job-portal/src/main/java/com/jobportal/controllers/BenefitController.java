@@ -30,5 +30,4 @@ public class BenefitController {
         ApiResource<List<BenefitResource>> resource = ApiResource.ok(resources, "Success");
         return ResponseEntity.ok(resource);
     }
-
 }

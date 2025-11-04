@@ -26,7 +26,4 @@ public class UserSkill {
     @JoinColumn(name = "skill_id", nullable = false,
             foreignKey = @ForeignKey(name = "fk_user_skill_skill"))
     private Skill skill;
-
-    @Column(nullable = false)
-    private int yearsExperience;
 }

@@ -1,6 +1,5 @@
 package com.jobportal.repositories;
 
-import aj.org.objectweb.asm.commons.InstructionAdapter;
 import com.jobportal.entities.User;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -30,5 +29,14 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
            where u.email = :email
            """)
     Optional<User> findByEmailWithRolesAndPermissions(@Param("email") String email);
+
+    @Query("""
+           select distinct u
+           from User u
+           left join fetch u.roles r
+           left join fetch r.permissions p
+           where u.id = :id
+           """)
+    Optional<User> findByIdWithRolesAndPermissions(@Param("id") Long id);
     Optional<User> findByEmail(String email);
 }

@@ -13,5 +13,4 @@ public class UserSkillResource {
     private Long id;
     private String name;
     private String slug;
-    private int yearsExperience;
 }

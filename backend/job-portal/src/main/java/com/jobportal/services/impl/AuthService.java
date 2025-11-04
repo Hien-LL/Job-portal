@@ -70,6 +70,12 @@ public class AuthService extends BaseService implements AuthServiceInterface {
         return userMapper.tProfileResource(user);
     }
 
+    @Override
+    public UserProfileResource getProfileById(Long id) {
+        User user = userRepository.findByIdWithRolesAndPermissions(id).orElseThrow(() -> new EntityNotFoundException("User không tồn tại"));
+        return userMapper.tProfileResource(user);
+    }
+
 
     @Override
     public RegisterResource createUser(RegisterRequest request) {

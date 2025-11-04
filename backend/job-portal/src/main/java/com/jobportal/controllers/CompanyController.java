@@ -4,19 +4,19 @@ import com.jobportal.dtos.requests.creation.CompanyCreationRequest;
 import com.jobportal.dtos.requests.updation.CompanyUpdationRequest;
 import com.jobportal.dtos.resources.ApiResource;
 import com.jobportal.dtos.resources.CompanyResource;
-import com.jobportal.dtos.resources.UserProfileResource;
+import com.jobportal.securities.exceptions.BusinessException;
+import com.jobportal.securities.helps.details.CustomUserDetails;
 import com.jobportal.entities.Company;
 import com.jobportal.mappers.CompanyMapper;
 import com.jobportal.services.interfaces.AuthServiceInterface;
 import com.jobportal.services.interfaces.CompanyServiceInterface;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,128 +27,73 @@ import java.util.Map;
 @RequestMapping("/api/companies")
 @RequiredArgsConstructor
 public class CompanyController {
+
     private final CompanyServiceInterface companyService;
-    private final AuthServiceInterface authService;
     private final CompanyMapper companyMapper;
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping
-    public ResponseEntity<?> createCompany(@Valid @RequestBody CompanyCreationRequest request) {
-        try {
-            String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            UserProfileResource userId = authService.getUserFromEmail(email);
-
-            Company company = companyService.createCompany(userId.getId(),  request);
-            CompanyResource companyResource = companyMapper.tResource(company);
-            return ResponseEntity.ok(ApiResource.ok(companyResource, "Tạo công ty thành công"));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
-        }
+    public ApiResource<CompanyResource> createCompany(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @Valid @RequestBody CompanyCreationRequest request
+    ) {
+        Long userId = user.getUserId();
+        Company company = companyService.createCompany(userId, request);
+        return ApiResource.ok(companyMapper.tResource(company), "Tạo công ty thành công");
     }
 
     @GetMapping("/list")
-    public ResponseEntity<?> getAllCompanies(HttpServletRequest request) {
-        try {
-            Map<String, String[]> parameterMap = request.getParameterMap();
+    public ApiResource<List<CompanyResource>> getAllCompanies(HttpServletRequest request) {
+        Map<String, String[]> parameterMap = request.getParameterMap();
 
-            List<CompanyResource> companies = companyService.getAllCompanies(parameterMap);
-            return ResponseEntity.ok(ApiResource.ok(companies, "Lấy danh sách công ty thành công"));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
-        }
+        List<CompanyResource> companies = companyService.getAllCompanies(parameterMap);
+        return ApiResource.ok(companies, "Lấy danh sách công ty thành công");
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/my-company/list")
-    public ResponseEntity<?> getListCompany() {
-        try {
-            String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            Long userId = authService.getUserFromEmail(email).getId();
-
-            List<Company> companies = companyService.getListCompany(userId);
-            List<CompanyResource> companyResource = companyMapper.tResourceList(companies);
-            return ResponseEntity.ok(ApiResource.ok(companyResource, "Lấy danh sách công ty thành công"));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
-        }
+    public ApiResource<List<CompanyResource>> getMyCompanies(@AuthenticationPrincipal CustomUserDetails user) {
+        Long userId = user.getUserId();
+        List<Company> companies = companyService.getListCompany(userId);
+        return ApiResource.ok(companyMapper.tResourceList(companies), "Lấy danh sách công ty thành công");
     }
 
-    @PutMapping(value = "/my-company/upload-logo/{companyId}" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> uploadLogo(@PathVariable Long companyId, @RequestPart("logo") MultipartFile file) {
-        try {
-            if (file == null || file.isEmpty()) {
-                return ResponseEntity.badRequest().body(
-                        ApiResource.error("BAD_REQUEST", "File rỗng hoặc thiếu part 'file'", HttpStatus.BAD_REQUEST)
-                );
-            }
-
-            String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            Long userId = authService.getUserFromEmail(email).getId();
-
-            String avatarUrl = companyService.uploadCompanyLogo(userId,companyId, file);
-            return ResponseEntity.ok(ApiResource.ok(avatarUrl, "Upload avatar thành công"));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
+    @PreAuthorize("isAuthenticated()")
+    @PutMapping(value = "/my-company/upload-logo/{companyId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResource<String> uploadLogo(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @PathVariable Long companyId,
+            @RequestPart("logo") MultipartFile logo // dùng đúng key "logo"
+    ) {
+        if (logo == null || logo.isEmpty()) {
+            throw new BusinessException("BAD_REQUEST", "Logo rỗng hoặc thiếu part 'logo'", HttpStatus.BAD_REQUEST);
         }
+        Long userId = user.getUserId();
+        String logoUrl = companyService.uploadCompanyLogo(userId, companyId, logo);
+        return ApiResource.ok(logoUrl, "Upload logo thành công");
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PutMapping("/my-company/{companyId}")
-    public ResponseEntity<?> updateCompany(@PathVariable Long companyId, @Valid @RequestBody CompanyUpdationRequest request) {
-        try {
-            String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            Long userId = authService.getUserFromEmail(email).getId();
-
-            Company company = companyService.updateCompany(userId, companyId, request);
-            CompanyResource companyResource = companyMapper.tResource(company);
-            return ResponseEntity.ok(ApiResource.ok(companyResource, "Cập nhật công ty thành công"));
-        } catch (SecurityException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(ApiResource.error("FORBIDDEN", e.getMessage(), HttpStatus.FORBIDDEN));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
-        }
+    public ApiResource<CompanyResource> updateCompany(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @PathVariable Long companyId,
+            @Valid @RequestBody CompanyUpdationRequest request
+    ) {
+        Long userId = user.getUserId();
+        Company company = companyService.updateCompany(userId, companyId, request);
+        return ApiResource.ok(companyMapper.tResource(company), "Cập nhật công ty thành công");
     }
 
-    @GetMapping("/{companySlug}" )
-    public ResponseEntity<?> getCompanyBySlug(@PathVariable String companySlug) {
-        try {
-            CompanyResource companyResource = companyService.getCompanyBySlug(companySlug);
-            return ResponseEntity.ok(ApiResource.ok(companyResource, "Lấy thông tin công ty thành công"));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
-        }
+    @GetMapping("/{companySlug}")
+    public ApiResource<CompanyResource> getCompanyBySlug(@PathVariable String companySlug) {
+        CompanyResource company = companyService.getCompanyBySlug(companySlug);
+        return ApiResource.ok(company, "Lấy thông tin công ty thành công");
     }
 
-    @GetMapping("/detail/{companyId}" )
-    public ResponseEntity<?> getCompanyById(@PathVariable Long companyId) {
-        try {
-            CompanyResource companyResource = companyService.getCompanyById(companyId);
-            return ResponseEntity.ok(ApiResource.ok(companyResource, "Lấy thông tin công ty thành công"));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
-        }
+    @GetMapping("/detail/{companyId}")
+    public ApiResource<CompanyResource> getCompanyById(@PathVariable Long companyId) {
+        CompanyResource company = companyService.getCompanyById(companyId);
+        return ApiResource.ok(company, "Lấy thông tin công ty thành công");
     }
 }

@@ -13,7 +13,6 @@ public interface UserSkillMapper {
     @Mapping(target = "id", source = "skill.id")
     @Mapping(target = "name", source = "skill.name")
     @Mapping(target = "slug", source = "skill.slug")
-    @Mapping(target = "yearsExperience", source = "yearsExperience")
     UserSkillResource tResource(UserSkill userSkill);
 
     List<SkillResource> tResourceList(Set<UserSkill> userSkills);

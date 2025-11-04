@@ -8,11 +8,11 @@ import com.jobportal.dtos.resources.UserProfileResource;
 import com.jobportal.dtos.resources.UserResource;
 import com.jobportal.entities.User;
 import com.jobportal.mappers.UserMapper;
+import com.jobportal.securities.exceptions.BusinessException;
+import com.jobportal.securities.helps.details.CustomUserDetails;
 import com.jobportal.services.interfaces.AuthServiceInterface;
-import com.jobportal.services.interfaces.NotificationServiceInterface;
 import com.jobportal.services.interfaces.UserServiceInterface;
 import com.jobportal.services.interfaces.UserSkillServiceInterface;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -20,280 +20,130 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
 
+@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/users")
 public class UserController {
-    private final AuthServiceInterface authService;
+
     private final UserServiceInterface userService;
     private final UserMapper userMapper;
     private final UserSkillServiceInterface userSkillService;
-    private final NotificationServiceInterface notificationService;
+    private final AuthServiceInterface authService; // nếu không dùng, có thể xoá
 
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping("/me")
-    public ResponseEntity<?> me() {
-        try {
-            String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            UserProfileResource userResource =  authService.getUserFromEmail(email);
-            ApiResource<UserProfileResource> response = ApiResource.ok(userResource, "SUCCESS");
-
-            return ResponseEntity.ok(response);
-        } catch (EntityNotFoundException exception) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                    ApiResource.error("NOT_FOUND", exception.getMessage(), HttpStatus.NOT_FOUND)
-            );
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                    ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
-                    ));
-        }
+    @GetMapping("/me")
+    public ApiResource<UserProfileResource> me(@AuthenticationPrincipal CustomUserDetails user) {
+        UserProfileResource me = authService.getProfileById(user.getUserId());
+        return ApiResource.ok(me, "SUCCESS");
     }
 
     @PreAuthorize("hasPermission(null , 'UPDATE_USER')")
     @PutMapping("/{id}")
-    public  ResponseEntity<?> updateRolesForUser(@Valid @RequestBody RolesForUserUpdationRequest request, @PathVariable @Positive(message = "id phải lớn hơn 0") Long id) {
-        try {
-            UserDetailsResource resource = authService.updateRolesForUser(request.getRoleIds(), id);
-            ApiResource<UserDetailsResource> response = ApiResource.ok(resource, "Cập nhật bản ghi thành công");
-            return ResponseEntity.ok(response);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                    ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND)
-            );
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                    ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
-                    ));
-        }
+    public ApiResource<UserDetailsResource> updateRolesForUser(
+            @Valid @RequestBody RolesForUserUpdationRequest request,
+            @PathVariable @Positive(message = "id phải lớn hơn 0") Long id
+    ) {
+        UserDetailsResource resource = authService.updateRolesForUser(request.getRoleIds(), id);
+        return ApiResource.ok(resource, "Cập nhật bản ghi thành công");
     }
 
     @PreAuthorize("hasPermission(null , 'READ_USER')")
     @GetMapping("/list")
-    public ResponseEntity<?> list(HttpServletRequest request) {
-        Map<String, String[]> parameterMap = request.getParameterMap();
-        List<User> users = userService.getAll(parameterMap);
-        List<UserResource> userResources = userMapper.tResourceList(users);
-
-        ApiResource<java.util.List<UserResource>> response = ApiResource.ok(userResources, " SUCCESS");
-        return ResponseEntity.ok(response);
+    public ApiResource<List<UserResource>> list(HttpServletRequest request) {
+        Map<String, String[]> params = request.getParameterMap();
+        List<User> users = userService.getAll(params);
+        return ApiResource.ok(userMapper.tResourceList(users), "SUCCESS");
     }
 
     @PreAuthorize("hasPermission(null , 'READ_USER')")
     @GetMapping
-    public ResponseEntity<?> index(HttpServletRequest request) {
-        Map<String, String[]> parameters = request.getParameterMap();
-        Page<User> users = userService.paginate(parameters);
-
-        Page<UserResource> userResources = userMapper.tResourcePage(users);
-
-        ApiResource<?> response = ApiResource.ok(userResources,
-                " SUCCESS");
-        return ResponseEntity.ok(response);
+    public ApiResource<Page<UserResource>> index(HttpServletRequest request) {
+        Map<String, String[]> params = request.getParameterMap();
+        Page<User> users = userService.paginate(params);
+        return ApiResource.ok(userMapper.tResourcePage(users), "SUCCESS");
     }
+
     @PreAuthorize("hasPermission(null , 'READ_USER')")
     @GetMapping("/profile/{id}")
-    public ResponseEntity<?> profile(@PathVariable @Positive(message = "id phải lớn hơn 0") Long id) {
-        try {
-            UserDetailsResource resource = userService.getById(id);
-            ApiResource<UserDetailsResource> response = ApiResource.ok(resource, " SUCCESS");
-            return ResponseEntity.ok(response);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                    ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND)
-            );
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                    ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
-                    ));
-        }
+    public ApiResource<UserDetailsResource> profile(@PathVariable @Positive(message = "id phải lớn hơn 0") Long id) {
+        UserDetailsResource resource = userService.getById(id);
+        return ApiResource.ok(resource, "SUCCESS");
     }
+
     @PreAuthorize("hasPermission(null , 'UPDATE_USER')")
     @PutMapping("/profile/{id}")
-    public ResponseEntity<?> updateProfile(@Valid @RequestBody UserUpdationRequest request, @PathVariable @Positive(message = "id phải lớn hơn 0") Long id) {
-        try {
-            UserProfileResource resource = userService.update(id, request);
-            ApiResource<UserProfileResource> response = ApiResource.ok(resource, "Cập nhật bản ghi thành công");
-            return ResponseEntity.ok(response);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                    ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND)
-            );
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                    ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
-                    ));
-        }
+    public ApiResource<UserProfileResource> updateProfile(
+            @Valid @RequestBody UserUpdationRequest request,
+            @PathVariable @Positive(message = "id phải lớn hơn 0") Long id
+    ) {
+        UserProfileResource resource = userService.update(id, request);
+        return ApiResource.ok(resource, "Cập nhật bản ghi thành công");
     }
 
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/profile/me")
-    public ResponseEntity<?> updateMyProfile(@Valid @RequestBody UserUpdationRequest request) {
-        try {
-            String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            Long userId = authService.getUserFromEmail(email).getId();
-
-            UserProfileResource resource = userService.update(userId, request);
-            ApiResource<UserProfileResource> response = ApiResource.ok(resource, "Cập nhật bản ghi thành công");
-            return ResponseEntity.ok(response);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                    ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND)
-            );
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                    ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
-                    ));
-        }
+    public ApiResource<UserProfileResource> updateMyProfile(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @Valid @RequestBody UserUpdationRequest request
+    ) {
+        UserProfileResource resource = userService.update(user.getUserId(), request);
+        return ApiResource.ok(resource, "Cập nhật bản ghi thành công");
     }
 
     @PreAuthorize("hasPermission(null , 'DELETE_USER')")
-    @DeleteMapping({"/{id}"})
-    public ResponseEntity<?> delete(@PathVariable @Positive(message = "id phải lớn hơn 0") Long id) {
-        try {
-            userService.delete(id);
-            return ResponseEntity.ok(ApiResource.ok(null, "Xóa bản ghi thành công"));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                    ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND)
-            );
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                    ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
-                    ));
-        }
+    @DeleteMapping("/{id}")
+    public ApiResource<Void> delete(@PathVariable @Positive(message = "id phải lớn hơn 0") Long id) {
+        userService.delete(id);
+        return ApiResource.ok(null, "Xóa bản ghi thành công");
     }
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping(value = "/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> uploadAvatar(@RequestPart("file") MultipartFile file) {
-        try {
-            if (file == null || file.isEmpty()) {
-                return ResponseEntity.badRequest().body(
-                        ApiResource.error("BAD_REQUEST", "File rỗng hoặc thiếu part 'file'", HttpStatus.BAD_REQUEST)
-                );
-            }
-
-            String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            Long userId = authService.getUserFromEmail(email).getId();
-
-            String avatarUrl = userService.uploadAvatar(userId, file);
-            return ResponseEntity.ok(ApiResource.ok(avatarUrl, "Upload avatar thành công"));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
+    public ApiResource<String> uploadAvatar(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @RequestPart("file") MultipartFile file
+    ) {
+        if (file == null || file.isEmpty()) {
+            throw new BusinessException("BAD_REQUEST", "File rỗng hoặc thiếu part 'file'", HttpStatus.BAD_REQUEST);
         }
+        String avatarUrl = userService.uploadAvatar(user.getUserId(), file);
+        return ApiResource.ok(avatarUrl, "Upload avatar thành công");
     }
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/skills/{slug}")
-    ResponseEntity<?> addSkillToUser(@PathVariable String slug) {
-        try {
-            String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            Long userId = authService.getUserFromEmail(email).getId();
-
-            userSkillService.addSkillToUser(userId, slug);
-            return ResponseEntity.ok(ApiResource.ok(null, "Thêm kỹ năng cho người dùng thành công"));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(ApiResource.error("BAD_REQUEST", e.getMessage(), HttpStatus.BAD_REQUEST));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
-        }
+    public ApiResource<Void> addSkillToUser(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @PathVariable String slug
+    ) {
+        userSkillService.addSkillToUser(user.getUserId(), slug);
+        return ApiResource.ok(null, "Thêm kỹ năng cho người dùng thành công");
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/skills")
-    ResponseEntity<?> getSkillsForUser() {
-        try {
-            String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            Long userId = authService.getUserFromEmail(email).getId();
-
-            var skills = userSkillService.getSkillsById(userId);
-            return ResponseEntity.ok(ApiResource.ok(skills, "Success"));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(ApiResource.error("BAD_REQUEST", e.getMessage(), HttpStatus.BAD_REQUEST));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
-        }
+    public ApiResource<?> getSkillsForUser(@AuthenticationPrincipal CustomUserDetails user) {
+        var skills = userSkillService.getSkillsById(user.getUserId());
+        return ApiResource.ok(skills, "Success");
     }
 
-    @PutMapping("/skills/{slug}")
-    ResponseEntity<?> updateSkillForUser(@PathVariable String slug, @RequestParam int yearsExperience) {
-        try {
-            String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            Long userId = authService.getUserFromEmail(email).getId();
-
-            userSkillService.updateYearsBySlug(userId, slug, yearsExperience);
-            return ResponseEntity.ok(ApiResource.ok(null, "Cập nhật số năm kinh nghiệm cho kỹ năng thành công"));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(ApiResource.error("BAD_REQUEST", e.getMessage(), HttpStatus.BAD_REQUEST));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
-        }
-    }
-
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/skills/{slug}")
-    ResponseEntity<?> removeSkillFromUser(@PathVariable String slug) {
-        try {
-            String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            Long userId = authService.getUserFromEmail(email).getId();
-
-            userSkillService.removeSkillFromUser(userId, slug);
-            return ResponseEntity.ok(ApiResource.ok(null, "Xóa kỹ năng khỏi người dùng thành công"));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(ApiResource.error("BAD_REQUEST", e.getMessage(), HttpStatus.BAD_REQUEST));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
-        }
+    public ApiResource<Void> removeSkillFromUser(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @PathVariable String slug
+    ) {
+        userSkillService.removeSkillFromUser(user.getUserId(), slug);
+        return ApiResource.ok(null, "Xóa kỹ năng khỏi người dùng thành công");
     }
-
-//    @GetMapping("/candidate/infomations/{userId}")
-//    public ResponseEntity<?> getCandidateInfomations(@PathVariable @Positive(message = "id phải lớn hơn 0") Long userId) {
-//        try {
-//            String email = SecurityContextHolder.getContext().getAuthentication().getName();
-//            Long candidateId = authService.getUserFromEmail(email).getId();
-//
-//            var infomations = userService.getCandidateInfomations(candidateId, userId);
-//            return ResponseEntity.ok(ApiResource.ok(infomations, "Success"));
-//        } catch (EntityNotFoundException e) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-//                    .body(ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND));
-//        } catch (IllegalArgumentException e) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-//                    .body(ApiResource.error("BAD_REQUEST", e.getMessage(), HttpStatus.BAD_REQUEST));
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
-//        }
 }

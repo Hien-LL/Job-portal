@@ -5,151 +5,109 @@ import com.jobportal.dtos.requests.updation.ResumeUpdationRequest;
 import com.jobportal.dtos.resources.ApiResource;
 import com.jobportal.dtos.resources.ResumeFileResource;
 import com.jobportal.dtos.resources.ResumeResource;
-import com.jobportal.dtos.resources.UserProfileResource;
-import com.jobportal.services.interfaces.AuthServiceInterface;
+import com.jobportal.securities.helps.details.CustomUserDetails;
 import com.jobportal.services.interfaces.ResumeFileServiceInterface;
 import com.jobportal.services.interfaces.ResumeServiceInterface;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.*;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-@RestController
 @RequiredArgsConstructor
+@RestController
 @RequestMapping("/api/resumes")
 public class ResumeController {
 
     private final ResumeServiceInterface resumeService;
-    private final AuthServiceInterface authService;
     private final ResumeFileServiceInterface resumeFileService;
 
     @PreAuthorize("isAuthenticated()")
-    @GetMapping()
-    public ResponseEntity<?> getList(@RequestParam(required = false) Boolean isDefault) {
-        try {
-            String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            UserProfileResource user = authService.getUserFromEmail(email);
-
-            List<ResumeResource> resumes = resumeService.getListById(user.getId(), isDefault);
-            return ResponseEntity.ok(ApiResource.ok(resumes, "Success"));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
-        }
+    @GetMapping
+    public ApiResource<List<ResumeResource>> getList(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @RequestParam(required = false) Boolean isDefault
+    ) {
+        Long userId = user.getUserId();
+        List<ResumeResource> resumes = resumeService.getListById(userId, isDefault);
+        return ApiResource.ok(resumes, "Success");
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{resumeId}")
-    public ResponseEntity<?> getDetail(@PathVariable Long resumeId) {
-        try {
-            String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            UserProfileResource user = authService.getUserFromEmail(email);
-
-            ResumeResource resume = resumeService.getDetail(user.getId(), resumeId);
-            return ResponseEntity.ok(ApiResource.ok(resume, "Success"));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
-        }
+    public ApiResource<ResumeResource> getDetail(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @Positive(message = "id phải lớn hơn 0") @PathVariable Long resumeId
+    ) {
+        Long userId = user.getUserId();
+        ResumeResource resume = resumeService.getDetail(userId, resumeId);
+        return ApiResource.ok(resume, "Success");
     }
 
-    @PostMapping()
-    public ResponseEntity<?> create(@RequestBody @Valid ResumeCreationRequest request) {
-        try {
-            String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            UserProfileResource user = authService.getUserFromEmail(email);
-
-            ResumeResource result = resumeService.create(user.getId(), request);
-            return ResponseEntity.status(HttpStatus.CREATED).body(ApiResource.ok(result, "Created"));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
-        }
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping
+    public ApiResource<ResumeResource> create(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @RequestBody @Valid ResumeCreationRequest request
+    ) {
+        Long userId = user.getUserId();
+        ResumeResource result = resumeService.create(userId, request);
+        return ApiResource.ok(result, "Created");
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PutMapping("/{resumeId}")
-    public ResponseEntity<?> update(@PathVariable Long resumeId, @RequestBody @Valid ResumeUpdationRequest request) {
-        try {
-            String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            UserProfileResource user = authService.getUserFromEmail(email);
-            ResumeResource result = resumeService.update(user.getId(), resumeId, request);
-            return ResponseEntity.ok(ApiResource.ok(result, "Updated"));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
-        }
+    public ApiResource<ResumeResource> update(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @Positive(message = "id phải lớn hơn 0") @PathVariable Long resumeId,
+            @RequestBody @Valid ResumeUpdationRequest request
+    ) {
+        Long userId = user.getUserId();
+        ResumeResource result = resumeService.update(userId, resumeId, request);
+        return ApiResource.ok(result, "Updated");
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping(
             value = "/{resumeId}/upload",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<?> uploadFile(
-            @PathVariable Long resumeId,
-            @RequestParam("file") MultipartFile file,
-            @RequestParam(required = false) String fileType // <- raw string
+    public ApiResource<ResumeFileResource> uploadFile(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @Positive(message = "id phải lớn hơn 0") @PathVariable Long resumeId,
+            @RequestPart("file") MultipartFile file,
+            @RequestParam(required = false) String fileType
     ) {
-        try {
-            String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            UserProfileResource user = authService.getUserFromEmail(email);
-            ResumeFileResource result = resumeFileService.upload(user.getId(), resumeId, file, fileType);
-            return ResponseEntity.status(HttpStatus.CREATED).body(ApiResource.ok(result, "Upload File thành công"));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
-        }
+        Long userId = user.getUserId();
+        ResumeFileResource result = resumeFileService.upload(userId, resumeId, file, fileType);
+        return ApiResource.ok(result, "Upload File thành công");
     }
 
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/files/{resumeId}")
-    public ResponseEntity<?> deleteFile(@PathVariable Long resumeId) {
-        try {
-            String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            UserProfileResource user = authService.getUserFromEmail(email);
-            resumeFileService.deleteFile(user.getId(), resumeId);
-            return ResponseEntity.ok(ApiResource.ok(null, "Xoá File thành công"));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
-        }
+    public ApiResource<Void> deleteFile(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @Positive(message = "id phải lớn hơn 0") @PathVariable Long resumeId
+    ) {
+        Long userId = user.getUserId();
+        resumeFileService.deleteFile(userId, resumeId);
+        return ApiResource.ok(null, "Xoá File thành công");
     }
 
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{resumeId}")
-    public ResponseEntity<?> delete(@PathVariable Long resumeId) {
-        try {
-            String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            UserProfileResource user = authService.getUserFromEmail(email);
-            resumeService.delete(user.getId(), resumeId);
-            return ResponseEntity.ok(ApiResource.ok(null, "Deleted"));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ApiResource.error("NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResource.error("INTERNAL_SERVER_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
-        }
+    public ApiResource<Void> delete(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @Positive(message = "id phải lớn hơn 0") @PathVariable Long resumeId
+    ) {
+        Long userId = user.getUserId();
+        resumeService.delete(userId, resumeId);
+        return ApiResource.ok(null, "Deleted");
     }
 }

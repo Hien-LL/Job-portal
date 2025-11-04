@@ -61,22 +61,4 @@ public class UserSkillService implements UserSkillServiceInterface {
 
         return userSkillRepo.findSkillViewsByUserId(userId);
     }
-
-    @Override
-    public void updateYearsBySlug(Long userId, String slug, int yearsOfExperience) {
-        validateYears(yearsOfExperience);
-        var skill = skillRepo.findBySlug(slug)
-                .orElseThrow(() -> new IllegalArgumentException("Kỹ năng không tồn tại"));
-        var id = new UserSkillId(userId, skill.getId());
-        var userSkill = userSkillRepo.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Kỹ năng không được gán cho người dùng"));
-        userSkill.setYearsExperience(yearsOfExperience);
-        userSkillRepo.save(userSkill);
-    }
-
-    private void validateYears(int years) {
-        if (years < 0 || years > 60) {
-            throw new IllegalArgumentException("yearsExperience không hợp lệ (0–60)");
-        }
-    }
 }
