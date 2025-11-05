@@ -75,7 +75,7 @@ public class ApplicationService implements ApplicationServiceInterface {
             Long actorUserId, Long companyId, Long jobId, String status, Pageable pageable) {
 
         // Quyền: user phải là admin của company
-        if (!companyAdminRepository.existsByUser_IdAndCompany_Id(actorUserId, companyId)) {
+        if (!companyAdminRepository.existsByCompany_IdAndUser_Id(actorUserId, companyId)) {
             throw new SecurityException("Bạn không có quyền truy cập ứng viên của công ty này");
         }
 
@@ -102,7 +102,7 @@ public class ApplicationService implements ApplicationServiceInterface {
 
         // Quyền: là chủ đơn, hoặc admin của company
         boolean allowed = ownerId.equals(actorUserId) ||
-                companyAdminRepository.existsByUser_IdAndCompany_Id(actorUserId, companyId);
+                companyAdminRepository.existsByCompany_IdAndUser_Id(actorUserId, companyId);
 
         if (!allowed) throw new SecurityException("Bạn không có quyền xem đơn này");
 

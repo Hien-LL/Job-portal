@@ -4,19 +4,26 @@ import com.jobportal.dtos.requests.creation.CompanyCreationRequest;
 import com.jobportal.dtos.requests.updation.CompanyUpdationRequest;
 import com.jobportal.dtos.resources.ApiResource;
 import com.jobportal.dtos.resources.CompanyResource;
+import com.jobportal.dtos.resources.JobListItemResource;
+import com.jobportal.entities.Job;
+import com.jobportal.mappers.JobMapper;
 import com.jobportal.securities.exceptions.BusinessException;
 import com.jobportal.securities.helps.details.CustomUserDetails;
 import com.jobportal.entities.Company;
 import com.jobportal.mappers.CompanyMapper;
 import com.jobportal.services.interfaces.AuthServiceInterface;
 import com.jobportal.services.interfaces.CompanyServiceInterface;
+import com.jobportal.services.interfaces.JobServiceInterface;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,6 +37,9 @@ public class CompanyController {
 
     private final CompanyServiceInterface companyService;
     private final CompanyMapper companyMapper;
+    private final  AuthServiceInterface authService;
+    private final JobServiceInterface  jobService;
+    private final JobMapper jobMapper;
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping
@@ -51,37 +61,37 @@ public class CompanyController {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @GetMapping("/my-company/list")
-    public ApiResource<List<CompanyResource>> getMyCompanies(@AuthenticationPrincipal CustomUserDetails user) {
+    @GetMapping("/my-company/details")
+    public ApiResource<CompanyResource> getMyCompanies(
+            @AuthenticationPrincipal CustomUserDetails user
+    ) {
         Long userId = user.getUserId();
-        List<Company> companies = companyService.getListCompany(userId);
-        return ApiResource.ok(companyMapper.tResourceList(companies), "Lấy danh sách công ty thành công");
+        Company company = companyService.getMyCompany(userId);
+        return ApiResource.ok(companyMapper.tResource(company), "Lấy công ty của tôi thành công");
     }
 
     @PreAuthorize("isAuthenticated()")
-    @PutMapping(value = "/my-company/upload-logo/{companyId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/my-company/upload-logo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResource<String> uploadLogo(
             @AuthenticationPrincipal CustomUserDetails user,
-            @PathVariable Long companyId,
             @RequestPart("logo") MultipartFile logo // dùng đúng key "logo"
     ) {
         if (logo == null || logo.isEmpty()) {
             throw new BusinessException("BAD_REQUEST", "Logo rỗng hoặc thiếu part 'logo'", HttpStatus.BAD_REQUEST);
         }
         Long userId = user.getUserId();
-        String logoUrl = companyService.uploadCompanyLogo(userId, companyId, logo);
+        String logoUrl = companyService.uploadCompanyLogo(userId, logo);
         return ApiResource.ok(logoUrl, "Upload logo thành công");
     }
 
     @PreAuthorize("isAuthenticated()")
-    @PutMapping("/my-company/{companyId}")
+    @PutMapping("/my-company/details")
     public ApiResource<CompanyResource> updateCompany(
             @AuthenticationPrincipal CustomUserDetails user,
-            @PathVariable Long companyId,
             @Valid @RequestBody CompanyUpdationRequest request
     ) {
         Long userId = user.getUserId();
-        Company company = companyService.updateCompany(userId, companyId, request);
+        Company company = companyService.updateCompany(userId, request);
         return ApiResource.ok(companyMapper.tResource(company), "Cập nhật công ty thành công");
     }
 
@@ -95,5 +105,16 @@ public class CompanyController {
     public ApiResource<CompanyResource> getCompanyById(@PathVariable Long companyId) {
         CompanyResource company = companyService.getCompanyById(companyId);
         return ApiResource.ok(company, "Lấy thông tin công ty thành công");
+    }
+
+    @GetMapping("jobs/{companyId}")
+    public ApiResource<Page<JobListItemResource>> getJobsByCompanyId(
+            @Positive(message = "id phải lớn hơn 0") @PathVariable Long companyId,
+            HttpServletRequest request
+    ) {
+        Map<String, String[]> params = request.getParameterMap();
+        Page<Job> jobs = jobService.getJobsByCompanyId(companyId, params);
+        Page<JobListItemResource> jobResources = jobMapper.tListResourcePage(jobs);
+        return ApiResource.ok(jobResources, "Success");
     }
 }

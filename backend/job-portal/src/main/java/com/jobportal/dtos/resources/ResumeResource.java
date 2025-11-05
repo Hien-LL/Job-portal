@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.jobportal.entities.*;
 import lombok.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -14,6 +16,7 @@ public class ResumeResource {
     private Long id;
     private String title;
     private String summary;
+    private LocalDateTime createdAt;
 
     @JsonProperty("isDefault")
     private boolean isDefault;

@@ -33,7 +33,7 @@ const API_CONFIG = {
     JOBS: {
         LIST: '/jobs',
         GET_DETAIL: '/jobs/:jobSlug',
-        GET_BY_COMPANY: '/jobs/list/:companyId',
+        GET_BY_COMPANY: '/companies/jobs/:companyId',
         CHECK_APPLIED: '/applications/isApplied/:jobId',
         APPLY: '/applications/:jobId/apply',
         GET_RELATED: '/jobs?category.slug=:categorySlug&perPage=3&published=true',
@@ -41,10 +41,10 @@ const API_CONFIG = {
         GET_MY_JOB: '/jobs/my-company/:companyId/job/:jobId',
         UPDATE_MY_JOB: '/jobs/my-company/:companyId/job/:jobId',
         DELETE_MY_COMPANY: '/jobs/my-company/:companyId/job/:jobId',
-        SAVE: '/jobs/:jobSlug/save',
-        UNSAVE: '/jobs/:jobSlug/unsave',
-        CHECK_SAVED: '/jobs/:jobSlug/is-saved',
-        SAVED_JOBS_LIST: '/jobs/saved-jobs/list',  // ✅ THÊM MỚI
+        SAVE: '/saved-jobs/:jobSlug/save',
+        UNSAVE: '/saved-jobs/:jobSlug/unsave',
+        CHECK_SAVED: '/saved-jobs/:jobSlug/is-saved',
+        SAVED_JOBS_LIST: '/saved-jobs/saved-jobs/list',  
     },
     
     // Resume/CV Endpoints
@@ -69,9 +69,9 @@ const API_CONFIG = {
         GET_DETAIL: '/companies/:slug',
         GET_DETAIL_BY_ID: '/companies/detail/:companyId',
         CREATE: '/companies',
-        MY_COMPANIES_LIST: '/companies/my-company/list',
-        UPDATE_MY_COMPANY: '/companies/my-company/:companyId',
-        UPLOAD_LOGO: '/companies/my-company/upload-logo/:companyId',
+        MY_COMPANY_DETAILS: '/companies/my-company/details',
+        UPDATE_MY_COMPANY: '/companies/my-company/details',
+        UPLOAD_LOGO: '/companies/my-company/upload-logo',
     },
     
     // Follow/Unfollow Companies Endpoints

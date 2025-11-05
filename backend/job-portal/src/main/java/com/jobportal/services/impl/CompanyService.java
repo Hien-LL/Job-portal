@@ -6,7 +6,6 @@ import com.jobportal.dtos.requests.creation.CompanyCreationRequest;
 import com.jobportal.dtos.requests.updation.CompanyUpdationRequest;
 import com.jobportal.dtos.resources.CompanyResource;
 import com.jobportal.entities.Company;
-import com.jobportal.entities.CompanyAdminId;
 import com.jobportal.entities.User;
 import com.jobportal.mappers.CompanyMapper;
 import com.jobportal.repositories.CompanyAdminRepository;
@@ -55,6 +54,9 @@ public class CompanyService extends BaseService implements CompanyServiceInterfa
 
     @Override
     public Company createCompany(Long userId, CompanyCreationRequest request) {
+        if (companyAdminRepository.existsByUser_Id(userId)) {
+            throw new IllegalStateException("Bạn đã có công ty rồi");
+        }
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy user"));
 
@@ -70,20 +72,21 @@ public class CompanyService extends BaseService implements CompanyServiceInterfa
     }
 
     @Override
-    public List<Company> getListCompany(Long userId) {
-        return companyRepository.findAllByMemberUserId(userId);
+    public Company getMyCompany(Long userId) {
+        // chẩn đoán nhanh
+        if (!companyAdminRepository.existsByUser_Id(userId)) {
+            throw new EntityNotFoundException("User chưa được link làm admin của công ty nào");
+        }
+        return companyAdminRepository.findCompanyByAdminUserId(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Tồn tại link nhưng lấy company fail"));
     }
+
 
     @Transactional
     @Override
-    public Company updateCompany(Long userId, Long companyId, CompanyUpdationRequest request) {
-        if (!companyAdminRepository.existsById(new CompanyAdminId(userId, companyId))) {
-            throw new SecurityException("Bạn không có quyền cập nhật công ty này");
-        }
-
-        Company company = companyRepository.findById(companyId)
-                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy company "));
-
+    public Company updateCompany(Long userId, CompanyUpdationRequest request) {
+        Company company = companyAdminRepository.findCompanyByAdminUserId(userId)
+                .orElseThrow(() -> new SecurityException("Bạn không có quyền cập nhật công ty này"));
         companyMapper.updateEntityFromRequest(request, company);
 
         if (request.getName() != null) {
@@ -105,16 +108,12 @@ public class CompanyService extends BaseService implements CompanyServiceInterfa
 
     @Transactional
     @Override
-    public String uploadCompanyLogo(Long userId, Long companyId, MultipartFile file) {
+    public String uploadCompanyLogo(Long userId, MultipartFile file) {
         validateFileSize(file, uploadConfig.getMaxSize());
         validateExt(file, uploadConfig.getAllowedImageExt()); // chỉ ảnh
 
-        if (!companyAdminRepository.existsById(new CompanyAdminId(userId, companyId))) {
-            throw new SecurityException("Bạn không có quyền upload logo cho công ty này");
-        }
-
-        Company company = companyRepository.findById(companyId)
-                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy company"));
+        Company company = companyAdminRepository.findCompanyByAdminUserId(userId)
+                .orElseThrow(() -> new SecurityException("Bạn không có quyền cập nhật công ty này"));
 
         Path logoDir = ensureDir(uploadConfig.getBaseDir(), uploadConfig.getCompanyLogoDir());
 

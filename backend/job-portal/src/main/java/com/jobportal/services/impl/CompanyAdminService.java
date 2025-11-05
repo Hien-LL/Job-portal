@@ -2,7 +2,6 @@ package com.jobportal.services.impl;
 
 import com.jobportal.entities.Company;
 import com.jobportal.entities.CompanyAdmin;
-import com.jobportal.entities.CompanyAdminId;
 import com.jobportal.entities.User;
 import com.jobportal.repositories.CompanyAdminRepository;
 import com.jobportal.repositories.CompanyRepository;
@@ -32,31 +31,18 @@ public class CompanyAdminService {
      */
     @Transactional
     public void linkUserToCompany(Long userId, Long companyId) {
-        CompanyAdminId id = new CompanyAdminId(userId, companyId);
-
-        // 1) Đang managed trong persistence context?
-        CompanyAdmin managed = em.find(CompanyAdmin.class, id);
-        if (managed != null) {
-            return;
+        if (companyAdminRepository.existsByUser_Id(userId)) {
+            throw new IllegalStateException("User này đã là admin của 1 công ty khác");
         }
 
-        // 2) Trong DB đã có chưa?
-        companyAdminRepository.findById(id).orElseGet(() -> {
-            // 3) Tạo mới 1 lần duy nhất
-            User user = em.getReference(User.class, userId);
-            Company company = em.getReference(Company.class, companyId);
+        User user = userRepository.findById(userId).orElseThrow();
+        Company company = companyRepository.findById(companyId).orElseThrow();
 
-            CompanyAdmin ca = CompanyAdmin.of(user, company);
+        CompanyAdmin ca = CompanyAdmin.builder()
+                .user(user)
+                .company(company)
+                .build();
 
-            // ❗ Không add vào cả hai Set nữa để tránh nhân đôi cascade trong cùng session
-            // Nếu cần đồng bộ 2 chiều, có thể add một bên sau khi save.
-            CompanyAdmin saved = companyAdminRepository.save(ca);
-
-            // (tuỳ chọn) đồng bộ 1 chiều để tránh duplicate trong bộ nhớ:
-            user.getCompanyAdmins().add(saved);
-            // company.getCompanyAdmins().add(saved); // thường KHÔNG cần add cả hai phía
-
-            return saved;
-        });
+        companyAdminRepository.save(ca);
     }
 }

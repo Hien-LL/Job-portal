@@ -45,7 +45,7 @@ public class ApplicationWorkflowService extends BaseService implements Applicati
         Long companyId = app.getJob().getCompany().getId();
 
         boolean allowed = ownerId.equals(actorUserId) ||
-                companyAdminRepository.existsByUser_IdAndCompany_Id(actorUserId, companyId);
+                companyAdminRepository.existsByCompany_IdAndUser_Id(actorUserId, companyId);
         if (!allowed) throw new SecurityException("Bạn không có quyền thay đổi thông tin này");
 
         String newCode = request.getNewStatusCode().trim().toUpperCase();
@@ -100,7 +100,7 @@ public class ApplicationWorkflowService extends BaseService implements Applicati
         Long companyId = app.getJob().getCompany().getId();
 
         boolean isCandidate = ownerId.equals(actorUserId);
-        boolean isCompanyAdmin = companyAdminRepository.existsByUser_IdAndCompany_Id(actorUserId, companyId);
+        boolean isCompanyAdmin = companyAdminRepository.existsByCompany_IdAndUser_Id(actorUserId, companyId);
 
         if (!isCandidate && !isCompanyAdmin) {
             throw new SecurityException("Bạn không có quyền xem timeline này");

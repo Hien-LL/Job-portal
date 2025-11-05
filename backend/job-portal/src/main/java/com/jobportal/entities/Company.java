@@ -31,7 +31,7 @@ public class Company extends BaseEntity {
     @JoinColumn(name = "created_by")
     private User createdBy;
 
-    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "company", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<CompanyAdmin> companyAdmins = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "company")

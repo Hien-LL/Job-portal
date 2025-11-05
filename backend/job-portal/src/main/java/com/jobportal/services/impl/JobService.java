@@ -42,18 +42,14 @@ public class JobService extends BaseService implements JobServiceInterface {
     private final FollowCompanyRepository followCompanyRepository;
     private final SkillRepository skillRepository;
     private final SavedJobRepository savedJobRepository;
+    private final CompanyAdminRepository adminRepository;
 
 
     @Override
     @Transactional
-    public JobResource createJobForMyCompany(Long userId, Long companyId, JobCreationRequest request) {
-        if (!companyAdminRepository.existsById(new CompanyAdminId(userId, companyId))) {
-            throw new SecurityException("Bạn không có quyền tạo việc làm cho công ty này");
-        }
-
-        // lấy công ty đúng
-        Company company = companyRepository.findById(companyId)
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy công ty"));
+    public JobResource createJobForMyCompany(Long userId, JobCreationRequest request) {
+        Company company  = adminRepository.findCompanyByAdminUserId(userId)
+                .orElseThrow(() -> new SecurityException("Bạn không có quyền tạo việc làm cho công ty nào"));
 
         // kiểm tra categoryId có null không
         if (request.getCategoryId() == null) {
@@ -97,8 +93,10 @@ public class JobService extends BaseService implements JobServiceInterface {
 
     @Override
     @Transactional
-    public JobResource updateJobForMyCompany(Long userId, Long companyId, Long jobId, JobUpdationRequest request) {
-        assertCompanyAdmin(userId, companyId);
+    public JobResource updateJobForMyCompany(Long userId, Long jobId, JobUpdationRequest request) {
+        Company company = adminRepository.findCompanyByAdminUserId(userId)
+                .orElseThrow(() -> new SecurityException("Bạn không có quyền cập nhật việc làm cho công ty nào"));
+        Long companyId = company.getId();
 
         Job job = jobRepository.findDetailById(jobId)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy việc làm với id: " + jobId));
@@ -163,7 +161,7 @@ public class JobService extends BaseService implements JobServiceInterface {
     }
 
     private void assertCompanyAdmin(Long userId, Long companyId) {
-        if (!companyAdminRepository.existsById(new CompanyAdminId(userId, companyId))) {
+        if (!companyAdminRepository.existsByCompany_IdAndUser_Id(companyId, userId)) {
             throw new SecurityException("Bạn không có quyền thao tác với công ty này");
         }
     }
@@ -202,8 +200,10 @@ public class JobService extends BaseService implements JobServiceInterface {
 
     @Override
     @Transactional
-    public void deleteJobForMyCompany(Long userId, Long companyId, Long jobId) {
-        assertCompanyAdmin(userId, companyId);
+    public void deleteJobForMyCompany(Long userId, Long jobId) {
+        Company company  = adminRepository.findCompanyByAdminUserId(userId)
+                .orElseThrow(() -> new SecurityException("Bạn không có quyền xóa việc làm cho công ty nào"));
+        Long companyId = company.getId();
 
         Job job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy việc làm với id: " + jobId));
@@ -234,12 +234,16 @@ public class JobService extends BaseService implements JobServiceInterface {
                 .and(BaseSpecification.whereSpec(filterSimple))
                 .and(BaseSpecification.complexWhereSpec(filterComplex))
                 .and(BaseSpecification.equalLong("company.id", companyId));
+        // ép published=true cho public
+        spec = spec.and((root, q, cb) -> cb.isTrue(root.get("published")));
         return jobRepository.findAll(spec, pageable);
     }
 
     @Override
-    public JobResource getJobForMyCompany(Long userId, Long companyId, Long jobId) {
-        assertCompanyAdmin(userId, companyId);
+    public JobResource getJobForMyCompany(Long userId,Long jobId) {
+        Company company  = adminRepository.findCompanyByAdminUserId(userId)
+                .orElseThrow(() -> new SecurityException("Bạn không có quyền xem việc làm cho công ty nào"));
+        Long companyId = company.getId();
 
         Job job = jobRepository.findDetailById(jobId)
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy việc làm với id: " + jobId));

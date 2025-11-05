@@ -95,7 +95,7 @@ let currentPage = 1;
                 }
 
                 // ✅ SỬA: Dùng config (cần thêm endpoint mới)
-                const savedJobsUrl = buildCompleteUrl('/jobs/saved-jobs/list', {}, queryParams);
+                const savedJobsUrl = buildCompleteUrl(API_CONFIG.JOBS.SAVED_JOBS_LIST, {}, queryParams);
                 const response = await window.authUtils.apiRequest(savedJobsUrl, {
                     method: 'GET'
                 });

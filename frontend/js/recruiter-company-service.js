@@ -1,13 +1,15 @@
-// ==================== Recruiter Company Management Service ====================
-// Handles company management operations (CRUD)
+// ==================== Recruiter Company Profile Service ====================
+// Handles single company profile display and management
+
+let currentCompany = null;
 
 // ==================== API Functions ====================
 
-// Get list of my companies - ✅ ĐÃ SỬA
-async function getMyCompanies() {
+// Get my company details - ✅ API MỚI
+async function getMyCompany() {
     try {
-        const url = buildApiUrl(API_CONFIG.COMPANIES.MY_COMPANIES_LIST);
-        console.log('Fetching companies from:', url);
+        const url = buildApiUrl(API_CONFIG.COMPANIES.MY_COMPANY_DETAILS);
+        console.log('Fetching company from:', url);
 
         const response = await authService.apiRequest(url, {
             method: 'GET'
@@ -18,27 +20,28 @@ async function getMyCompanies() {
         }
 
         const data = await response.json();
-        console.log('Get companies response:', data);
+        console.log('Get company response:', data);
 
+        // API trả về object trực tiếp, không phải array
         return {
             success: data.success,
             message: data.message,
-            data: data.data || []
+            data: data.data || null
         };
     } catch (error) {
-        console.error('Get Companies API Error:', error);
+        console.error('Get Company API Error:', error);
         return {
             success: false,
             message: 'Lỗi kết nối. Vui lòng thử lại sau.',
-            data: []
+            data: null
         };
     }
 }
 
-// Update company information - ✅ ĐÃ SỬA
-async function updateCompany(companyId, companyData) {
+// Update company information - ✅ API MỚI
+async function updateCompany(companyData) {
     try {
-        const url = buildApiUrl(API_CONFIG.COMPANIES.UPDATE_MY_COMPANY, { companyId });
+        const url = buildApiUrl(API_CONFIG.COMPANIES.UPDATE_MY_COMPANY);
         console.log('Updating company at:', url);
         console.log('Company data:', companyData);
 
@@ -75,22 +78,20 @@ async function updateCompany(companyId, companyData) {
     }
 }
 
-// Upload company logo - ✅ ĐÃ SỬA
-async function uploadCompanyLogo(companyId, logoFile) {
+// Upload company logo - ✅ API MỚI (không cần companyId)
+async function uploadCompanyLogo(logoFile) {
     try {
-        const url = buildApiUrl(API_CONFIG.COMPANIES.UPLOAD_LOGO, { companyId });
+        const url = buildApiUrl(API_CONFIG.COMPANIES.UPLOAD_LOGO);
         console.log('Uploading logo to:', url);
 
         const formData = new FormData();
         formData.append('logo', logoFile);
 
-        // ✅ SỬA: Dùng authService.getToken() cho FormData upload
         const token = authService.getToken();
         const response = await fetch(url, {
             method: 'PUT',
             headers: {
                 'Authorization': `Bearer ${token}`
-                // No Content-Type for FormData - browser auto-sets with boundary
             },
             body: formData
         });
@@ -122,181 +123,118 @@ async function uploadCompanyLogo(companyId, logoFile) {
 
 // ==================== UI Functions ====================
 
-// ❌ XÓA: showError() - Dùng showErrorToast() từ utils.js
-// ❌ XÓA: showSuccess() - Dùng showSuccessToast() từ utils.js
+// Display company profile
+function displayCompanyProfile(company) {
+    if (!company) return;
 
-// Render company card - ✅ ĐÃ SỬA
-function renderCompanyCard(company) {
-    // ✅ SỬA: Dùng API_CONFIG.FILE_BASE_URL
-    const logoUrl = company.logoUrl ? `${API_CONFIG.FILE_BASE_URL}${company.logoUrl}` : null;
-    const hasLogo = logoUrl && logoUrl.trim() !== '';
+    currentCompany = company;
+
+    // Update logo
+    const logoUrl = company.logoUrl 
+        ? `${API_CONFIG.FILE_BASE_URL}${company.logoUrl}` 
+        : 'img/default-company-logo.png';
     
-    return `
-        <div class="company-card bg-white rounded-xl shadow-md overflow-hidden">
-            <!-- Logo Section with gradient overlay -->
-            <div class="h-40 bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center relative group overflow-hidden">
-                ${hasLogo 
-                    ? `<img src="${logoUrl}" alt="${company.name}" class="w-full h-full object-cover">`
-                    : `<div class="text-white text-center">
-                        <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                        </svg>
-                      </div>`
-                }
-                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
-                    <button class="upload-logo-btn bg-white text-gray-900 px-5 py-2 rounded-lg font-semibold hover:bg-gray-100 transition transform hover:scale-105" data-company-id="${company.id}">
-                        📤 Tải lên logo
-                    </button>
-                </div>
-            </div>
+    const logoElement = document.getElementById('company-logo');
+    if (logoElement) {
+        logoElement.src = logoUrl;
+        logoElement.alt = company.name;
+    }
 
-            <!-- Content Section -->
-            <div class="p-5">
-                <!-- Header with badge -->
-                <div class="flex items-start justify-between mb-3">
-                    <h3 class="text-lg font-bold text-gray-900 flex-1">${company.name}</h3>
-                    <span class="px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ml-2 ${company.verified ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">
-                        ${company.verified ? '✓ Xác thực' : '⏳ Chờ'}
-                    </span>
-                </div>
+    // Update company name
+    setTextContent('company-name', company.name || 'Chưa có tên');
 
-                <!-- Description -->
-                <p class="text-gray-600 text-sm mb-4 line-clamp-2 leading-relaxed">${company.description || 'Chưa có mô tả'}</p>
+    // Update verified badge
+    if (company.verified) {
+        showElement('verified-badge');
+    } else {
+        hideElement('verified-badge');
+    }
 
-                <!-- Company Info Grid -->
-                <div class="space-y-3 mb-5 pb-5 border-b border-gray-200">
-                    ${company.website ? `
-                        <div class="flex items-center text-sm">
-                            <span class="text-gray-500 w-24">🌐 Website:</span>
-                            <a href="${company.website.startsWith('http') ? company.website : 'https://' + company.website}" target="_blank" class="text-blue-600 hover:underline truncate">${company.website}</a>
-                        </div>
-                    ` : ''}
-                    ${company.size_min && company.size_max ? `
-                        <div class="flex items-center text-sm">
-                            <span class="text-gray-500 w-24">👥 Quy mô:</span>
-                            <span class="text-gray-900 font-medium">${company.size_min} - ${company.size_max} nhân viên</span>
-                        </div>
-                    ` : ''}
-                    <div class="flex items-center text-sm">
-                        <span class="text-gray-500 w-24">❤️ Theo dõi:</span>
-                        <span class="text-gray-900 font-medium">${company.followerCount || 0}</span>
-                    </div>
-                </div>
+    // Update description
+    setTextContent('company-description', company.description || 'Chưa có mô tả');
 
-                <!-- Action Buttons -->
-                <div class="flex gap-2">
-                    <button class="flex-1 edit-btn bg-blue-600 text-white py-2.5 rounded-lg font-semibold hover:bg-blue-700 transition transform hover:-translate-y-0.5" data-company-id="${company.id}">
-                        ✎ Chỉnh sửa
-                    </button>
-                    <button class="flex-1 view-btn bg-gray-100 text-gray-700 py-2.5 rounded-lg font-semibold hover:bg-gray-200 transition transform hover:-translate-y-0.5" data-company-id="${company.id}">
-                        → Chi tiết
-                    </button>
-                </div>
-            </div>
-        </div>
-    `;
+    // Update size
+    if (company.size_min && company.size_max) {
+        setTextContent('company-size', `${company.size_min} - ${company.size_max} nhân viên`);
+        setTextContent('company-size-detail', `${company.size_min} - ${company.size_max} nhân viên`);
+    } else {
+        setTextContent('company-size', 'Chưa cập nhật');
+        setTextContent('company-size-detail', 'Chưa cập nhật');
+    }
+
+    // Update followers
+    setTextContent('company-followers', `${company.followerCount || 0} người theo dõi`);
+
+    // Update website
+    const websiteElement = document.getElementById('company-website');
+    if (websiteElement) {
+        if (company.website) {
+            const fullUrl = company.website.startsWith('http') 
+                ? company.website 
+                : `https://${company.website}`;
+            websiteElement.href = fullUrl;
+            websiteElement.textContent = company.website;
+            websiteElement.classList.remove('hidden');
+        } else {
+            websiteElement.textContent = 'Chưa cập nhật';
+            websiteElement.removeAttribute('href');
+            websiteElement.classList.add('text-gray-500');
+        }
+    }
+
+    // Update manage jobs button link
+    const manageJobsBtn = document.getElementById('manage-jobs-btn');
+    if (manageJobsBtn && company.slug) {
+        manageJobsBtn.href = `recruiter-company-detail.html?slug=${company.slug}`;
+    }
+
+    // Show profile, hide loading/error
+    hideElement('loading');
+    hideElement('error-message');
+    showElement('company-profile');
 }
 
-// Load companies - ✅ ĐÃ SỬA
-async function loadCompanies() {
+// Load company profile
+async function loadCompanyProfile() {
     try {
-        // ✅ SỬA: Dùng authService.requireAuth()
+        // Check authentication
         if (!authService.requireAuth()) {
             return;
         }
 
-        showElement('loading-state');
-        hideElement('error-state');
-        hideElement('empty-state');
+        showElement('loading');
+        hideElement('error-message');
+        hideElement('company-profile');
 
-        const result = await getMyCompanies();
+        const result = await getMyCompany();
 
-        hideElement('loading-state');
+        hideElement('loading');
 
-        if (result.success && result.data.length > 0) {
-            const companiesContainer = document.getElementById('companies-container');
-            if (companiesContainer) {
-                companiesContainer.innerHTML = result.data.map(company => renderCompanyCard(company)).join('');
-            }
-            attachEventListeners();
-        } else if (result.success && result.data.length === 0) {
-            showElement('empty-state');
+        if (result.success && result.data) {
+            displayCompanyProfile(result.data);
         } else {
-            // ✅ SỬA: Dùng showErrorToast từ utils.js
-            showErrorToast(result.message || 'Không thể tải danh sách công ty', 5000);
-            showElement('error-state');
-            setTextContent('error-message', result.message || 'Không thể tải danh sách công ty');
+            showElement('error-message');
+            setTextContent('error-text', result.message || 'Không thể tải thông tin công ty');
+            showErrorToast(result.message || 'Không thể tải thông tin công ty', 5000);
         }
     } catch (error) {
-        console.error('Load companies error:', error);
-        hideElement('loading-state');
+        console.error('Load company profile error:', error);
+        hideElement('loading');
+        showElement('error-message');
+        setTextContent('error-text', 'Có lỗi xảy ra. Vui lòng thử lại.');
         showErrorToast('Có lỗi xảy ra. Vui lòng thử lại.', 5000);
-        showElement('error-state');
-        setTextContent('error-message', 'Có lỗi xảy ra. Vui lòng thử lại.');
     }
 }
 
-// Attach event listeners to dynamically created elements
-function attachEventListeners() {
-    // Edit button
-    document.querySelectorAll('.edit-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const companyId = this.dataset.companyId;
-            openEditModal(companyId);
-        });
-    });
-
-    // View button - For recruiters, go to company detail page
-    document.querySelectorAll('.view-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const companyId = this.dataset.companyId;
-            sessionStorage.setItem('selectedCompanyId', companyId);
-            window.location.href = `recruiter-company-detail.html?companyId=${companyId}`;
-        });
-    });
-
-    // Upload logo button
-    document.querySelectorAll('.upload-logo-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const companyId = this.dataset.companyId;
-            openLogoUploadDialog(companyId);
-        });
-    });
-}
-
 // Open edit modal
-function openEditModal(companyId) {
-    // Find company data from DOM
-    const card = document.querySelector(`[data-company-id="${companyId}"]`).closest('.company-card');
-    if (!card) return;
-    
-    const name = card.querySelector('h3')?.textContent || '';
-    const description = card.querySelector('p')?.textContent || '';
-    
-    // Parse size from info
-    const sizeElements = card.querySelectorAll('.flex.items-center.text-sm');
-    let sizeMin = '';
-    let sizeMax = '';
-    
-    sizeElements.forEach(el => {
-        const label = el.querySelector('span:first-child')?.textContent;
-        if (label && label.includes('Quy mô')) {
-            const sizeText = el.querySelector('span:last-child')?.textContent || '';
-            const match = sizeText.match(/(\d+)\s*-\s*(\d+)/);
-            if (match) {
-                sizeMin = match[1];
-                sizeMax = match[2];
-            }
-        }
-    });
+function openEditModal() {
+    if (!currentCompany) return;
 
-    setElementValue('company-id-input', companyId);
-    setElementValue('edit-company-name', name);
-    setElementValue('edit-company-description', description);
-    setElementValue('edit-size-min', sizeMin);
-    setElementValue('edit-size-max', sizeMax);
-    
+    setElementValue('edit-company-name', currentCompany.name || '');
+    setElementValue('edit-company-description', currentCompany.description || '');
+    setElementValue('edit-size-min', currentCompany.size_min || '');
+    setElementValue('edit-size-max', currentCompany.size_max || '');
+
     openModal('edit-modal');
 }
 
@@ -307,62 +245,72 @@ function closeEditModal() {
     if (form) form.reset();
 }
 
-// Open logo upload dialog - ✅ ĐÃ SỬA
-function openLogoUploadDialog(companyId) {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    
-    input.onchange = async function(e) {
-        const file = e.target.files[0];
-        if (!file) return;
+// Handle logo upload
+async function handleLogoUpload(file) {
+    if (!currentCompany || !file) return;
 
-        // Validate file size (5MB max)
-        if (file.size > 5 * 1024 * 1024) {
-            showErrorToast('Kích thước ảnh không được vượt quá 5MB', 3000);
-            return;
+    // Validate file size (5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+        showErrorToast('Kích thước ảnh không được vượt quá 5MB', 3000);
+        return;
+    }
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+        showErrorToast('Vui lòng chọn file ảnh', 3000);
+        return;
+    }
+
+    try {
+        // API MỚI: không cần truyền companyId
+        const result = await uploadCompanyLogo(file);
+
+        if (result.success) {
+            showSuccessToast('Tải lên logo thành công!', 3000);
+            await loadCompanyProfile();
+        } else {
+            showErrorToast(result.message || 'Không thể tải lên logo', 3000);
         }
-
-        // Validate file type
-        if (!file.type.startsWith('image/')) {
-            showErrorToast('Vui lòng chọn file ảnh', 3000);
-            return;
-        }
-
-        try {
-            const uploadBtn = document.querySelector(`button.upload-logo-btn[data-company-id="${companyId}"]`);
-            if (uploadBtn) {
-                uploadBtn.disabled = true;
-                uploadBtn.textContent = 'Đang tải lên...';
-            }
-
-            const result = await uploadCompanyLogo(companyId, file);
-
-            if (result.success) {
-                showSuccessToast('Tải lên logo thành công!', 3000);
-                await loadCompanies();
-            } else {
-                showErrorToast(result.message || 'Không thể tải lên logo', 3000);
-            }
-        } catch (error) {
-            console.error('Upload logo error:', error);
-            showErrorToast('Có lỗi xảy ra khi tải lên logo', 3000);
-        }
-    };
-
-    input.click();
+    } catch (error) {
+        console.error('Upload logo error:', error);
+        showErrorToast('Có lỗi xảy ra khi tải lên logo', 3000);
+    }
 }
 
 // ==================== Event Listeners ====================
 
-// Edit form submit - ✅ ĐÃ SỬA
 document.addEventListener('DOMContentLoaded', function() {
+    // Edit company button
+    const editCompanyBtn = document.getElementById('edit-company-btn');
+    if (editCompanyBtn) {
+        editCompanyBtn.addEventListener('click', openEditModal);
+    }
+
+    // Logo upload overlay
+    const logoUploadOverlay = document.getElementById('logo-upload-overlay');
+    const logoUploadInput = document.getElementById('logo-upload-input');
+    
+    if (logoUploadOverlay && logoUploadInput) {
+        logoUploadOverlay.addEventListener('click', function() {
+            logoUploadInput.click();
+        });
+
+        logoUploadInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                handleLogoUpload(file);
+            }
+        });
+    }
+
+    // Edit form submit
     const editForm = document.getElementById('edit-company-form');
     if (editForm) {
         editForm.addEventListener('submit', async function(e) {
             e.preventDefault();
 
-            const companyId = getElementValue('company-id-input');
+            if (!currentCompany) return;
+
             const companyData = {
                 name: getElementValue('edit-company-name'),
                 description: getElementValue('edit-company-description'),
@@ -388,12 +336,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     submitBtn.textContent = 'Đang cập nhật...';
                 }
 
-                const result = await updateCompany(companyId, companyData);
+                // API MỚI: không cần truyền companyId
+                const result = await updateCompany(companyData);
 
                 if (result.success) {
                     showSuccessToast('Cập nhật công ty thành công!', 3000);
                     closeEditModal();
-                    await loadCompanies();
+                    await loadCompanyProfile();
                 } else {
                     showErrorToast(result.message || 'Không thể cập nhật công ty', 3000);
                 }
@@ -404,7 +353,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const submitBtn = this.querySelector('button[type="submit"]');
                 if (submitBtn) {
                     submitBtn.disabled = false;
-                    submitBtn.textContent = 'Lưu thay đổi';
+                    submitBtn.textContent = 'Cập nhật';
                 }
             }
         });
@@ -433,5 +382,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ==================== Initialize ====================
-    loadCompanies();
+    loadCompanyProfile();
 });

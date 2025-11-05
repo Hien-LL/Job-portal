@@ -14,10 +14,12 @@ import com.jobportal.services.interfaces.SavedJobServiceInterface;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,37 +36,18 @@ public class JobController {
     private final SavedJobServiceInterface savedJobService;
     private final JobMapper jobMapper;
     private final NotificationServiceInterface notificationService;
+    private final AuthServiceInterface authService;
+    private final Logger logger = org.slf4j.LoggerFactory.getLogger(JobController.class);
 
-    @PreAuthorize("isAuthenticated()")
-    @PostMapping("/my-company/{companyId}")
+    @PostMapping("/my-company/create")
     public ApiResource<JobResource> createJob(
-            @AuthenticationPrincipal CustomUserDetails user,
-            @Valid @RequestBody JobCreationRequest request,
-            @Positive(message = "id phải lớn hơn 0") @PathVariable Long companyId
+            @Valid @RequestBody JobCreationRequest request
     ) {
-        Long userId = user.getUserId();
-        JobResource jobResource = jobService.createJobForMyCompany(userId, companyId, request);
-
-        notificationService.sendNotification(
-                userId,
-                NotificationRequest.builder()
-                        .title("Tạo mới công việc")
-                        .body("Công việc " + request.getTitle() + " đã được tạo thành công.")
-                        .build()
-        );
-
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Long userId = authService.getUserFromEmail(email).getId();
+        logger.info("Creating job for user with ID: {}", userId);
+        JobResource jobResource = jobService.createJobForMyCompany(userId, request);
         return ApiResource.ok(jobResource, "Create job");
-    }
-
-    @GetMapping("list/{companyId}")
-    public ApiResource<Page<JobListItemResource>> getJobsByCompanyId(
-            @Positive(message = "id phải lớn hơn 0") @PathVariable Long companyId,
-            HttpServletRequest request
-    ) {
-        Map<String, String[]> params = request.getParameterMap();
-        Page<Job> jobs = jobService.getJobsByCompanyId(companyId, params);
-        Page<JobListItemResource> jobResources = jobMapper.tListResourcePage(jobs);
-        return ApiResource.ok(jobResources, "Success");
     }
 
     @GetMapping("/{slug}")
@@ -81,94 +64,34 @@ public class JobController {
         return ApiResource.ok(jobResources, "Success");
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/admin/all")
-    public ApiResource<Page<JobListItemResource>> getAllJobsForAdmin(HttpServletRequest request) {
-        Map<String, String[]> params = request.getParameterMap();
-        Page<Job> jobs = jobService.paginationJob(params, true);
-        Page<JobListItemResource> jobResources = jobMapper.tListResourcePage(jobs);
-        return ApiResource.ok(jobResources, "Success");
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping("/my-company/{companyId}/job/{jobId}")
+    @GetMapping("/my-company/job/{jobId}")
     public ApiResource<JobResource> getJobForMyCompany(
             @AuthenticationPrincipal CustomUserDetails user,
-            @Positive(message = "id phải lớn hơn 0") @PathVariable Long companyId,
             @Positive(message = "id phải lớn hơn 0") @PathVariable Long jobId
     ) {
         Long userId = user.getUserId();
-        JobResource jobResource = jobService.getJobForMyCompany(userId, companyId, jobId);
+        JobResource jobResource = jobService.getJobForMyCompany(userId, jobId);
         return ApiResource.ok(jobResource, "Get job");
     }
 
-    @PreAuthorize("isAuthenticated()")
-    @PutMapping("/my-company/{companyId}/job/{jobId}")
+    @PutMapping("/my-company/job/{jobId}")
     public ApiResource<JobResource> updateJob(
             @AuthenticationPrincipal CustomUserDetails user,
-            @Positive(message = "id phải lớn hơn 0") @PathVariable Long companyId,
             @Positive(message = "id phải lớn hơn 0") @PathVariable Long jobId,
             @Valid @RequestBody JobUpdationRequest request
     ) {
         Long userId = user.getUserId();
-        JobResource jobResource = jobService.updateJobForMyCompany(userId, companyId, jobId, request);
+        JobResource jobResource = jobService.updateJobForMyCompany(userId, jobId, request);
         return ApiResource.ok(jobResource, "Update job");
     }
 
-    @PreAuthorize("isAuthenticated()")
-    @DeleteMapping("/my-company/{companyId}/job/{jobId}")
+    @DeleteMapping("/my-company/job/{jobId}")
     public ApiResource<Void> deleteJob(
             @AuthenticationPrincipal CustomUserDetails user,
-            @Positive(message = "id phải lớn hơn 0") @PathVariable Long companyId,
             @Positive(message = "id phải lớn hơn 0") @PathVariable Long jobId
     ) {
         Long userId = user.getUserId();
-        jobService.deleteJobForMyCompany(userId, companyId, jobId);
+        jobService.deleteJobForMyCompany(userId, jobId);
         return ApiResource.ok(null, "Xóa thành công job");
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    @PostMapping("/{jobSlug}/save")
-    public ApiResource<Void> saveJob(
-            @AuthenticationPrincipal CustomUserDetails user,
-            @PathVariable String jobSlug
-    ) {
-        Long userId = user.getUserId();
-        savedJobService.saveJob(userId, jobSlug);
-        return ApiResource.ok(null, "Lưu thành công job");
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    @RequestMapping(value = "saved-jobs/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ApiResource<Page<SavedJobResource>> getSavedJobs(
-            @AuthenticationPrincipal CustomUserDetails user,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        Long userId = user.getUserId();
-        Page<SavedJobResource> resourcePage = savedJobService.getSavedJobsByUserId(userId, page, size);
-        return ApiResource.ok(resourcePage, "Lấy danh sách công việc đã lưu thành công");
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    @DeleteMapping("/{jobSlug}/unsave")
-    public ApiResource<Void> unsaveJob(
-            @AuthenticationPrincipal CustomUserDetails user,
-            @PathVariable String jobSlug
-    ) {
-        Long userId = user.getUserId();
-        savedJobService.removeSavedJob(userId, jobSlug);
-        return ApiResource.ok(null, "Bỏ lưu thành công job");
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping("{jobSlug}/is-saved")
-    public ApiResource<Boolean> isJobSaved(
-            @AuthenticationPrincipal CustomUserDetails user,
-            @PathVariable String jobSlug
-    ) {
-        Long userId = user.getUserId();
-        boolean isSaved = savedJobService.isJobSavedByUser(userId, jobSlug);
-        return ApiResource.ok(isSaved, "Kiểm tra trạng thái lưu job thành công");
     }
 }

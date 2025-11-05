@@ -570,3 +570,24 @@ function hideSuccessNotification() {
         notificationEl.classList.add('hidden');
     }
 }
+
+/**
+ * Show confirmation modal
+ * @param {string} modalId - Modal element ID
+ * @param {Function} onConfirm - Callback when confirmed
+ */
+function showConfirmationModal(modalId, onConfirm) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.remove('hidden');
+        const confirmBtn = modal.querySelector('.confirm-btn');
+        if (confirmBtn) {
+            const handler = () => {
+                onConfirm();
+                modal.classList.add('hidden');
+                confirmBtn.removeEventListener('click', handler);
+            };
+            confirmBtn.addEventListener('click', handler);
+        }
+    }
+}
