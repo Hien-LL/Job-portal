@@ -5,6 +5,7 @@ export default {
     "./pages/**/*.html",
     "./components/**/*.html",
     "./src/**/*.{js,jsx,ts,tsx}",
+    "./fragments/**/*.html",
   ],
   theme: {
     extend: {
