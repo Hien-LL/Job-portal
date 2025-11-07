@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý tin tuyển dụng - jobPortal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Header Fragment -->
+    <div data-fragment="fragments/header-recruiter.html"></div>
+
+    <!-- Main Content -->
+    <main class="flex-grow bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Breadcrumb -->
+            <nav class="flex mb-6 text-sm text-gray-600" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1">
+                    <li class="inline-flex items-center">
+                        <a href="recruiter-company.html" class="hover:text-blue-600">Dashboard</a>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <svg class="w-3 h-3 mx-2" fill="currentColor" viewBox="0 0 12 12">
+                                <path d="M4.5 2.5l4 5-4 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+                            <span class="text-gray-900 font-medium">Tin tuyển dụng</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+
+            <!-- Grid Layout with Sidebar -->
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
+                <!-- Sidebar Fragment -->
+                <div data-fragment="fragments/recruiter-sidebar.html" class="relative"></div>
+
+                <!-- Main Content -->
+                <div class="lg:col-span-3">
+                    <!-- Header with Add Button -->
+                    <div class="flex justify-between items-center mb-8">
+                        <div>
+                            <h1 class="text-3xl font-bold text-gray-900">Tin tuyển dụng</h1>
+                            <p class="text-gray-600 mt-1">Quản lý tất cả các tin tuyển dụng của bạn</p>
+                        </div>
+                        <a href="recruiter-job-create.html" class="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-blue-700 transition inline-flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                            Đăng tin mới
+                        </a>
+                    </div>
+
+                    <!-- Stats Cards -->
+                    <div id="stats-container" class="grid grid-cols-4 gap-4 mb-8">
+                        <!-- Stats will be inserted here -->
+                    </div>
+
+                    <!-- Filters Section -->
+                    <div class="bg-white rounded-lg shadow-sm p-4 mb-6 border border-gray-200">
+                        <div class="flex flex-col gap-4">
+                            <!-- First Row: Search + Sort -->
+                            <div class="flex items-center justify-between gap-4">
+                                <div class="relative flex-1">
+                                    <svg class="w-5 h-5 text-gray-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    </svg>
+                                    <input id="job-search-input" type="text" placeholder="Tìm kiếm theo tiêu đề công việc..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <button onclick="clearAllFilters()" class="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition">
+                                    Xóa bộ lọc
+                                </button>
+                                <select id="job-sort-select" class="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="publishedAt,desc">Mới nhất</option>
+                                    <option value="publishedAt,asc">Cũ nhất</option>
+                                    <option value="expiresAt,asc">Hạn sắp kết thúc</option>
+                                </select>
+                            </div>
+
+                            <!-- Second Row: Status Filter + Date Range -->
+                            <div class="flex items-center gap-4">
+                                <!-- Status Filter -->
+                                <div class="relative">
+                                    <button onclick="toggleDropdown('job-status')" class="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                                        </svg>
+                                        Trạng thái
+                                    </button>
+                                    <div id="job-status-dropdown" class="hidden absolute top-full left-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-lg z-50 p-3 min-w-48">
+                                        <label class="flex items-center text-sm text-gray-700 cursor-pointer hover:bg-gray-50 px-2 py-1 rounded mb-1">
+                                            <input type="checkbox" value="all" class="mr-2 rounded job-status-filter"> Tất cả
+                                        </label>
+                                        <label class="flex items-center text-sm text-gray-700 cursor-pointer hover:bg-gray-50 px-2 py-1 rounded mb-1">
+                                            <input type="checkbox" value="published" class="mr-2 rounded job-status-filter"> Đang hiển thị
+                                        </label>
+                                        <label class="flex items-center text-sm text-gray-700 cursor-pointer hover:bg-gray-50 px-2 py-1 rounded">
+                                            <input type="checkbox" value="draft" class="mr-2 rounded job-status-filter"> Bản nháp
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Date Range Filter -->
+                                <div class="flex items-center gap-2">
+                                    <label class="text-sm text-gray-600">Từ:</label>
+                                    <input id="date-from" type="date" class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <label class="text-sm text-gray-600">Đến:</label>
+                                    <input id="date-to" type="date" class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div id="loading" class="flex justify-center items-center py-20">
+                        <div class="flex items-center gap-3 text-blue-600">
+                            <svg class="animate-spin h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span class="text-lg font-semibold">Đang tải dữ liệu...</span>
+                        </div>
+                    </div>
+
+                    <!-- Error State -->
+                    <div id="error-state" class="hidden bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-lg">
+                        <p class="font-semibold">Có lỗi xảy ra</p>
+                        <p id="error-text" class="text-sm mt-1"></p>
+                    </div>
+
+                    <!-- Jobs Table -->
+                    <div id="jobs-container" class="hidden bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-gray-50 border-b border-gray-200">
+                                    <th class="px-6 py-4 text-left">
+                                        <input type="checkbox" class="w-4 h-4 rounded border-gray-300 cursor-pointer">
+                                    </th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-900">Tin tuyển dụng</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-900">Trạng thái</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-900">Ngày đăng</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-900">Hạn</th>
+                                    <th class="px-6 py-4 text-center text-sm font-semibold text-gray-900">Ứng viên</th>
+                                    <th class="px-6 py-4 text-center text-sm font-semibold text-gray-900">Tuần tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="jobs-list">
+                                <!-- Jobs will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="empty-state" class="hidden text-center py-20">
+                        <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <h3 class="mt-2 text-xl font-semibold text-gray-900">Chưa có tin tuyển dụng</h3>
+                        <p class="mt-1 text-gray-600">Bắt đầu bằng cách đăng tin tuyển dụng mới</p>
+                        <a href="recruiter-job-create.html" class="mt-4 inline-block bg-blue-600 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-blue-700 transition">
+                            Đăng tin mới
+                        </a>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div id="pagination" class="hidden flex justify-between items-center mt-6">
+                        <div class="text-sm text-gray-600">
+                            <span>Hiển thị <span id="page-start">1</span>-<span id="page-end">10</span> trong <span id="total-jobs">0</span> kết quả</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <button class="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">Trước</button>
+                            <button class="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">1</button>
+                            <button class="px-4 py-2 border border-blue-600 bg-blue-50 rounded-lg text-sm text-blue-600 font-semibold">2</button>
+                            <button class="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">Tiếp</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full">
+            <div class="px-8 py-6 border-b border-gray-200">
+                <h2 class="text-xl font-bold text-gray-900">Xác nhận xóa tin</h2>
+            </div>
+            <div class="px-8 py-4">
+                <p class="text-gray-600">Bạn có chắc chắn muốn xóa tin tuyển dụng này không? Hành động này không thể được hoàn tác.</p>
+            </div>
+            <div class="px-8 py-6 border-t border-gray-200 flex gap-3">
+                <button id="delete-cancel-btn" class="flex-1 bg-gray-200 text-gray-700 py-2.5 rounded-lg font-semibold hover:bg-gray-300 transition">
+                    Hủy
+                </button>
+                <button id="delete-confirm-btn" class="flex-1 bg-red-600 text-white py-2.5 rounded-lg font-semibold hover:bg-red-700 transition">
+                    Xóa
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Fragment -->
+    <div data-fragment="fragments/footer.html"></div>
+
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/common-helpers.js"></script>
+    <script src="js/markdown-service.js"></script>
+    <script src="js/fragments-loader.js"></script>
+    <script src="js/recruiter-job-service.js"></script>
+</body>
+</html>
