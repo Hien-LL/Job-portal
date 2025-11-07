@@ -1,6 +1,7 @@
 <p align="center">
-	<img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KICAgIDxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgODAwIDIwMCI+CiAgICAgICAgPGRlZnM+CiAgICAgICAgICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iYmctZ3JhZGllbnQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgogICAgICAgICAgICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6IzQxNThEMDtzdG9wLW9wYWNpdHk6MSIgLz4KICAgICAgICAgICAgICAgIDxzdG9wIG9mZnNldD0iNTAlIiBzdHlsZT0ic3RvcC1jb2xvcjojQzg1MEMwO3N0b3Atb3BhY2l0eToxIiAvPgogICAgICAgICAgICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdHlsZT0ic3RvcC1jb2xvcjojRkZDQzcwO3N0b3Atb3BhY2l0eToxIiAvPgogICAgICAgICAgICA8L2xpbmVhckdyYWRpZW50PgogICAgICAgICAgICA8ZmlsdGVyIGlkPSJzaGFkb3ciPgogICAgICAgICAgICAgICAgPGZlRHJvcFNoYWRvdyBkeD0iMCIgZHk9IjQiIHN0ZERldmlhdGlvbj0iNCIgZmxvb2Qtb3BhY2l0eT0iMC4yNSIgLz4KICAgICAgICAgICAgPC9maWx0ZXI+CiAgICAgICAgPC9kZWZzPgogICAgICAgIDxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iMjAwIiBmaWxsPSJ1cmwoI2JnLWdyYWRpZW50KSIgcng9IjE1IiByeT0iMTUiLz4KICAgICAgICA8dGV4dCB4PSI0MDAiIHk9IjEwMCIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjQ4IgogICAgICAgIGZvbnQtd2VpZ2h0PSJib2xkIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIgogICAgICAgIGZpbGw9IiNGRkZGRkYiIGZpbHRlcj0idXJsKCNzaGFkb3cpIj5KT0ItUE9SVEFMPC90ZXh0PgogICAgPC9zdmc+" alt="job-portal-banner" width="800">
+    <img src="https://raw.githubusercontent.com/PKief/vscode-material-icon-theme/ec559a9f6bfd399b82bb44393651661b08aaf7ba/icons/folder-markdown-open.svg" align="center" width="30%">
 </p>
+<p align="center"><h1 align="center">JOB-PORTAL</h1></p>
 <p align="center">
 	<em><code>❯ REPLACE-ME</code></em>
 </p>
@@ -54,24 +55,6 @@
     ├── README.md
     ├── backend
     │   └── job-portal
-    │       ├── .gitattributes
-    │       ├── .gitignore
-    │       ├── .mvn
-    │       │   └── wrapper
-    │       │       └── maven-wrapper.properties
-    │       ├── DEPLOY_GUIDE.md
-    │       ├── Dockerfile
-    │       ├── README.md
-    │       ├── docker-compose.dev.yml
-    │       ├── mvnw
-    │       ├── mvnw.cmd
-    │       ├── pom.xml
-    │       └── src
-    │           ├── main
-    │           │   ├── java
-    │           │   └── resources
-    │           └── test
-    │               └── java
     └── frontend
         ├── about.html
         ├── application-detail.html
@@ -82,67 +65,14 @@
         ├── company-detail.html
         ├── contact.html
         ├── css
-        │   └── components.css
         ├── cv-management.html
         ├── followed-companies.html
         ├── fragments
-        │   ├── footer.html
-        │   ├── header-candidate.html
-        │   ├── header-recruiter.html
-        │   ├── header.html
-        │   ├── recruiter-sidebar.html
-        │   └── user-sidebar.html
         ├── img
-        │   ├── icon-account.png
-        │   ├── icon-applications.png
-        │   ├── icon-cv.png
-        │   ├── icon-followed-companies.png
-        │   ├── icon-logout.png
-        │   ├── icon-notifications.png
-        │   ├── icon-profile.png
-        │   ├── icon-saved-jobs.png
-        │   ├── icon-settings.png
-        │   ├── o1.jpg
-        │   ├── o2.jpg
-        │   ├── o3.jpg
-        │   ├── o4.jpg
-        │   ├── o5.jpg
-        │   └── o6.jpg
         ├── index.html
         ├── job-detail.html
         ├── job.html
         ├── js
-        │   ├── application-detail-service.js
-        │   ├── applications-service.js
-        │   ├── auth.js
-        │   ├── blog-detail-service.js
-        │   ├── blog-service.js
-        │   ├── common-helpers.js
-        │   ├── companies-service.js
-        │   ├── company-detail-service.js
-        │   ├── config.js
-        │   ├── cv-management-service.js
-        │   ├── featured-categories.js
-        │   ├── featured-companies.js
-        │   ├── featured-jobs.js
-        │   ├── followed-companies-service.js
-        │   ├── fragments-loader.js
-        │   ├── job-detail-service.js
-        │   ├── job-service.js
-        │   ├── login-service.js
-        │   ├── markdown-service.js
-        │   ├── notification-detail-service.js
-        │   ├── notification-service.js
-        │   ├── profile-service.js
-        │   ├── recruiter-company-service.js
-        │   ├── recruiter-register-service.js
-        │   ├── register-service.js
-        │   ├── register-tab-handler.js
-        │   ├── reset-password-service.js
-        │   ├── reset-request-service.js
-        │   ├── reset-request.-service.js
-        │   ├── saved-jobs-service.js
-        │   └── utils.js
         ├── login.html
         ├── notification-detail.html
         ├── notifications.html
