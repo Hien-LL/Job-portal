@@ -85,13 +85,45 @@
             }
         ];
 
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', () => {
-            loadFragments().then(() => {
-                loadBlogPosts();
-                loadPopularPosts();
-            });
-        });
+        // ===== Init sau khi DOM sẵn sàng =====
+document.addEventListener('DOMContentLoaded', () => {
+  // loadFragments đã render header/footer/sidebar rồi mới chạy nội dung
+  loadFragments()
+    .catch(err => console.error('Error loading fragments:', err))
+    .finally(() => {
+      loadBlogPosts();      // nội dung chính
+      loadPopularPosts();   // sidebar
+      bindBlogEvents();     // gắn sự kiện sau cùng
+    });
+});
+
+
+function bindBlogEvents() {
+  console.log('Binding blog events...');
+  
+  // Enter trong ô search
+  const searchInput = document.getElementById('search-input');
+  if (searchInput) {
+    searchInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') searchBlogs();
+    });
+  }
+
+  // Nút filter category - gắn sự kiện click cho tất cả nút category-filter
+  document.querySelectorAll('.category-filter').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const categoryValue = this.getAttribute('data-category') || 'all';
+      filterByCategory(categoryValue, this);
+    });
+  });
+
+  // Prev/Next pagination nếu cần (tuỳ m có id hay không)
+  const prevBtn = document.getElementById('prev-btn');
+  const nextBtn = document.getElementById('next-btn');
+  if (prevBtn) prevBtn.addEventListener('click', () => changePage(-1));
+  if (nextBtn) nextBtn.addEventListener('click', () => changePage(1));
+}
 
         // Load blog posts
         function loadBlogPosts() {
@@ -146,7 +178,7 @@
             const endIndex = startIndex + 6;
             const paginatedPosts = posts.slice(startIndex, endIndex);
             
-            setHtmlContent('blog-posts', paginatedPosts.map(post => {
+            setHTMLContent('blog-posts', paginatedPosts.map(post => {
                 const publishedDate = formatDate(post.publishedAt);
                 
                 return `
@@ -211,22 +243,24 @@
             }).join('');
         }
 
-        // Filter by category
-        function filterByCategory(category) {
-            currentCategory = category;
-            currentPage = 1;
-            
-            // Update active button
-            document.querySelectorAll('.category-filter').forEach(btn => {
-                btn.classList.remove('active', 'bg-blue-600', 'text-white');
-                btn.classList.add('bg-gray-200', 'text-gray-700');
-            });
-            
-            event.target.classList.add('active', 'bg-blue-600', 'text-white');
-            event.target.classList.remove('bg-gray-200', 'text-gray-700');
-            
-            loadBlogPosts();
-        }
+        function filterByCategory(category, el) {
+  currentCategory = category;
+  currentPage = 1;
+
+  // Update active button styles
+  document.querySelectorAll('.category-filter').forEach(btn => {
+    if (btn.getAttribute('data-category') === category) {
+      btn.classList.add('active', 'bg-blue-600', 'text-white');
+      btn.classList.remove('bg-gray-200', 'text-gray-700');
+    } else {
+      btn.classList.remove('active', 'bg-blue-600', 'text-white');
+      btn.classList.add('bg-gray-200', 'text-gray-700');
+    }
+  });
+
+  loadBlogPosts();
+}
+
 
         // Search blogs
         function searchBlogs() {
@@ -234,13 +268,6 @@
             currentPage = 1;
             loadBlogPosts();
         }
-
-        // Handle enter key in search
-        document.getElementById('search-input').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                searchBlogs();
-            }
-        });
 
         // Pagination
         function changePage(direction) {
@@ -290,16 +317,16 @@
 
         // Utility functions
         function formatDate(dateString) {
-            const date = new Date(dateString);
-            const now = new Date();
-            const diffTime = Math.abs(now - date);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            
-            if (diffDays === 1) return 'Hôm qua';
-            if (diffDays < 7) return `${diffDays} ngày trước`;
-            if (diffDays < 30) return `${Math.ceil(diffDays / 7)} tuần trước`;
-            return `${Math.ceil(diffDays / 30)} tháng trước`;
-        }
+  const date = new Date(dateString);
+  if (isNaN(date)) return 'Không rõ';
+  const now = new Date();
+  const diffDays = Math.ceil(Math.abs(now - date) / (1000 * 60 * 60 * 24));
+  if (diffDays === 1) return 'Hôm qua';
+  if (diffDays < 7)  return `${diffDays} ngày trước`;
+  if (diffDays < 30) return `${Math.ceil(diffDays / 7)} tuần trước`;
+  return `${Math.ceil(diffDays / 30)} tháng trước`;
+}
+
 
         function showLoading() {
             showElement('loading-container');

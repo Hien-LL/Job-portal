@@ -21,6 +21,7 @@
             display: -webkit-box;
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
+            line-clamp: 3;
             overflow: hidden;
         }
         .blog-card {
@@ -68,25 +69,25 @@
             <main class="lg:col-span-3">
                 <!-- Category Filter -->
                 <div class="flex flex-wrap gap-3 mb-8">
-                    <button onclick="filterByCategory('all')" class="category-filter active bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-700 transition">
+                    <button class="category-filter active bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-700 transition" data-category="all">
                         Tất cả
                     </button>
-                    <button onclick="filterByCategory('career-tips')" class="category-filter bg-gray-200 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-300 transition">
+                    <button class="category-filter bg-gray-200 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-300 transition" data-category="career-tips">
                         Lời khuyên nghề nghiệp
                     </button>
-                    <button onclick="filterByCategory('market-trends')" class="category-filter bg-gray-200 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-300 transition">
+                    <button class="category-filter bg-gray-200 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-300 transition" data-category="market-trends">
                         Xu hướng thị trường
                     </button>
-                    <button onclick="filterByCategory('interview-tips')" class="category-filter bg-gray-200 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-300 transition">
+                    <button class="category-filter bg-gray-200 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-300 transition" data-category="interview-tips">
                         Phỏng vấn
                     </button>
-                    <button onclick="filterByCategory('salary-guide')" class="category-filter bg-gray-200 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-300 transition">
+                    <button class="category-filter bg-gray-200 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-300 transition" data-category="salary-guide">
                         Hướng dẫn lương
                     </button>
                 </div>
 
                 <!-- Loading State -->
-                <div id="loading-container" class="text-center py-12">
+                <div id="loading-container" class="text-center py-12 hidden">
                     <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
                     <p class="text-gray-600 text-sm mt-4">Đang tải bài viết...</p>
                 </div>
@@ -181,6 +182,7 @@
     <script src="js/auth.js"></script>
     <script src="js/markdown-service.js"></script>
     <script src="js/common-helpers.js"></script>
-    <script src= "js/blog-service.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/blog-service.js"></script>
 </body>
 </html>

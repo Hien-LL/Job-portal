@@ -687,169 +687,200 @@
             }
         ];
 
-        // Get article ID from URL
-        function getArticleIdFromURL() {
-            const urlParams = new URLSearchParams(window.location.search);
-            return parseInt(urlParams.get('id'));
-        }
+// ================== Init (chuẩn như trang list) ==================
+document.addEventListener('DOMContentLoaded', () => {
+  // loadFragments xong rồi mới render nội dung
+  loadFragments()
+    .catch(err => console.error('Error loading fragments:', err))
+    .finally(() => {
+      loadArticle();
+      bindDetailEvents();
+    });
+});
 
-        // Load article
-        function loadArticle() {
-            const articleId = getArticleIdFromURL();
-            
-            if (!articleId) {
-                showError();
-                return;
-            }
+// ================== Helpers ==================
+function getArticleIdFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  const raw = params.get('id');
+  if (!raw) return null;
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : null;
+}
 
-            const article = blogPosts.find(post => post.id === articleId);
-            
-            if (!article) {
-                showError();
-                return;
-            }
+function viFullDate(dateString) {
+  const d = new Date(dateString);
+  if (isNaN(d)) return 'Không rõ';
+  return d.toLocaleDateString('vi-VN', { day: '2-digit', month: 'long', year: 'numeric' });
+}
 
-            currentArticle = article;
-            displayArticle(article);
-            loadRelatedArticles(article);
-            hideLoading();
-        }
+function showError() {
+  const loading = document.getElementById('loading-container');
+  const error = document.getElementById('error-container');
+  if (loading) loading.style.display = 'none';
+  if (error) error.style.display = 'block';
+}
 
-        // Display article
-        function displayArticle(article) {
-            // Update page title
-            document.title = `${article.title} - JobPortal Blog`;
+function showArticle() {
+  const loading = document.getElementById('loading-container');
+  const article = document.getElementById('article-container');
+  if (loading) loading.style.display = 'none';
+  if (article) article.style.display = 'block';
+}
 
-            // Breadcrumb
-            document.getElementById('breadcrumb-category').textContent = article.categoryName;
+// ================== Render ==================
+function loadArticle() {
+  const id = getArticleIdFromURL();
+  if (!id) {
+    showError();
+    return;
+  }
 
-            // Article header
-            document.getElementById('article-category').textContent = article.categoryName;
-            document.getElementById('article-read-time').textContent = `${article.readTime} đọc`;
-            document.getElementById('article-title').textContent = article.title;
-            
-            // Author info
-            const authorAvatar = document.getElementById('author-avatar');
-            authorAvatar.textContent = article.author.charAt(0);
-            document.getElementById('article-author').textContent = article.author;
-            document.getElementById('article-date').textContent = formatDate(article.publishedAt);
+  const article = blogPosts.find(p => p.id === id);
+  if (!article) {
+    showError();
+    return;
+  }
 
-            // Featured image
-            const featuredImageContainer = document.getElementById('featured-image');
-            featuredImageContainer.innerHTML = `
-                <img src="${article.imageUrl}" alt="${article.title}" 
-                     class="w-full h-full object-cover">
-            `;
+  currentArticle = article;
+  renderArticle(article);
+  renderRelated(article);
+  showArticle();
+}
 
-            // Article content
-            document.getElementById('article-content').innerHTML = article.content;
+function renderArticle(article) {
+  // Title tab
+  document.title = `${article.title} - JobPortal Blog`;
 
-            // Tags
-            const tagsContainer = document.getElementById('article-tags');
-            tagsContainer.innerHTML = article.tags.map(tag => 
-                `<span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-200 transition cursor-pointer">#${tag}</span>`
-            ).join('');
-        }
+  // Breadcrumb + header meta
+  setText('breadcrumb-category', article.categoryName);
+  setText('article-category', article.categoryName);
+  setText('article-read-time', `${article.readTime} đọc`);
+  setText('article-title', article.title);
 
-        // Load related articles
-        function loadRelatedArticles(currentArticle) {
-            const relatedArticles = blogPosts
-                .filter(post => post.id !== currentArticle.id && post.category === currentArticle.category)
-                .slice(0, 3);
+  // Author
+  const avatar = document.getElementById('author-avatar');
+  if (avatar) avatar.textContent = article.author?.charAt(0) || '?';
+  setText('article-author', article.author);
+  setText('article-date', viFullDate(article.publishedAt));
 
-            const container = document.getElementById('related-articles');
-            
-            if (relatedArticles.length === 0) {
-                container.innerHTML = '<p class="text-gray-600 col-span-full text-center">Không có bài viết liên quan.</p>';
-                return;
-            }
+  // Featured image
+  const featured = document.getElementById('featured-image');
+  if (featured) {
+    featured.innerHTML = `
+      <img src="${article.imageUrl}" alt="${escapeHtml(article.title)}"
+           class="w-full h-full object-cover"/>
+    `;
+  }
 
-            container.innerHTML = relatedArticles.map(article => {
-                const publishedDate = formatDate(article.publishedAt);
-                
-                return `
-                    <div class="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition cursor-pointer"
-                         onclick="openArticle(${article.id})">
-                        <div class="aspect-video bg-gray-200">
-                            <img src="${article.imageUrl}" alt="${article.title}" 
-                                 class="w-full h-full object-cover">
-                        </div>
-                        <div class="p-4">
-                            <span class="inline-block bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-medium mb-2">
-                                ${article.categoryName}
-                            </span>
-                            <h4 class="font-semibold text-gray-900 mb-2 line-clamp-2">${article.title}</h4>
-                            <p class="text-gray-600 text-sm mb-2 line-clamp-2">${article.excerpt}</p>
-                            <div class="flex items-center justify-between text-xs text-gray-500">
-                                <span>${article.author}</span>
-                                <span>${publishedDate}</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
+  // Content (cho demo dùng innerHTML; khi dùng API Markdown thì render qua sanitizer)
+  const content = document.getElementById('article-content');
+  if (content) content.innerHTML = article.content;
 
-        // Open article
-        function openArticle(articleId) {
-            window.location.href = `blog-detail.html?id=${articleId}`;
-        }
+  // Tags
+  const tags = document.getElementById('article-tags');
+  if (tags) {
+    tags.innerHTML = (article.tags || [])
+      .map(t => `<button class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-200 transition"
+                      data-tag="${t}">#${t}</button>`)
+      .join('');
+  }
+}
 
-        // Share functions
-        function shareOnFacebook() {
-            const url = encodeURIComponent(window.location.href);
-            const title = encodeURIComponent(currentArticle.title);
-            window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${title}`, '_blank', 'width=600,height=400');
-        }
+function renderRelated(current) {
+  const sameCategory = blogPosts
+    .filter(p => p.id !== current.id && p.category === current.category)
+    .slice(0, 3);
 
-        function shareOnTwitter() {
-            const url = encodeURIComponent(window.location.href);
-            const text = encodeURIComponent(`${currentArticle.title} - JobPortal`);
-            window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank', 'width=600,height=400');
-        }
+  const box = document.getElementById('related-articles');
+  if (!box) return;
 
-        function shareOnLinkedIn() {
-            const url = encodeURIComponent(window.location.href);
-            window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank', 'width=600,height=400');
-        }
+  if (!sameCategory.length) {
+    box.innerHTML = '<p class="text-gray-600 col-span-full text-center">Không có bài viết liên quan.</p>';
+    return;
+  }
 
-        function copyLink() {
-            navigator.clipboard.writeText(window.location.href).then(() => {
-                // Show notification
-                const notification = document.createElement('div');
-                notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-lg z-50';
-                notification.textContent = 'Đã copy link bài viết!';
-                document.body.appendChild(notification);
-                
-                setTimeout(() => {
-                    notification.remove();
-                }, 3000);
-            });
-        }
+  box.innerHTML = sameCategory.map(a => `
+    <div class="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition cursor-pointer"
+         onclick="openArticle(${a.id})">
+      <div class="aspect-video bg-gray-200">
+        <img src="${a.imageUrl}" alt="${escapeHtml(a.title)}" class="w-full h-full object-cover">
+      </div>
+      <div class="p-4">
+        <span class="inline-block bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-medium mb-2">
+          ${a.categoryName}
+        </span>
+        <h4 class="font-semibold text-gray-900 mb-2 line-clamp-2">${a.title}</h4>
+        <p class="text-gray-600 text-sm mb-2 line-clamp-2">${a.excerpt}</p>
+        <div class="flex items-center justify-between text-xs text-gray-500">
+          <span>${a.author}</span>
+          <span>${viFullDate(a.publishedAt)}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
 
-        // Utility functions
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('vi-VN', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
-        }
+// ================== Events ==================
+function bindDetailEvents() {
+  // Tag click → về blog list với search theo tag
+  const tagsBox = document.getElementById('article-tags');
+  if (tagsBox) {
+    tagsBox.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-tag]');
+      if (!btn) return;
+      const tag = btn.getAttribute('data-tag');
+      // Điều hướng kèm query ?q=
+      window.location.href = `blog.html?q=${encodeURIComponent(tag)}`;
+    });
+  }
+}
 
-        function hideLoading() {
-            document.getElementById('loading-container').style.display = 'none';
-            document.getElementById('article-container').style.display = 'block';
-        }
+// Related click
+function openArticle(articleId) {
+  window.location.href = `blog-detail.html?id=${articleId}`;
+}
 
-        function showError() {
-            document.getElementById('loading-container').style.display = 'none';
-            document.getElementById('error-container').style.display = 'block';
-        }
+// ================== Share ==================
+function shareOnFacebook() {
+  if (!currentArticle) return;
+  const url = encodeURIComponent(window.location.href);
+  const quote = encodeURIComponent(currentArticle.title);
+  window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${quote}`, '_blank', 'width=600,height=400');
+}
 
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', () => {
-            loadFragments().then(() => {
-                loadArticle();
-            });
-        });
+function shareOnTwitter() {
+  if (!currentArticle) return;
+  const url = encodeURIComponent(window.location.href);
+  const text = encodeURIComponent(`${currentArticle.title} - JobPortal`);
+  window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank', 'width=600,height=400');
+}
+
+function shareOnLinkedIn() {
+  const url = encodeURIComponent(window.location.href);
+  window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank', 'width=600,height=400');
+}
+
+function copyLink() {
+  navigator.clipboard.writeText(window.location.href).then(() => {
+    // Nếu đã có utils.showSuccessToast thì dùng, không thì fallback
+    if (window?.utils?.showSuccessToast) {
+      window.utils.showSuccessToast('Đã copy link bài viết!');
+    } else {
+      const n = document.createElement('div');
+      n.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-lg z-50';
+      n.textContent = 'Đã copy link bài viết!';
+      document.body.appendChild(n);
+      setTimeout(() => n.remove(), 2500);
+    }
+  });
+}
+
+// ================== Small utils ==================
+function setText(id, text) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = text ?? '';
+}
+
+function escapeHtml(s = '') {
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}

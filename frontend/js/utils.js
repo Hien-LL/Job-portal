@@ -14,6 +14,11 @@ function showElement(id) {
     }
 }
 
+// helper chung
+function _el(target) {
+  return typeof target === 'string' ? document.getElementById(target) : target;
+}
+
 /**
  * Hide element by ID
  * @param {string} id - Element ID
@@ -35,6 +40,23 @@ function toggleElement(id) {
         element.classList.toggle('hidden');
     }
 }
+
+/**
+ * Show loading state
+ * @param {string} id - Loading container element ID (default: 'loading-container')
+ */
+function showLoading(id = 'loading-container') {
+    showElement(id);
+}
+
+/**
+ * Hide loading state
+ * @param {string} id - Loading container element ID (default: 'loading-container')
+ */
+function hideLoading(id = 'loading-container') {
+    hideElement(id);
+}
+
 
 /**
  * Set text content of element
@@ -446,6 +468,48 @@ function capitalizeFirst(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
+// helper chung
+function _el(target) {
+  return typeof target === 'string' ? document.getElementById(target) : target;
+}
+
+/**
+ * Show element by ID or Element
+ */
+function showElement(target) {
+  const element = _el(target);
+  if (element) {
+    element.classList.remove('hidden');
+    // nếu trước đó có inline display:none thì bỏ luôn
+    if (element.style.display === 'none') element.style.display = '';
+  }
+}
+
+/**
+ * Hide element by ID or Element
+ */
+function hideElement(target) {
+  const element = _el(target);
+  if (element) {
+    element.classList.add('hidden');
+    // optional: chặn layout nhấp nháy
+    element.style.display = 'none';
+  }
+}
+
+/**
+ * Toggle element visibility by ID or Element
+ */
+function toggleElement(target) {
+  const element = _el(target);
+  if (element) {
+    element.classList.toggle('hidden');
+    if (element.style.display === 'none') element.style.display = '';
+    else if (!element.classList.contains('hidden')) element.style.display = 'none';
+  }
+}
+
+
 // ==================== Export ====================
 // Make utilities available globally
 if (typeof window !== 'undefined') {
@@ -453,6 +517,8 @@ if (typeof window !== 'undefined') {
         showElement,
         hideElement,
         toggleElement,
+        showLoading,
+        hideLoading,
         setTextContent,
         setHTMLContent,
         openModal,
