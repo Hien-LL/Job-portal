@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý ứng viên - jobPortal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Header Fragment -->
+    <div data-fragment="fragments/header-recruiter.html"></div>
+
+    <!-- Main Content -->
+    <main class="flex-grow bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Breadcrumb -->
+            <nav class="flex mb-6 text-sm text-gray-600" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1">
+                    <li class="inline-flex items-center">
+                        <a href="recruiter-company.html" class="hover:text-blue-600">Dashboard</a>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <svg class="w-3 h-3 mx-2" fill="currentColor" viewBox="0 0 12 12">
+                                <path d="M4.5 2.5l4 5-4 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+                            <span class="text-gray-900 font-medium">Quản lý ứng viên</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+
+            <!-- Grid Layout with Sidebar -->
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
+                <!-- Sidebar Fragment -->
+                <div data-fragment="fragments/recruiter-sidebar.html" class="relative"></div>
+
+                <!-- Main Content -->
+                <div class="lg:col-span-3">
+                    <!-- Header with Title -->
+                    <div class="flex justify-between items-center mb-8">
+                        <div>
+                            <h1 class="text-3xl font-bold text-gray-900">Quản lý ứng viên</h1>
+                            <p class="text-gray-600 mt-1">Xem và quản lý tất cả ứng viên ứng tuyển vào các vị trí của bạn</p>
+                        </div>
+                    </div>
+
+                    <!-- Filters Section -->
+                    <div class="bg-white rounded-lg shadow-sm p-4 mb-6 border border-gray-200">
+                        <div class="flex flex-col gap-4">
+                            <!-- First Row: Search + Status Filter -->
+                            <div class="flex items-center justify-between gap-4">
+                                <div class="relative flex-1">
+                                    <svg class="w-5 h-5 text-gray-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    </svg>
+                                    <input id="applicant-search-input" type="text" placeholder="Tìm kiếm ứng viên..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <button onclick="clearAllApplicationFilters()" class="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition">
+                                    Xóa bộ lọc
+                                </button>
+                                <div class="relative">
+                                    <button onclick="toggleStatusDropdown()" class="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                                        </svg>
+                                        Trạng thái
+                                    </button>
+                                    <div id="status-dropdown" class="hidden absolute top-full right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-lg z-50 p-3 min-w-48">
+                                        <!-- Status filters will be loaded here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div id="loading" class="flex justify-center items-center py-20">
+                        <div class="flex items-center gap-3 text-blue-600">
+                            <svg class="animate-spin h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span class="text-lg font-semibold">Đang tải dữ liệu...</span>
+                        </div>
+                    </div>
+
+                    <!-- Error State -->
+                    <div id="error-state" class="hidden bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-lg">
+                        <p class="font-semibold">Có lỗi xảy ra</p>
+                        <p id="error-text" class="text-sm mt-1"></p>
+                    </div>
+
+                    <!-- Applications List -->
+                    <div id="applications-container" class="hidden space-y-4">
+                        <!-- Applications will be inserted here -->
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="empty-state" class="hidden text-center py-20">
+                        <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                        <h3 class="mt-2 text-xl font-semibold text-gray-900">Chưa có ứng viên</h3>
+                        <p class="mt-1 text-gray-600">Các ứng viên sẽ hiển thị ở đây khi họ ứng tuyển</p>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div id="pagination" class="hidden flex justify-between items-center mt-6">
+                        <div class="text-sm text-gray-600">
+                            <span>Hiển thị <span id="page-start">1</span>-<span id="page-end">5</span> trong <span id="total-applicants">0</span> ứng viên</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <!-- Pagination buttons will be inserted here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Application Detail Modal -->
+    <div id="application-detail-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full transform transition my-8">
+            <!-- Modal Header -->
+            <div class="px-8 py-6 border-b border-gray-200 flex justify-between items-center">
+                <h2 class="text-2xl font-bold text-gray-900">Chi tiết ứng viên</h2>
+                <button onclick="closeApplicationModal()" class="text-gray-500 hover:text-gray-700 text-3xl leading-none">&times;</button>
+            </div>
+
+            <!-- Modal Body -->
+            <div id="modal-body" class="p-8 space-y-6 max-h-96 overflow-y-auto">
+                <!-- Content will be loaded here -->
+            </div>
+
+            <!-- Modal Footer with Actions -->
+            <div class="px-8 py-6 border-t border-gray-200 flex gap-3">
+                <button onclick="closeApplicationModal()" class="flex-1 bg-gray-200 text-gray-700 py-2.5 rounded-lg font-semibold hover:bg-gray-300 transition">
+                    Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Fragment -->
+    <div data-fragment="fragments/footer.html"></div>
+
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/common-helpers.js"></script>
+    <script src="js/markdown-service.js"></script>
+    <script src="js/fragments-loader.js"></script>
+    <script src="js/recruiter-applications-service.js"></script>
+</body>
+</html>

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -18,6 +19,8 @@ public interface CompanyAdminRepository extends JpaRepository<CompanyAdmin, Long
     Optional<Company> findCompanyByAdminUserId(@Param("userId") Long userId);
 
     boolean existsByCompany_IdAndUser_Id(Long companyId, Long userId);
+
+    List<Long> findCompanyIdsByUserId(Long actorUserId);
 }
 
 

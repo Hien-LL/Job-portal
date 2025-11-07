@@ -37,10 +37,11 @@ const API_CONFIG = {
         CHECK_APPLIED: '/applications/isApplied/:jobId',
         APPLY: '/applications/:jobId/apply',
         GET_RELATED: '/jobs?category.slug=:categorySlug&perPage=3&published=true',
-        CREATE_MY_COMPANY: '/jobs/my-company/:companyId',
-        GET_MY_JOB: '/jobs/my-company/:companyId/job/:jobId',
-        UPDATE_MY_JOB: '/jobs/my-company/:companyId/job/:jobId',
-        DELETE_MY_COMPANY: '/jobs/my-company/:companyId/job/:jobId',
+        CREATE_MY_COMPANY: '/jobs/my-company/create',
+        GET_MY_JOBS: '/jobs/my-company/jobs',
+        GET_MY_JOB: '/jobs/my-company/job/:jobId',
+        UPDATE_MY_JOB: '/jobs/my-company/job/:jobId',
+        DELETE_MY_JOB: '/jobs/my-company/job/:jobId',
         SAVE: '/saved-jobs/:jobSlug/save',
         UNSAVE: '/saved-jobs/:jobSlug/unsave',
         CHECK_SAVED: '/saved-jobs/:jobSlug/is-saved',
@@ -59,8 +60,11 @@ const API_CONFIG = {
     APPLICATIONS: {
         LIST: '/applications/my-applications',
         GET_DETAIL: '/applications/candidate-info/:applicationId',
+        GET_CANDIDATE_INFO: '/applications/candidate-info/:applicationId',
         GET_TIMELINE: '/applications/:applicationId/timeline',
-        UPDATE_STATUS: '/applications/:applicationId/status',
+        UPDATE_STATUS: '/applications/:applicationId/change-status',
+        GET_MY_APPLICATIONS: '/applications/my-company/applications',
+        GET_STATUSES: '/application-statuses',
     },
     
     // Companies Endpoints

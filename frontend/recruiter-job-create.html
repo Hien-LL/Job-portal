@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng tin tuyển dụng - jobPortal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Header Fragment -->
+    <div data-fragment="fragments/header-recruiter.html"></div>
+
+    <!-- Main Content -->
+    <main class="flex-grow bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Breadcrumb -->
+            <nav class="flex mb-6 text-sm text-gray-600" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1">
+                    <li class="inline-flex items-center">
+                        <a href="recruiter-company.html" class="hover:text-blue-600">Dashboard</a>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <svg class="w-3 h-3 mx-2" fill="currentColor" viewBox="0 0 12 12">
+                                <path d="M4.5 2.5l4 5-4 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+                            <a href="recruiter-job.html" class="hover:text-blue-600">Tin tuyển dụng</a>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <svg class="w-3 h-3 mx-2" fill="currentColor" viewBox="0 0 12 12">
+                                <path d="M4.5 2.5l4 5-4 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+                            <span class="text-gray-900 font-medium" id="page-title">Đăng tin mới</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+
+            <!-- Loading State -->
+            <div id="loading" class="flex justify-center items-center py-20">
+                <div class="flex items-center gap-3 text-blue-600">
+                    <svg class="animate-spin h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span class="text-lg font-semibold">Đang tải dữ liệu...</span>
+                </div>
+            </div>
+
+            <!-- Error State -->
+            <div id="error-state" class="hidden bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-lg mb-6">
+                <p class="font-semibold">Có lỗi xảy ra</p>
+                <p id="error-text" class="text-sm mt-1"></p>
+            </div>
+
+            <!-- Grid Layout with Sidebar -->
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
+                <!-- Sidebar Fragment -->
+                <div data-fragment="fragments/recruiter-sidebar.html" class="relative"></div>
+
+                <!-- Main Content -->
+                <div class="lg:col-span-3">
+            <form id="job-form" class="hidden bg-white rounded-lg shadow-md p-8 space-y-8">
+                <input type="hidden" id="job-id">
+
+                <!-- Basic Information -->
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Thông tin cơ bản</h2>
+                    
+                    <div class="space-y-5">
+                        <!-- Job Title -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Tiêu đề *</label>
+                            <input 
+                                type="text" 
+                                id="job-title"
+                                placeholder="Ví dụ: Tuyển Senior UX/UI Design"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                required
+                            >
+                        </div>
+
+                        <!-- Description -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Mô tả công việc *</label>
+                            <textarea 
+                                id="job-description"
+                                placeholder="Mô tả chi tiết về công việc"
+                                rows="5"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition resize-none"
+                                required
+                            ></textarea>
+                        </div>
+
+                        <!-- Category -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Danh mục *</label>
+                            <select 
+                                id="job-category"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                required
+                            >
+                                <option value="">Chọn danh mục</option>
+                            </select>
+                        </div>
+
+                        <!-- Location -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Địa điểm *</label>
+                            <select 
+                                id="job-location"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                required
+                            >
+                                <option value="">Chọn địa điểm</option>
+                            </select>
+                        </div>
+
+                        <!-- Remote Work -->
+                        <div>
+                            <label class="flex items-center gap-3">
+                                <input 
+                                    type="checkbox" 
+                                    id="job-remote"
+                                    class="w-5 h-5 border border-gray-300 rounded cursor-pointer"
+                                >
+                                <span class="text-sm font-semibold text-gray-700">Cho phép làm việc từ xa</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Salary Information -->
+                <div class="border-t border-gray-200 pt-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Thông tin lương</h2>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                        <!-- Salary Min -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Lương tối thiểu *</label>
+                            <input 
+                                type="number" 
+                                id="job-salary-min"
+                                placeholder="Ví dụ: 18000000"
+                                min="0"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                required
+                            >
+                        </div>
+
+                        <!-- Salary Max -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Lương tối đa *</label>
+                            <input 
+                                type="number" 
+                                id="job-salary-max"
+                                placeholder="Ví dụ: 30000000"
+                                min="0"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                required
+                            >
+                        </div>
+
+                        <!-- Currency -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Tiền tệ *</label>
+                            <select 
+                                id="job-currency"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                required
+                            >
+                                <option value="VND">VND - Đồng Việt Nam</option>
+                                <option value="USD">USD - Đô la Mỹ</option>
+                                <option value="EUR">EUR - Euro</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Job Details -->
+                <div class="border-t border-gray-200 pt-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Chi tiết công việc</h2>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                        <!-- Seniority -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Cấp bậc *</label>
+                            <select 
+                                id="job-seniority"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                required
+                            >
+                                <option value="">Chọn cấp bậc</option>
+                                <option value="Intern">Thực tập sinh</option>
+                                <option value="Junior">Junior</option>
+                                <option value="Mid">Mid-level</option>
+                                <option value="Senior">Senior</option>
+                                <option value="Lead">Lead</option>
+                                <option value="Manager">Manager</option>
+                            </select>
+                        </div>
+
+                        <!-- Employment Type -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Hình thức làm việc *</label>
+                            <select 
+                                id="job-employment-type"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                required
+                            >
+                                <option value="">Chọn hình thức</option>
+                                <option value="FullTime">Toàn thời gian</option>
+                                <option value="PartTime">Bán thời gian</option>
+                                <option value="Contract">Hợp đồng</option>
+                                <option value="Temporary">Tạm thời</option>
+                                <option value="Internship">Thực tập</option>
+                            </select>
+                        </div>
+
+                        <!-- Years of Experience -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Kinh nghiệm (năm)</label>
+                            <input 
+                                type="number" 
+                                id="job-experience"
+                                placeholder="Ví dụ: 3"
+                                min="0"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Benefits -->
+                <div class="border-t border-gray-200 pt-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Quyền lợi</h2>
+                    <div class="relative">
+                        <button type="button" onclick="toggleBenefitsDropdown()" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition flex items-center justify-between bg-white">
+                            <span id="benefits-selected-text">Chọn quyền lợi</span>
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                            </svg>
+                        </button>
+                        <div id="benefits-dropdown" class="hidden absolute top-full left-0 right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-lg z-50 p-4 max-h-64 overflow-y-auto">
+                            <!-- Benefits will be loaded here -->
+                        </div>
+                    </div>
+                    <div id="benefits-selected" class="mt-4 flex flex-wrap gap-2">
+                        <!-- Selected benefits will be displayed as tags -->
+                    </div>
+                </div>
+
+                <!-- Skills -->
+                <div class="border-t border-gray-200 pt-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Kỹ năng yêu cầu</h2>
+                    <div class="relative">
+                        <button type="button" onclick="toggleSkillsDropdown()" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition flex items-center justify-between bg-white">
+                            <span id="skills-selected-text">Chọn kỹ năng</span>
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                            </svg>
+                        </button>
+                        <div id="skills-dropdown" class="hidden absolute top-full left-0 right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-lg z-50 p-4 max-h-64 overflow-y-auto">
+                            <!-- Skills will be loaded here -->
+                        </div>
+                    </div>
+                    <div id="skills-selected" class="mt-4 flex flex-wrap gap-2">
+                        <!-- Selected skills will be displayed as tags -->
+                    </div>
+                </div>
+
+                <!-- Expiry Date -->
+                <div class="border-t border-gray-200 pt-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Hạn cuối</h2>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Ngày hết hạn *</label>
+                        <input 
+                            type="datetime-local" 
+                            id="job-expires-at"
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="border-t border-gray-200 pt-8 flex gap-3">
+                    <button type="button" id="save-draft-btn" class="flex-1 bg-gray-200 text-gray-700 py-2.5 rounded-lg font-semibold hover:bg-gray-300 transition">
+                        Lưu nháp
+                    </button>
+                    <button type="submit" id="publish-btn" class="flex-1 bg-blue-600 text-white py-2.5 rounded-lg font-semibold hover:bg-blue-700 transition">
+                        <span id="submit-text">Đăng tin</span>
+                    </button>
+                    <a href="recruiter-job.html" class="flex-1 bg-white border border-gray-300 text-gray-700 py-2.5 rounded-lg font-semibold hover:bg-gray-50 transition text-center">
+                        Hủy
+                    </a>
+                </div>
+            </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Fragment -->
+    <div data-fragment="fragments/footer.html"></div>
+
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/common-helpers.js"></script>
+    <script src="js/markdown-service.js"></script>
+    <script src="js/fragments-loader.js"></script>
+    <script src="js/recruiter-job-create-service.js"></script>
+</body>
+</html>

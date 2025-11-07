@@ -8,6 +8,8 @@ import com.jobportal.dtos.resources.CandidateResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Map;
+
 public interface ApplicationServiceInterface {
     ApplicationResource createForJob(Long jobId, Long userId, ApplicationCreationRequest request);
     Page<ApplicationResource> getApplicationsByUserId(Long userId, String status, Pageable pageable);
@@ -16,4 +18,6 @@ public interface ApplicationServiceInterface {
     ApplicationDetailResource getDetailForActor(Long applicationId, Long actorUserId);
     CandidateResource getCandidateInfomations(Long applicationId, Long actorUserId);
     boolean existsByJobIdAndUserId(Long jobId, Long userId);
+
+    Page<ApplicationListItemForCompanyResource> getApplicationsForMyCompany(Long actorUserId, Map<String, String[]> parameters);
 }

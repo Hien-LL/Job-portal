@@ -17,4 +17,5 @@ public interface JobServiceInterface {
     void deleteJobForMyCompany(Long userId,Long jobId);
     Page<Job> getJobsByCompanyId(Long companyId, Map<String, String[]> params);
     JobResource getJobForMyCompany(Long userId, @Positive(message = "id phải lớn hơn 0") Long jobId);
+    Page<Job> paginationJobForMyCompany(Long userId, Map<String, String[]> params);
 }

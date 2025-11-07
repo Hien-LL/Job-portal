@@ -64,6 +64,18 @@ public class JobController {
         return ApiResource.ok(jobResources, "Success");
     }
 
+    @GetMapping("my-company/jobs")
+    public ApiResource<Page<JobListItemResource>> getJobsForMyCompany(
+            @AuthenticationPrincipal CustomUserDetails user,
+            HttpServletRequest request
+    ) {
+        Long userId = user.getUserId();
+        Map<String, String[]> params = request.getParameterMap();
+        Page<Job> jobs =  jobService.paginationJobForMyCompany(userId, params);
+        Page<JobListItemResource> jobResources = jobMapper.tListResourcePage(jobs);
+        return ApiResource.ok(jobResources, "Get jobs for my company");
+    }
+
     @GetMapping("/my-company/job/{jobId}")
     public ApiResource<JobResource> getJobForMyCompany(
             @AuthenticationPrincipal CustomUserDetails user,

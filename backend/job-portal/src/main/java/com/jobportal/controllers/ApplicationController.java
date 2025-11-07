@@ -7,6 +7,7 @@ import com.jobportal.securities.helps.details.CustomUserDetails;
 import com.jobportal.services.interfaces.ApplicationServiceInterface;
 import com.jobportal.services.interfaces.ApplicationWorkflowServiceInterface;
 import com.jobportal.services.interfaces.AuthServiceInterface;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RequiredArgsConstructor
 @RestController
@@ -115,5 +118,17 @@ public class ApplicationController {
         Long actorUserId = user.getUserId();
         CandidateResource data = applicationService.getCandidateInfomations(applicationId, actorUserId);
         return ApiResource.ok(data, "Lấy thông tin ứng viên thành công");
+    }
+
+    @GetMapping("my-company/applications")
+    public ApiResource<Page<ApplicationListItemForCompanyResource>> getApplicationsForMyCompany(
+            @AuthenticationPrincipal CustomUserDetails user,
+            HttpServletRequest request
+    ) {
+        Map<String , String[]> parameters = request.getParameterMap();
+        Long actorUserId = user.getUserId();
+        Page<ApplicationListItemForCompanyResource> data =
+                applicationService.getApplicationsForMyCompany(actorUserId, parameters );
+        return ApiResource.ok(data, "Lấy danh sách ứng tuyển thành công");
     }
 }

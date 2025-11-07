@@ -16,4 +16,6 @@ public class ApplicationListItemForCompanyResource {
     private Long jobId;
     private String jobTitle;
     private Long userId;
+    private String userFullName;
+    private String avatarUrl;
 }

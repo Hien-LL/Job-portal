@@ -23,7 +23,6 @@ public class ApplicationStatusController {
     private final ApplicationStatusServiceInterface applicationStatusService;
     private final ApplicationStatusMapper applicationStatusMapper;
 
-    @PreAuthorize("isAuthenticated()")
     @GetMapping
     public ResponseEntity<?> getListApplicationStatus(HttpServletRequest request) {
         Map<String, String[]> params = request.getParameterMap();

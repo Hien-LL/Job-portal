@@ -23,6 +23,8 @@ public interface ApplicationMapper extends BaseMapper<Application, ApplicationRe
     @Mapping(target = "jobTitle", source = "job.title")
     @Mapping(target = "applicationStatus", source = "status") // dùng ApplicationStatusMapper
     @Mapping(target = "userId", source = "user.id")
+    @Mapping(target = "userFullName", source = "user.name")
+    @Mapping(target = "avatarUrl", source = "user.avatarUrl")
     ApplicationListItemForCompanyResource tResourceListItem(Application entity);
 
     // CreateRequest -> Entity

@@ -253,6 +253,30 @@ public class JobService extends BaseService implements JobServiceInterface {
         return jobMapper.tResource(job);
     }
 
+    @Override
+    public Page<Job> paginationJobForMyCompany(Long userId, Map<String, String[]> params) {
+        Company company  = adminRepository.findCompanyByAdminUserId(userId)
+                .orElseThrow(() -> new SecurityException("Bạn không có quyền xem việc làm cho công ty nào"));
+        Long companyId = company.getId();
+
+        int page = params.containsKey("page") ? Integer.parseInt(params.get("page")[0]) - 1 : 0;
+        int size = params.containsKey("size") ? Integer.parseInt(params.get("size")[0]) : 5;
+        Sort sort = sortParam(params);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        String keyword = FilterParameter.filtertKeyword(params);
+        Map<String, String> filterSimple = FilterParameter.filterSimple(params);
+        Map<String, Map<String, String>> filterComplex = FilterParameter.filterComplex(params);
+
+        Specification<Job> spec = Specification
+                .where(BaseSpecification.<Job>keyword(
+                        keyword, "title", "description", "seniority", "employmentType", "currency", "remote"))
+                .and(BaseSpecification.whereSpec(filterSimple))
+                .and(BaseSpecification.complexWhereSpec(filterComplex))
+                .and(BaseSpecification.equalLong("company.id", companyId));
+        return jobRepository.findAll(spec, pageable);
+    }
+
     private String generateUniqueSlug(String base) {
         String slug = Slugifier.slugify(base);
 

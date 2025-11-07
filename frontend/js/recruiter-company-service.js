@@ -182,12 +182,6 @@ function displayCompanyProfile(company) {
         }
     }
 
-    // Update manage jobs button link
-    const manageJobsBtn = document.getElementById('manage-jobs-btn');
-    if (manageJobsBtn && company.slug) {
-        manageJobsBtn.href = `recruiter-company-detail.html?slug=${company.slug}`;
-    }
-
     // Show profile, hide loading/error
     hideElement('loading');
     hideElement('error-message');
