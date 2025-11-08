@@ -153,12 +153,21 @@ Mở DevTools (`F12`) để xem logs và debugging
 
 ## 🏭 Production Build & Deployment
 
-### Step 1: Build
+### Step 1: Clean (Optional but Recommended)
+```bash
+# Clean npm cache
+npm cache clean --force
+
+# Clean install dependencies
+npm ci --force
+```
+
+### Step 2: Build
 ```bash
 npm run build
 ```
 
-### Step 2: Test Build Locally
+### Step 3: Test Build Locally
 ```bash
 # Serve dist folder trên localhost:3000
 npx http-server dist -p 3000
@@ -189,6 +198,31 @@ vercel --prod
 ---
 
 ## 🐛 Troubleshooting
+
+### ❌ Clean node_modules & Dependencies
+
+**Khi nào cần clean:**
+- ✅ Sau khi pull code từ GitHub (có thay đổi dependencies)
+- ✅ Khi gặp lỗi `npm ERR!`
+- ✅ Khi update Node.js version
+- ✅ Khi dependencies bị corrupt
+
+**Lệnh clean:**
+```bash
+# Option 1: Clean npm cache
+npm cache clean --force
+
+# Option 2: Clean install (xóa node_modules + reinstall)
+npm ci --force
+
+# Option 3: Full clean (xóa node_modules + package-lock.json)
+Remove-Item -Recurse -Force node_modules, package-lock.json
+
+# Option 4: Clean + reinstall (all in one)
+Remove-Item -Recurse -Force node_modules, package-lock.json; npm install
+```
+
+---
 
 ### ❌ PowerShell Script Execution Error
 

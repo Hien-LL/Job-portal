@@ -1,6 +1,5 @@
 package com.jobportal.controllers;
 
-import com.jobportal.dtos.requests.NotificationRequest;
 import com.jobportal.dtos.requests.creation.JobCreationRequest;
 import com.jobportal.dtos.requests.updation.JobUpdationRequest;
 import com.jobportal.dtos.resources.*;
@@ -16,8 +15,6 @@ import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.springframework.data.domain.Page;
-import org.springframework.http.MediaType;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
