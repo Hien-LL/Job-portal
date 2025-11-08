@@ -4,8 +4,8 @@
 
 const API_CONFIG = {
     // Base URL for all API requests
-    BASE_URL: 'http://localhost:8080/api',
-    FILE_BASE_URL: 'http://localhost:8080',
+    BASE_URL: 'https://cvxn08rn-8080.asse.devtunnels.ms/api',
+    FILE_BASE_URL: 'https://cvxn08rn-8080.asse.devtunnels.ms',
     
     // Authentication Endpoints
     AUTH: {

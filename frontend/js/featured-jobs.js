@@ -52,7 +52,7 @@
                 const companyLogo = job.company?.logoUrl;
 
                 return `
-                    <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition">
+                    <div class="group bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition">
                         <div class="flex gap-4">
                             <!-- Company Logo (circular) -->
                             <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex-shrink-0 flex items-center justify-center overflow-hidden">
@@ -107,7 +107,9 @@
                                 </div>
                                 
                                 <!-- Action Button -->
-                                <a href="job-detail.html?slug=${job.slug}" class="text-blue-600 hover:text-blue-700 font-medium text-sm">
+                                <a href="job-detail.html?slug=${job.slug}" 
+   class="opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 
+          transition-all duration-300 text-blue-600 hover:text-blue-700 font-medium text-sm"">
                                     Xem chi tiết →
                                 </a>
                             </div>
