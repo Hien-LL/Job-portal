@@ -323,6 +323,7 @@ function showError(message) {
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', () => {
+              
              loadCompanyDetail();   // gọi thẳng, không chờ fragments
         });
 
@@ -337,4 +338,3 @@ const _range = (min, max, unit = '') => {
   if (max) return `Đến ${max.toLocaleString()}${unit ? ' ' + unit : ''}`;
   return 'Không rõ';
 };
-
