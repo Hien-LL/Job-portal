@@ -5,7 +5,7 @@
 const API_CONFIG = {
     // Base URL for all API requests
     BASE_URL: 'http://localhost:8080/api',
-    FILE_BASE_URL: 'http://localhost:8080',
+    FILE_BASE_URL: 'http://localhost:3000',
 
     // Authentication Endpoints
     AUTH: {
