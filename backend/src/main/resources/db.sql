@@ -125,9 +125,12 @@ create table companies
 
 create table company_admins
 (
-    company_id bigint not null,
-    user_id    bigint not null,
-    primary key (company_id, user_id),
+    id         bigint auto_increment
+        primary key,
+    company_id bigint      not null,
+    user_id    bigint      not null,
+    constraint UK_company_admins_company_user
+        unique (company_id, user_id),
     constraint FKjv0n5iebd50bsdmaep8d66olv
         foreign key (company_id) references companies (id),
     constraint FKofovk1pf83oiu912q2ogovtfb
