@@ -13,6 +13,7 @@ public class CompanyResource {
     private String slug;
     private String website;
     private String logoUrl;
+    private String backgroundImageUrl;
     private String description;
     private int size_min;
     private int size_max;

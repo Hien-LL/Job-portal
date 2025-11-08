@@ -121,6 +121,58 @@ async function uploadCompanyLogo(logoFile) {
     }
 }
 
+// ✅ THÊM MỚI: Upload company background image
+async function uploadCompanyBackground(backgroundFile) {
+    try {
+        if (!backgroundFile) {
+            return { success: false, message: 'Vui lòng chọn ảnh' };
+        }
+
+        if (backgroundFile.size > 5 * 1024 * 1024) {
+            showErrorToast('Kích thước ảnh không được vượt quá 5MB', 3000);
+            return { success: false, message: 'Kích thước ảnh quá lớn' };
+        }
+
+        const url = buildApiUrl(API_CONFIG.COMPANIES.UPLOAD_BACKGROUND);
+        console.log('Uploading background to:', url);
+
+        const formData = new FormData();
+        formData.append('background', backgroundFile);
+
+        const token = authService.getToken();
+        const response = await fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            body: formData
+        });
+
+        if (!response.ok) {
+            const data = await response.json();
+            return {
+                success: false,
+                message: data.message || 'Upload thất bại'
+            };
+        }
+
+        const data = await response.json();
+        console.log('Upload background response:', data);
+
+        return {
+            success: data.success,
+            message: data.message,
+            data: data.data
+        };
+    } catch (error) {
+        console.error('Upload Background API Error:', error);
+        return {
+            success: false,
+            message: 'Lỗi kết nối. Vui lòng thử lại sau.'
+        };
+    }
+}
+
 // ==================== UI Functions ====================
 
 // Display company profile
@@ -138,6 +190,15 @@ function displayCompanyProfile(company) {
     if (logoElement) {
         logoElement.src = logoUrl;
         logoElement.alt = company.name;
+    }
+
+    // ✅ THÊM MỚI: Update background image
+    const backgroundElement = document.getElementById('company-background');
+    if (backgroundElement && company.backgroundImageUrl) {
+        backgroundElement.src = `${API_CONFIG.FILE_BASE_URL}${company.backgroundImageUrl}`;
+        backgroundElement.style.display = 'block';
+    } else if (backgroundElement) {
+        backgroundElement.style.display = 'none';
     }
 
     // Update company name
@@ -271,6 +332,37 @@ async function handleLogoUpload(file) {
     }
 }
 
+// ✅ THÊM MỚI: Handle background upload
+async function handleBackgroundUpload(file) {
+    if (!currentCompany || !file) return;
+
+    // Validate file size (5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+        showErrorToast('Kích thước ảnh không được vượt quá 5MB', 3000);
+        return;
+    }
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+        showErrorToast('Vui lòng chọn file ảnh', 3000);
+        return;
+    }
+
+    try {
+        const result = await uploadCompanyBackground(file);
+
+        if (result.success) {
+            showSuccessToast('Tải lên ảnh bìa thành công!', 3000);
+            await loadCompanyProfile();
+        } else {
+            showErrorToast(result.message || 'Không thể tải lên ảnh bìa', 3000);
+        }
+    } catch (error) {
+        console.error('Upload background error:', error);
+        showErrorToast('Có lỗi xảy ra khi tải lên ảnh bìa', 3000);
+    }
+}
+
 // ==================== Event Listeners ====================
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -293,6 +385,23 @@ document.addEventListener('DOMContentLoaded', function() {
             const file = e.target.files[0];
             if (file) {
                 handleLogoUpload(file);
+            }
+        });
+    }
+
+    // ✅ THÊM MỚI: Background upload overlay
+    const backgroundUploadOverlay = document.getElementById('background-upload-overlay');
+    const backgroundUploadInput = document.getElementById('background-upload-input');
+    
+    if (backgroundUploadOverlay && backgroundUploadInput) {
+        backgroundUploadOverlay.addEventListener('click', function() {
+            backgroundUploadInput.click();
+        });
+
+        backgroundUploadInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                handleBackgroundUpload(file);
             }
         });
     }

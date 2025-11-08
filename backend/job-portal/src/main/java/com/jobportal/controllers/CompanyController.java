@@ -74,15 +74,28 @@ public class CompanyController {
     @PutMapping(value = "/my-company/upload-logo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResource<String> uploadLogo(
             @AuthenticationPrincipal CustomUserDetails user,
-            @RequestPart("logo") MultipartFile logo // dùng đúng key "logo"
+            @RequestPart("logo") MultipartFile logo
     ) {
         if (logo == null || logo.isEmpty()) {
             throw new BusinessException("BAD_REQUEST", "Logo rỗng hoặc thiếu part 'logo'", HttpStatus.BAD_REQUEST);
         }
-        Long userId = user.getUserId();
-        String logoUrl = companyService.uploadCompanyLogo(userId, logo);
-        return ApiResource.ok(logoUrl, "Upload logo thành công");
+        String url = companyService.uploadCompanyImage(user.getUserId(), logo, "logo");
+        return ApiResource.ok(url, "Upload logo thành công");
     }
+
+    @PreAuthorize("isAuthenticated()")
+    @PutMapping(value = "/my-company/upload-background", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResource<String> uploadBackground(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @RequestPart("background") MultipartFile background
+    ) {
+        if (background == null || background.isEmpty()) {
+            throw new BusinessException("BAD_REQUEST", "Background rỗng hoặc thiếu part 'background'", HttpStatus.BAD_REQUEST);
+        }
+        String url = companyService.uploadCompanyImage(user.getUserId(), background, "background");
+        return ApiResource.ok(url, "Upload background thành công");
+    }
+
 
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/my-company/details")

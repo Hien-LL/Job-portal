@@ -22,6 +22,9 @@ public class Company extends BaseEntity {
 
     @Column(name = "logo_url")
     private String logoUrl;
+
+    @Column(name = "background_image_url")
+    private String backgroundImageUrl;
     private String description;
     private int size_min;
     private int size_max;

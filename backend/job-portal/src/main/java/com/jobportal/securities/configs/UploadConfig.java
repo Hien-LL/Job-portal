@@ -10,11 +10,12 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "upload")
 public class UploadConfig {
-    private String baseDir;
-    private String avatarDir;
-    private String companyLogoDir;
-    private String resumeDir;
-    private String allowedImageExt;
-    private String allowedDocExt;
-    private String maxSize;
+    private String baseDir;              // thư mục gốc upload (local: uploads/, docker: /app/uploads)
+    private String avatarDir;            // thư mục ảnh đại diện
+    private String companyLogoDir;       // thư mục logo công ty
+    private String backgroundImageDir;   // thư mục ảnh nền công ty
+    private String resumeDir;            // thư mục lưu CV
+    private String allowedImageExt;      // đuôi ảnh hợp lệ
+    private String allowedDocExt;        // đuôi file tài liệu hợp lệ
+    private String maxSize;              // dung lượng tối đa (ví dụ 10MB)
 }

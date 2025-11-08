@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hồ sơ ứng viên - JobPortal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Header Fragment -->
+    <div data-fragment="fragments/header.html" data-header-type="auto"></div>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Loading State -->
+        <div id="loading" class="flex justify-center items-center py-20">
+            <div class="flex items-center gap-3 text-blue-600">
+                <svg class="animate-spin h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span class="text-lg font-semibold">Đang tải hồ sơ...</span>
+            </div>
+        </div>
+
+        <!-- Error State -->
+        <div id="error-state" class="hidden text-center py-20">
+            <div class="text-red-500 mb-4">
+                <svg class="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                </svg>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">Không thể tải hồ sơ</h3>
+            <p id="error-text" class="text-gray-600 mb-4">Vui lòng thử lại sau</p>
+        </div>
+
+        <!-- Profile Content -->
+        <div id="profile-content" class="hidden space-y-6">
+            <!-- Header Section -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+                <div class="flex items-start gap-6">
+                    <!-- Avatar -->
+                    <img id="user-avatar" src="" alt="Avatar" class="w-24 h-24 rounded-full object-cover flex-shrink-0 bg-gray-200">
+                    
+                    <!-- User Info -->
+                    <div class="flex-1">
+                        <div class="mb-4">
+                            <h1 id="user-name" class="text-3xl font-bold text-gray-900 mb-2"></h1>
+                            <p id="user-headline" class="text-lg text-blue-600 font-medium mb-4"></p>
+                        </div>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                            <div>
+                                <p class="text-gray-600">📧 Email</p>
+                                <p id="user-email" class="font-medium text-gray-900"></p>
+                            </div>
+                            <div>
+                                <p class="text-gray-600">📱 Điện thoại</p>
+                                <p id="user-phone" class="font-medium text-gray-900"></p>
+                            </div>
+                            <div>
+                                <p class="text-gray-600">📍 Địa chỉ</p>
+                                <p id="user-address" class="font-medium text-gray-900"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Section -->
+            <div id="summary-section" class="hidden bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h2 class="text-xl font-bold text-gray-900 mb-4">Giới thiệu</h2>
+                <div id="user-summary" class="prose prose-sm max-w-none text-gray-700">
+                    <!-- Summary will be inserted here -->
+                </div>
+            </div>
+
+            <!-- Skills Section -->
+            <div id="skills-section" class="hidden bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h2 class="text-xl font-bold text-gray-900 mb-4">Kỹ năng</h2>
+                <div id="skills-container" class="flex flex-wrap gap-3">
+                    <!-- Skills will be inserted here -->
+                </div>
+            </div>
+
+            <!-- CV/Resume Section -->
+            <div id="cv-section" class="hidden bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h2 class="text-xl font-bold text-gray-900 mb-4">Hồ sơ/CV</h2>
+                <div id="cv-content" class="space-y-6">
+                    <!-- CV content will be inserted here -->
+                </div>
+            </div>
+
+            <!-- Experience Section -->
+            <div id="experience-section" class="hidden bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h2 class="text-xl font-bold text-gray-900 mb-4">Kinh nghiệm làm việc</h2>
+                <div id="experience-container" class="space-y-6">
+                    <!-- Experience will be inserted here -->
+                </div>
+            </div>
+
+            <!-- Education Section -->
+            <div id="education-section" class="hidden bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h2 class="text-xl font-bold text-gray-900 mb-4">Học vấn</h2>
+                <div id="education-container" class="space-y-6">
+                    <!-- Education will be inserted here -->
+                </div>
+            </div>
+
+            <!-- Portfolio Section -->
+            <div id="portfolio-section" class="hidden bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h2 class="text-xl font-bold text-gray-900 mb-4">Portfolio</h2>
+                <div id="portfolio-container" class="space-y-4">
+                    <!-- Portfolio files will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Fragment -->
+    <div data-fragment="fragments/footer.html"></div>
+
+    <!-- Scripts -->
+    <script src="js/fragments-loader.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/common-helpers.js"></script>
+    <script src="js/markdown-service.js"></script>
+    <script src="js/public-profile-service.js"></script>
+</body>
+</html>

@@ -72,6 +72,15 @@ let currentCompany = null;
                 logoElement.innerHTML = `<span class="text-4xl">🏢</span>`;
             }
 
+            // Company background image - ✅ THÊM MỚI
+            const backgroundImg = document.getElementById('company-background-image');
+            if (company.backgroundImageUrl) {
+                backgroundImg.src = `${API_CONFIG.FILE_BASE_URL}${company.backgroundImageUrl}`;
+                backgroundImg.style.display = 'block';
+            } else {
+                backgroundImg.style.display = 'none';
+            }
+
             // Company info
             const companySizeText = formatCompanySize(company.size_min, company.size_max);
             document.getElementById('company-size').textContent = companySizeText;

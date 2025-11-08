@@ -4,6 +4,7 @@ import com.jobportal.dtos.requests.creation.CompanyCreationRequest;
 import com.jobportal.dtos.requests.updation.CompanyUpdationRequest;
 import com.jobportal.dtos.resources.CompanyResource;
 import com.jobportal.entities.Company;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -14,7 +15,9 @@ public interface CompanyServiceInterface {
     Company createCompany(Long userId ,CompanyCreationRequest request);
     Company getMyCompany(Long userId);
     Company updateCompany(Long userId, CompanyUpdationRequest request);
-    String uploadCompanyLogo(Long userId, MultipartFile file);
+    @Transactional
+    String uploadCompanyImage(Long userId, MultipartFile file, String type);
+
     List<CompanyResource> getAllCompanies(Map<String, String[]> parameterMap);
     CompanyResource getCompanyById(Long companyId);
 }

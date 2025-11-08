@@ -33,8 +33,14 @@
 
     <!-- Company Detail Content -->
     <div id="company-detail-container" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style="display: none;">
+        <!-- Company Background Image -->
+        <div id="company-background-section" class="relative h-64 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg shadow-sm border border-gray-200 mb-8 overflow-hidden">
+            <img id="company-background-image" src="" alt="Company background" class="w-full h-full object-cover" style="display: none;">
+            <div class="absolute inset-0 bg-black opacity-0 hover:opacity-10 transition"></div>
+        </div>
+
         <!-- Company Header -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8">
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8 -mt-16 relative z-10">
             <div class="flex flex-col md:flex-row gap-6">
                 <div id="company-logo" class=" h-24 bg-gray-100 rounded-lg flex-shrink-0 flex items-center justify-center">
                     <!-- Company logo will be inserted here -->

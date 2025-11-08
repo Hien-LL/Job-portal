@@ -13,7 +13,6 @@ services:
       - "${MYSQL_PORT}:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      # Nếu có file init SQL, giữ dòng dưới; không có thì xóa:
       - ./src/main/resources/db.sql:/docker-entrypoint-initdb.d/init.sql:ro
     command: --default-authentication-plugin=mysql_native_password
     restart: unless-stopped
@@ -41,7 +40,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: ${BACKEND_IMAGE} # build xong tag đúng BACKEND_IMAGE luôn
+    image: ${BACKEND_IMAGE}
     container_name: job-portal-backend
     env_file:
       - .env

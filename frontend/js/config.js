@@ -4,8 +4,8 @@
 
 const API_CONFIG = {
     // Base URL for all API requests
-    BASE_URL: 'https://cvxn08rn-8080.asse.devtunnels.ms/api',
-    FILE_BASE_URL: 'https://cvxn08rn-8080.asse.devtunnels.ms',
+    BASE_URL: 'http://localhost:8080/api',
+    FILE_BASE_URL: 'http://localhost:8080',
     
     // Authentication Endpoints
     AUTH: {
@@ -27,6 +27,8 @@ const API_CONFIG = {
         ADD_SKILL: '/users/skills/:skillSlug',
         DELETE_SKILL: '/users/skills/:skillSlug',
         UPDATE_SKILL_YEARS: '/users/skills/:skillSlug',
+        PROFILE_DETAIL: '/public/users/{id}',
+        SKILLS: '/public/skills/{userId}',
     },
     
     // Jobs Endpoints
@@ -54,6 +56,7 @@ const API_CONFIG = {
         GET_DETAIL: '/resumes/:resumeId',
         UPLOAD: '/resumes/:resumeId/upload',
         DELETE_FILE: '/resumes/files/:fileId',  // ✅ THÊM MỚI
+        DEFAULT: '/public/resumes/{userId}',
     },
     
     // Applications Endpoints
@@ -76,6 +79,7 @@ const API_CONFIG = {
         MY_COMPANY_DETAILS: '/companies/my-company/details',
         UPDATE_MY_COMPANY: '/companies/my-company/details',
         UPLOAD_LOGO: '/companies/my-company/upload-logo',
+        UPLOAD_BACKGROUND: '/companies/my-company/upload-background',
     },
     
     // Follow/Unfollow Companies Endpoints
