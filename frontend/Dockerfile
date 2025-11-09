@@ -5,7 +5,11 @@ WORKDIR /app
 
 # Install production/dev deps needed for the build (tailwind/postcss/terser etc.)
 COPY package*.json ./
-RUN npm ci --silent
+# Show npm output to capture detailed errors during image build
+# Use `npm install` here because package-lock.json and package.json
+# in the repo are out-of-sync. `npm install` will compute deps from
+# package.json and produce a working node_modules for the build.
+RUN npm install --no-audit --no-fund --no-fund
 
 # Copy source and run build script which outputs to ./dist
 COPY . .

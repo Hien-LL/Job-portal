@@ -2,6 +2,8 @@
 // Centralized markdown parser and formatter
 // Converts markdown text to HTML with proper styling
 
+// Browser-ready markdown service (no CommonJS require)
+
 /**
  * Escape HTML special characters
  * @param {string} text - Text to escape
@@ -185,28 +187,110 @@ function formatDescription(description) {
  * Format salary range
  * @param {number} min - Minimum salary
  * @param {number} max - Maximum salary
+ * @param {string} currency - Currency code (e.g., 'VND', 'USD')
  * @returns {string} Formatted salary string
  */
-function formatSalaryRange(min, max) {
-    if (!min && !max) return 'Thương lượng';
-    
-    const formatAmount = (amount) => {
-        return new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0
-        }).format(amount);
+function formatSalaryRange(min, max, currency = 'VND') {
+    const isEmpty = v => v == null || v === '' || Number.isNaN(Number(v));
+    if (isEmpty(min) && isEmpty(max)) return 'Thương lượng';
+
+    const toNum = v =>
+        v == null || v === ''
+            ? NaN
+            : Number(String(v).replace(/[^\d.-]/g, ''));
+
+    const nMin = toNum(min);
+    const nMax = toNum(max);
+    const hasMin = Number.isFinite(nMin) && nMin > 0;
+    const hasMax = Number.isFinite(nMax) && nMax > 0;
+    const curr = currency.toUpperCase();
+
+    // Helpers
+    const nf = (v, d = 0) =>
+        new Intl.NumberFormat('vi-VN', {
+            minimumFractionDigits: d,
+            maximumFractionDigits: d
+        }).format(v);
+
+    const decimals = v => (Math.abs(v) % 1 === 0 ? 0 : 1);
+
+    // ==================== FORMATTERS ====================
+
+    const formatVND = v => {
+        if (!Number.isFinite(v)) return '';
+        const abs = Math.abs(v);
+        if (abs >= 1e9) return `${nf(v / 1e9, decimals(v / 1e9))} tỷ`;
+        if (abs >= 1e6) return `${nf(v / 1e6, decimals(v / 1e6))} triệu`;
+        return `${nf(v, 0)} VND`;
     };
 
-    if (min && max) {
-        return `${formatAmount(min)} - ${formatAmount(max)}`;
-    } else if (min) {
-        return `Từ ${formatAmount(min)}`;
-    } else {
-        return `Đến ${formatAmount(max)}`;
+    const symbols = {
+        USD: '$', EUR: '€', GBP: '£', JPY: '¥',
+        CNY: '¥', KRW: '₩', AUD: 'A$', CAD: 'C$', SGD: 'S$'
+    };
+
+    const formatOther = (v, code) => {
+        if (!Number.isFinite(v)) return '';
+        const abs = Math.abs(v);
+        const symbol = symbols[code] || '';
+        let val = v, suf = '';
+
+        if (abs >= 1e9) (val = v / 1e9, suf = 'B');
+        else if (abs >= 1e6) (val = v / 1e6, suf = 'M');
+        else if (abs >= 1e3) (val = v / 1e3, suf = 'K');
+
+        return suf
+            ? `${symbol}${nf(val, decimals(val))}${suf} ${code}`
+            : `${symbol}${nf(val, 0)} ${code}`;
+    };
+
+    const fmt = v => curr === 'VND' ? formatVND(v) : formatOther(v, curr);
+
+    // ==================== RANGE LOGIC ====================
+
+    const sameUnit = (a, b, unit) =>
+        Math.abs(a) >= unit && Math.abs(b) >= unit;
+
+    const rangeFormat = (a, b, unit, label) => {
+        const va = a / unit, vb = b / unit;
+        return `${nf(va, decimals(va))} - ${nf(vb, decimals(vb))}${label}`;
+    };
+
+    // Both min & max
+    if (hasMin && hasMax) {
+        // VND range unit merge
+        if (curr === 'VND') {
+            if (sameUnit(nMin, nMax, 1e9))
+                return rangeFormat(nMin, nMax, 1e9, ' tỷ VND');
+
+            if (sameUnit(nMin, nMax, 1e6))
+                return rangeFormat(nMin, nMax, 1e6, ' triệu VND');
+
+            return `${nf(nMin)} - ${nf(nMax)} VND`;
+        }
+
+        // Other currencies (try merge K/M/B)
+        const absMin = Math.abs(nMin), absMax = Math.abs(nMax);
+
+        if (sameUnit(absMin, absMax, 1e9))
+            return rangeFormat(nMin, nMax, 1e9, `B ${curr}`);
+
+        if (sameUnit(absMin, absMax, 1e6))
+            return rangeFormat(nMin, nMax, 1e6, `M ${curr}`);
+
+        if (sameUnit(absMin, absMax, 1e3))
+            return rangeFormat(nMin, nMax, 1e3, `K ${curr}`);
+
+        return `${fmt(nMin)} - ${fmt(nMax)}`;
     }
+
+    // Only min or max
+    if (hasMin) return `Từ ${fmt(nMin)}`;
+    if (hasMax) return `Đến ${fmt(nMax)}`;
+
+    return 'Thương lượng';
 }
+
 
 /**
  * Format date

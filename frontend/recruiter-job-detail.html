@@ -1,294 +1,240 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chi tiết tin tuyển dụng - jobPortal</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="styles.css">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        h1, h2, h3, h4, h5, h6 {
-            font-family: 'Poppins', sans-serif;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chi tiết tin tuyển dụng - JobPortal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body{font-family:'Inter',sans-serif}
+    h1,h2,h3,h4,h5,h6{font-family:'Poppins',sans-serif}
+  </style>
 </head>
-<body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen">
-    <!-- Header Fragment -->
-    <div data-fragment="fragments/header.html" data-header-type="auto"></div>
+<body class="bg-slate-50 min-h-screen">
+  <!-- Header Fragment -->
+  <div data-fragment="fragments/header.html" data-header-type="auto"></div>
 
-    <!-- Main Section -->
-    <section class="py-12 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-4xl mx-auto">
-            <!-- Breadcrumb & Back Button -->
-            <div class="mb-8 flex items-center gap-3">
-                <a href="recruiter-company-detail.html" class="text-blue-600 hover:text-blue-700 font-semibold flex items-center gap-1 transition">
-                    ← Quay lại
-                </a>
-            </div>
+  <main class="px-4 sm:px-6 lg:px-8 py-8">
+    <div class="max-w-7xl mx-auto">
 
-            <!-- Loading State -->
-            <div id="loading-state" class="text-center py-20">
-                <svg class="animate-spin h-16 w-16 text-blue-600 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                <p class="text-gray-600 text-lg font-medium">Đang tải thông tin tin tuyển dụng...</p>
-            </div>
+      <!-- back -->
+      <div class="mb-6">
+        <a href="recruiter-company-detail.html" class="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold">
+          <span class="mr-2">←</span> Quay lại
+        </a>
+      </div>
 
-            <!-- Error State -->
-            <div id="error-state" class="bg-gradient-to-r from-red-50 to-orange-50 border-l-4 border-red-500 rounded-xl p-8 hidden">
-                <div class="flex items-start gap-4">
-                    <svg class="h-8 w-8 text-red-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <div>
-                        <h3 class="text-lg font-bold text-red-900 mb-1">Lỗi tải dữ liệu</h3>
-                        <p class="text-red-700 font-medium" id="error-message"></p>
-                    </div>
-                </div>
-            </div>
+      <!-- loading -->
+      <div id="loading-state" class="text-center py-16">
+        <svg class="animate-spin h-12 w-12 text-blue-600 mx-auto mb-4" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0A12 12 0 000 12h4z"/>
+        </svg>
+        <p class="text-gray-600 font-medium">Đang tải thông tin tin tuyển dụng...</p>
+      </div>
 
-            <!-- Job Detail Content -->
-            <div id="job-content" class="hidden">
-                <!-- Job Header -->
-                <div class="bg-white rounded-2xl shadow-2xl p-8 mb-8">
-                    <div class="flex items-start justify-between mb-6">
-                        <div class="flex-1">
-                            <h1 id="job-title" class="text-4xl font-bold text-gray-900 mb-3"></h1>
-                            <div class="flex flex-wrap gap-4">
-                                <div class="flex items-center gap-2">
-                                    <span class="text-2xl">💼</span>
-                                    <div>
-                                        <p class="text-xs text-gray-500 font-medium">Công ty</p>
-                                        <span id="job-company" class="text-gray-900 font-semibold"></span>
-                                    </div>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <span class="text-2xl">🎯</span>
-                                    <div>
-                                        <p class="text-xs text-gray-500 font-medium">Cấp độ</p>
-                                        <span id="job-seniority" class="text-gray-900 font-semibold"></span>
-                                    </div>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <span class="text-2xl">📍</span>
-                                    <div>
-                                        <p class="text-xs text-gray-500 font-medium">Địa điểm</p>
-                                        <span id="job-location" class="text-gray-900 font-semibold"></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <span id="job-status" class="px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap border"></span>
-                    </div>
-                </div>
-
-                <!-- Job Info Cards -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                    <div class="bg-white rounded-xl shadow-lg p-6">
-                        <p class="text-gray-500 text-sm font-medium mb-2">💰 Lương tối thiểu</p>
-                        <p id="job-salary-min" class="text-2xl font-bold text-gray-900"></p>
-                    </div>
-                    <div class="bg-white rounded-xl shadow-lg p-6">
-                        <p class="text-gray-500 text-sm font-medium mb-2">💰 Lương tối đa</p>
-                        <p id="job-salary-max" class="text-2xl font-bold text-gray-900"></p>
-                    </div>
-                    <div class="bg-white rounded-xl shadow-lg p-6">
-                        <p class="text-gray-500 text-sm font-medium mb-2">📋 Loại công việc</p>
-                        <p id="job-type" class="text-2xl font-bold text-gray-900"></p>
-                    </div>
-                    <div class="bg-white rounded-xl shadow-lg p-6">
-                        <p class="text-gray-500 text-sm font-medium mb-2">🌐 Remote</p>
-                        <p id="job-remote" class="text-2xl font-bold text-gray-900"></p>
-                    </div>
-                </div>
-
-                <!-- Job Description & Edit Button -->
-                <div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
-                    <div class="flex items-center justify-between mb-6">
-                        <h2 class="text-2xl font-bold text-gray-900">📝 Mô tả công việc</h2>
-                        <button id="edit-job-btn" class="bg-gradient-to-r from-blue-600 to-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition transform hover:-translate-y-0.5">
-                            ✏️ Chỉnh sửa
-                        </button>
-                    </div>
-                    <div id="job-description" class="prose prose-sm max-w-none text-gray-700 leading-relaxed"></div>
-                </div>
-
-                <!-- Additional Info -->
-                <div class="grid grid-cols-2 gap-8 mb-8">
-                    <div class="bg-white rounded-2xl shadow-lg p-8">
-                        <h3 class="text-lg font-bold text-gray-900 mb-4">📅 Thông tin hết hạn</h3>
-                        <p class="text-gray-600">
-                            <span class="font-semibold text-gray-900" id="job-expires-at"></span>
-                        </p>
-                    </div>
-                    <div class="bg-white rounded-2xl shadow-lg p-8">
-                        <h3 class="text-lg font-bold text-gray-900 mb-4">🏷️ Danh mục</h3>
-                        <p id="job-category" class="text-gray-600">
-                            <span class="font-semibold text-gray-900" id="job-category-name"></span>
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Delete Button -->
-                <div class="flex gap-4">
-                    <button id="delete-job-btn" class="flex-1 bg-gradient-to-r from-red-600 to-red-500 text-white py-4 rounded-xl font-bold hover:shadow-lg transition transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
-                        <span>🗑️</span> Xóa tin tuyển dụng
-                    </button>
-                </div>
-            </div>
+      <!-- error -->
+      <div id="error-state" class="hidden bg-red-50 border border-red-200 text-red-700 rounded-xl p-5 mb-6">
+        <div class="flex gap-3">
+          <svg class="w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M4.93 4.93l14.14 14.14M12 2a10 10 0 100 20 10 10 0 000-20z"/>
+          </svg>
+          <p id="error-message" class="font-semibold"></p>
         </div>
-    </section>
+      </div>
 
-    <!-- Edit Job Modal -->
-    <div id="edit-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-            <!-- Modal Header -->
-            <div class="px-8 py-6 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-gradient-to-r from-blue-50 to-blue-100">
-                <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                    <span>✏️</span> Chỉnh sửa tin tuyển dụng
-                </h2>
-                <button id="close-modal" class="text-gray-500 hover:text-gray-700 text-4xl leading-none h-10 w-10 flex items-center justify-center rounded-lg hover:bg-red-100 transition">&times;</button>
+      <!-- content -->
+      <div id="job-content" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- LEFT: main -->
+        <section class="lg:col-span-8 space-y-6">
+
+          <!-- job header card -->
+          <div class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-6">
+            <div class="flex items-start gap-4">
+              <!-- logo -->
+              <div class="w-16 h-16 rounded-xl overflow-hidden bg-slate-100 flex items-center justify-center ring-1 ring-slate-200">
+                <img id="company-logo" src="" alt="logo" class="w-full h-full object-cover hidden">
+                <span id="company-logo-fallback" class="text-slate-400 text-2xl">🏢</span>
+              </div>
+
+              <div class="flex-1">
+                <div class="flex items-start justify-between gap-3">
+                  <h1 id="job-title" class="text-2xl md:text-3xl font-bold text-slate-900"></h1>
+                  <span id="job-posted-ago" class="text-sm text-slate-500 whitespace-nowrap">—</span>
+                </div>
+
+                <div class="mt-2 flex flex-wrap items-center gap-3 text-sm">
+                  <a id="job-company" href="#" class="text-slate-700 font-medium">—</a>
+                  <span class="text-slate-400">•</span>
+                  <span id="job-location" class="text-slate-700">—</span>
+                  <span class="text-slate-400">•</span>
+                  <span id="job-salary-range" class="text-slate-700">—</span>
+                  <span class="text-slate-400">•</span>
+                  <span id="job-seniority" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">—</span>
+                </div>
+
+                <div class="mt-4 flex flex-wrap gap-3">
+                  <!-- recruiter actions -->
+                  <div class="ml-auto flex gap-2">
+                    <button id="edit-job-btn" class="px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-500">Chỉnh sửa</button>
+                    <button id="delete-job-btn" class="px-4 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-500">Xóa</button>
+                  </div>
+                </div>
+              </div>
             </div>
+          </div>
 
-            <!-- Modal Body -->
-            <form id="edit-form" class="p-8 space-y-6">
-                <input type="hidden" id="company-id-input">
-                <input type="hidden" id="job-id-input">
+          <!-- mô tả -->
+          <div class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-6">
+            <h2 class="text-xl font-bold text-slate-900 mb-4">Mô tả công việc</h2>
+            <div id="job-description" class="prose prose-sm max-w-none text-slate-700 leading-relaxed"></div>
+          </div>
 
-                <!-- Title & Description -->
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">📌 Tiêu đề tin tuyển *</label>
-                        <input 
-                            type="text" 
-                            id="edit-title"
-                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                            required
-                        >
-                    </div>
+          <!-- quyền lợi (optional, render nếu có) -->
+          <div id="benefits-card" class="hidden bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-6">
+            <h3 class="text-lg font-bold text-slate-900 mb-4">Quyền lợi</h3>
+            <ul id="job-benefits" class="grid sm:grid-cols-2 gap-y-2 text-slate-700"></ul>
+          </div>
 
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">📝 Mô tả công việc *</label>
-                        <textarea 
-                            id="edit-description"
-                            rows="5"
-                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition resize-none"
-                            required
-                        ></textarea>
-                    </div>
-                </div>
+        </section>
 
-                <!-- Salary -->
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">💰 Lương tối thiểu (VND) *</label>
-                        <input 
-                            type="number" 
-                            id="edit-salary-min"
-                            min="0"
-                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                            required
-                        >
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">💰 Lương tối đa (VND) *</label>
-                        <input 
-                            type="number" 
-                            id="edit-salary-max"
-                            min="0"
-                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                            required
-                        >
-                    </div>
-                </div>
+        <!-- RIGHT: sidebar -->
+        <aside class="lg:col-span-4 space-y-6">
 
-                <!-- Seniority & Employment Type -->
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">🎯 Cấp độ kinh nghiệm *</label>
-                        <select id="edit-seniority" class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" required>
-                            <option value="">-- Chọn --</option>
-                            <option value="Internship">Internship</option>
-                            <option value="Junior">Junior</option>
-                            <option value="Middle">Middle</option>
-                            <option value="Senior">Senior</option>
-                            <option value="Lead">Lead</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">🏷️ Danh mục *</label>
-                        <select 
-                            id="edit-category-id"
-                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                            required
-                        >
-                            <option value="">-- Đang tải danh mục --</option>
-                        </select>
-                    </div>
-                </div>
+          <!-- Thông tin tuyển dụng -->
+          <div class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-6 lg:sticky lg:top-6">
+            <h3 class="text-lg font-bold text-slate-900 mb-4">Thông tin tuyển dụng</h3>
 
-                <!-- Employment Type & Remote -->
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">📋 Loại công việc *</label>
-                        <select id="edit-employment-type" class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" required>
-                            <option value="">-- Chọn --</option>
-                            <option value="FullTime">Toàn thời gian</option>
-                            <option value="PartTime">Bán thời gian</option>
-                            <option value="Contract">Hợp đồng</option>
-                            <option value="Freelance">Freelance</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">⏰ Hết hạn *</label>
-                        <input 
-                            type="datetime-local" 
-                            id="edit-expires-at"
-                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                            required
-                        >
-                    </div>
-                </div>
-
-                <!-- Remote Checkbox -->
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">🌐 Remote</label>
-                    <label class="flex items-center gap-3">
-                        <input type="checkbox" id="edit-is-remote" class="w-6 h-6 rounded border-2 border-gray-300 text-blue-600 focus:ring-2">
-                        <span class="text-gray-700 font-semibold">Cho phép làm remote</span>
-                    </label>
-                </div>
-
-                <!-- Buttons -->
-                <div class="flex gap-4 pt-8 border-t-2 border-gray-200">
-                    <button type="submit" class="flex-1 bg-gradient-to-r from-blue-600 to-blue-500 text-white py-3 rounded-xl font-bold hover:shadow-lg transition transform hover:-translate-y-0.5">
-                        ✓ Cập nhật
-                    </button>
-                    <button type="button" id="cancel-modal" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-300 transition">
-                        Hủy
-                    </button>
-                </div>
-            </form>
-        </div>
+            <dl class="divide-y divide-slate-200">
+              <div class="py-3 flex items-start justify-between gap-4">
+                <dt class="text-slate-600">Ngày đăng</dt>
+                <dd id="job-posted-date" class="font-semibold text-slate-900 text-right">—</dd>
+              </div>
+              <div class="py-3 flex items-start justify-between gap-4">
+                <dt class="text-slate-600">Hạn nộp hồ sơ</dt>
+                <dd id="job-deadline" class="font-semibold text-slate-900 text-right">—</dd>
+              </div>
+              <div class="py-3 flex items-start justify-between gap-4">
+                <dt class="text-slate-600">Địa điểm</dt>
+                <dd id="job-sidebar-location" class="font-semibold text-slate-900 text-right">—</dd>
+              </div>
+              <div class="py-3 flex items-start justify-between gap-4">
+                <dt class="text-slate-600">Mức lương</dt>
+                <dd id="job-salary-range-sidebar" class="font-semibold text-slate-900 text-right">—</dd>
+              </div>
+              <div class="py-3 flex items-start justify-between gap-4">
+                <dt class="text-slate-600">Cấp bậc</dt>
+                <dd id="job-sidebar-seniority" class="font-semibold text-slate-900 text-right">—</dd>
+              </div>
+              <div class="py-3 flex items-start justify-between gap-4">
+                <dt class="text-slate-600">Kinh nghiệm</dt>
+                <dd id="job-experience" class="font-semibold text-slate-900 text-right">—</dd>
+              </div>
+            </dl>
+          </div>
+        </aside>
+      </div>
     </div>
+  </main>
 
-    <!-- Footer Fragment -->
-    <div data-fragment="fragments/footer.html"></div>
+  <!-- Edit Modal -->
+  <div id="edit-modal" class="fixed inset-0 bg-black/50 hidden z-50 items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+      <div class="px-6 py-4 border-b bg-blue-50 flex items-center justify-between sticky top-0">
+        <h2 class="text-xl font-bold">✏️ Chỉnh sửa tin tuyển dụng</h2>
+        <button id="close-modal" class="text-3xl leading-none px-2 hover:text-red-600">&times;</button>
+      </div>
 
-    <!-- Scripts -->
-    <script src="js/config.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/utils.js"></script>
-    <script src="js/common-helpers.js"></script>
-    <script src="js/markdown-service.js"></script>
-    <script src="js/fragments-loader.js"></script>
-    <script src="js/recruiter-job-detail-service.js"></script>
+      <form id="edit-form" class="p-6 space-y-5">
+        <input type="hidden" id="company-id-input">
+        <input type="hidden" id="job-id-input">
+
+        <div>
+          <label class="block text-sm font-bold mb-2">Tiêu đề *</label>
+          <input id="edit-title" type="text" required class="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500">
+        </div>
+
+        <div>
+          <label class="block text-sm font-bold mb-2">Mô tả *</label>
+          <textarea id="edit-description" rows="5" required class="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500"></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-bold mb-2">Lương tối thiểu (VND) *</label>
+            <input id="edit-salary-min" type="number" min="0" required class="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500">
+          </div>
+          <div>
+            <label class="block text-sm font-bold mb-2">Lương tối đa (VND) *</label>
+            <input id="edit-salary-max" type="number" min="0" required class="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-bold mb-2">Cấp độ *</label>
+            <select id="edit-seniority" required class="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500">
+              <option value="">-- Chọn --</option>
+              <option value="Internship">Internship</option>
+              <option value="Junior">Junior</option>
+              <option value="Middle">Middle</option>
+              <option value="Senior">Senior</option>
+              <option value="Lead">Lead</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-bold mb-2">Danh mục *</label>
+            <select id="edit-category-id" required class="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500">
+              <option value="">-- Đang tải danh mục --</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-bold mb-2">Loại công việc *</label>
+            <select id="edit-employment-type" required class="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500">
+              <option value="">-- Chọn --</option>
+              <option value="FullTime">Toàn thời gian</option>
+              <option value="PartTime">Bán thời gian</option>
+              <option value="Contract">Hợp đồng</option>
+              <option value="Freelance">Freelance</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-bold mb-2">Hết hạn *</label>
+            <input id="edit-expires-at" type="datetime-local" required class="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500">
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <input id="edit-is-remote" type="checkbox" class="w-5 h-5">
+          <label for="edit-is-remote" class="font-semibold">Cho phép làm remote</label>
+        </div>
+
+        <div class="pt-4 flex gap-3">
+          <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl">Cập nhật</button>
+          <button type="button" id="cancel-modal" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-3 rounded-xl">Hủy</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div data-fragment="fragments/footer.html"></div>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/common-helpers.js"></script>
+  <script src="js/markdown-service.js"></script>
+  <script src="js/fragments-loader.js"></script>
+  <script src="js/recruiter-job-detail-service.js"></script>
 </body>
 </html>

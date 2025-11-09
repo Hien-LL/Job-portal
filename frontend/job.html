@@ -45,17 +45,41 @@
         .job-title-hover {
             position: relative;
         }
-        
+
+        /* Hover popup: positioned below the title, scrollable if content is long */
+        /* JavaScript controls left/top positioning to avoid viewport clipping */
         .job-hover-popup {
             display: none;
-            animation: fadeInUp 0.2s ease-out;
+            position: fixed;
+            z-index: 9999;
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+            animation: fadeInUp 0.3 ease-out;
+            max-height: 60vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 0.75rem;
+            width: min(560px, 90vw);
         }
-        
-        .group\/title:hover .job-hover-popup {
+
+        /* Show popup when hovering the title wrapper (keeps popup visible while mouse is over it)
+           the escaped selector below mirrors previous behavior for group/title */
+        .group\/title:hover .job-hover-popup,
+        .job-title-hover:hover .job-hover-popup {
             display: block;
-            animation: delayedShow 1.5s ease-out;
+            animation: delayedShow 0.18s ease-out;
             animation-fill-mode: backwards;
         }
+
+        /* Make inner content readable and scrollable */
+        .job-hover-popup .prose, .job-hover-popup p, .job-hover-popup .text-sm {
+            max-width: 100%;
+        }
+
+        /* Thin custom scrollbar for webkit browsers */
+        .job-hover-popup::-webkit-scrollbar { width: 8px; }
+        .job-hover-popup::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.08); border-radius: 6px; }
         
         @keyframes delayedShow {
             0%, 99% {

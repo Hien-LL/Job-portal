@@ -39,7 +39,7 @@
             
             grid.innerHTML = displayJobs.map(job => {
                 // Format salary
-                const salaryText = formatSalary(job.salaryMin, job.salaryMax);
+                const salaryText = formatSalaryRange(job.salaryMin, job.salaryMax, job.salaryCurrency);
                 
                 // Format location
                 const locationText = job.isRemote ? 'Remote' : 

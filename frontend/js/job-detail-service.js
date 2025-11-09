@@ -4,6 +4,7 @@
         let currentCompanySlug = ''; // ✅ THÊM: Khai báo biến này
         let isJobSaved = false;
         let isJobApplied = false;
+        
 
         function viewCompany(slug, companyId) {
             window.location.href = `company-detail.html?slug=${currentCompanySlug.replace(/"/g, '')}`;
@@ -91,7 +92,7 @@
 
             // Job info
             const locationText = job.isRemote ? 'Remote' : (job.location?.displayName || 'Không xác định');
-            const salaryText = formatSalary(job.salaryMin, job.salaryMax);
+            const salaryText = formatSalaryRange(job.salaryMin, job.salaryMax, job.salaryCurrency);
             
             document.getElementById('job-location').textContent = `📍 ${locationText}`;
             document.getElementById('job-salary').textContent = `💰 ${salaryText}`;

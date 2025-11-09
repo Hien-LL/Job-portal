@@ -135,6 +135,8 @@ function displayJobDetail(job) {
 
     currentJob = job;
     currentCompanyId = job.company?.id;
+    const locationText = job.isRemote ? 'Remote' : 
+                (job.location?.displayName || 'Không xác định');
 
     // Title
     setTextContent('job-title', job.title || 'N/A');
@@ -146,8 +148,30 @@ function displayJobDetail(job) {
     setTextContent('job-seniority', job.seniority || 'N/A');
 
     // Location
-    setTextContent('job-location', job.location?.displayName || 'N/A');
+    setTextContent('job-location', locationText);
 
+    setTextContent('job-posted-date', new Date(job.publishedAt).toLocaleDateString('vi-VN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+    }));
+
+    setTextContent('job-deadline', new Date(job.expiresAt).toLocaleDateString('vi-VN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+    }));
+
+    setTextContent('job-sidebar-seniority', job.seniority || 'Không yêu cầu'); 
+    setTextContent('job-sidebar-location', locationText);
+    setTextContent('job-sidebar-salary', formatSalaryRange(job.salaryMin, job.salaryMax) || 'N/A');
+    setTextContent('job-sidebar-type', job.employmentType || 'N/A');
+    setTextContent('job-salary-range-sidebar', `${formatSalaryRange(job.salaryMin, job.salaryMax, job.currency)}    `);
+    setTextContent('job-experience', job.experience || 'Không yêu cầu');
     // Status badge
     const statusBadge = document.getElementById('job-status');
     if (statusBadge) {

@@ -186,6 +186,8 @@ function displayJobs(jobs, paginationData) {
     jobs.forEach(job => {
         const publishedDate = formatDateDisplay(job.publishedAt || job.createdAt);
         const expiresDate = formatDateDisplay(job.expiresAt);
+        const locationText = job.isRemote ? 'Remote' : 
+                (job.location?.displayName || 'Không xác định');
         
         const statusBadge = job.published 
             ? '<span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-semibold flex items-center gap-1"><svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Đang hiển thị</span>'
@@ -206,7 +208,7 @@ function displayJobs(jobs, paginationData) {
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                             </svg>
-                            <p class="text-xs text-gray-600 line-clamp-1">${job.location?.displayName || 'N/A'}</p>
+                            <p class="text-xs text-gray-600 line-clamp-1">${locationText}</p>
                         </div>
                     </div>
                 </td>
@@ -268,7 +270,6 @@ function displayStats(stats) {
         { label: 'Tổng số tin', value: stats.total, icon: '📄', color: 'blue' },
         { label: 'Đang hiển thị', value: stats.published, icon: '✓', color: 'green' },
         { label: 'Ứng viên', value: stats.applications, icon: '👥', color: 'orange' },
-        { label: 'Bản nháp', value: stats.draft, icon: '📝', color: 'yellow' }
     ];
 
     let html = '';

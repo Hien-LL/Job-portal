@@ -105,7 +105,7 @@
                 `).join('')}
             `;
             container.innerHTML = html;
-
+            
             // Add event listeners
             container.querySelectorAll('.location-filter').forEach(checkbox => {
                 checkbox.addEventListener('change', updateLocationFilter);
@@ -832,9 +832,13 @@
 
         // Update UI with filters from URL
         function updateUiWithFilters() {
-            // Set keyword input
-            const searchInputs = document.querySelectorAll('input[placeholder*="từ khóa"]');
+            // Set keyword input (support id and placeholder-based inputs)
+            const keywordInputById = document.getElementById('keyword-search');
+            const placeholderSearchInputs = Array.from(document.querySelectorAll('input[placeholder*="từ khóa"]'));
+            // Build a list that prefers the explicit #keyword-search input
+            const searchInputs = keywordInputById ? [keywordInputById, ...placeholderSearchInputs] : placeholderSearchInputs;
             if (currentFilters.keyword && searchInputs.length > 0) {
+                // Populate all matched inputs with the keyword from URL
                 searchInputs.forEach(input => input.value = currentFilters.keyword);
             }
             
@@ -954,7 +958,7 @@
             }
 
             const html = jobs.map(job => {
-                const salaryText = formatSalary(job.salaryMin, job.salaryMax);
+                const salaryText =  formatSalaryRange(job.salaryMin, job.salaryMax, job.currency);
                 const locationText = job.isRemote ? 'Remote' : 
                     (job.location?.displayName || 'Không xác định');
                 
@@ -1001,9 +1005,9 @@
                                             ${job.title}
                                         </h3>
                                         
-                                        <!-- Hover Popup (triggered by title hover) -->
-                                        <div class="job-hover-popup hidden group-hover/title:block absolute left-0 top-0 bg-white border-2 border-blue-500 rounded-lg shadow-2xl z-50 p-5" 
-                                             style="min-width: 400px; margin-top: -10px;">
+                                <!-- Hover Popup (triggered by title hover) -->
+                                <div class="job-hover-popup absolute left-0 top-0 bg-white border-2 border-blue-500 rounded-lg shadow-2xl z-50 p-5" 
+                                    style="min-width: 400px;">
                                             <div class="flex gap-3 mb-4">
                                                 <!-- Company Logo -->
                                                 <div class="w-16 h-16 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden border border-gray-200">
@@ -1115,6 +1119,134 @@
             }).join('');
 
             container.innerHTML = html;
+
+            // Setup hover popup positioning (NOW in correct place: after jobs rendered)
+            (function setupHoverPopups() {
+                const triggers = container.querySelectorAll('.job-title-hover');
+                console.debug('setupHoverPopups: found triggers', triggers.length);
+                triggers.forEach(trigger => {
+                    const popup = trigger.querySelector('.job-hover-popup');
+                    if (!popup) return;
+
+                    const placePopup = () => {
+                        console.debug('placePopup called for trigger', trigger, popup);
+                        const margin = 8;
+                        const trigRect = trigger.getBoundingClientRect();
+
+                        // Put popup in a predictable spot to measure its natural size
+                        popup.style.visibility = 'hidden';
+                        popup.style.display = 'block';
+                        popup.style.position = 'fixed';
+                        popup.style.left = '0px';
+                        popup.style.top = '0px';
+                        popup.style.transform = 'none';
+
+                        const popupRect = popup.getBoundingClientRect();
+
+                        // Vertical placement: prefer below, else above, else clamp
+                        let top = trigRect.bottom + margin;
+                        if (top + popupRect.height > window.innerHeight - 10) {
+                            const aboveTop = trigRect.top - popupRect.height - margin;
+                            if (aboveTop > 10) top = aboveTop;
+                            else top = Math.max(10, window.innerHeight - popupRect.height - 10);
+                        }
+
+                        // Horizontal placement:
+                        // PRIORITY 1: If trigger is in the right 30% of viewport, ALWAYS place left
+                        // This prevents clipping for 3-column layouts where 3rd column items sit near the edge.
+                        let left;
+                        if (trigRect.left > window.innerWidth * 0.7) {
+                            // Force popup to the left of the trigger
+                            left = trigRect.left - popupRect.width - margin;
+                            console.debug('RIGHT COLUMN: forcing left placement', { trigLeft: trigRect.left, viewportWidth: window.innerWidth });
+                        } else {
+                            // PRIORITY 2: For left/center columns, try to place right; if not enough room, go left
+                            const maxRight = window.innerWidth - 10;
+                            left = trigRect.left;
+
+                            // Check if placing to the right would overflow
+                            const availableRight = window.innerWidth - trigRect.left - margin;
+                            if (popupRect.width > availableRight || (trigRect.right + margin + popupRect.width > window.innerWidth)) {
+                                // Not enough room to the right: place to the left of trigger
+                                left = trigRect.left - popupRect.width - margin;
+                                console.debug('CENTER/LEFT COLUMN: switched to left (overflow)', { availableRight, popupWidth: popupRect.width });
+                            } else if (left + popupRect.width > maxRight) {
+                                // Fallback: not enough room to the right, place to the left
+                                left = trigRect.left - popupRect.width - margin;
+                            }
+                        }
+
+                        // Handle left-side overflow: if popup goes past left edge, clamp to viewport left
+                        if (left < 10) {
+                            const alt = trigRect.right - popupRect.width;
+                            if (alt >= 10 && alt + popupRect.width <= window.innerWidth - 10) {
+                                left = alt;
+                            } else {
+                                left = 10;
+                            }
+                        }
+
+                        // Final clamp to viewport right
+                        if (left + popupRect.width > window.innerWidth - 10) {
+                            left = Math.max(10, window.innerWidth - popupRect.width - 10);
+                        }
+
+                        // Apply final position and restore visibility
+                        console.debug('placePopup calc', { left, top, popupRect, trigRect });
+                        popup.style.left = `${Math.round(left)}px`;
+                        popup.style.top = `${Math.round(top)}px`;
+                        popup.style.zIndex = 9999;
+                        popup.style.visibility = '';
+                    };
+
+                    const resetPopup = () => {
+                        popup.style.display = 'none';
+                        popup.style.left = '';
+                        popup.style.top = '';
+                        popup.style.position = '';
+                        popup.style.transform = '';
+                        popup.style.zIndex = '';
+                        popup.style.visibility = '';
+                    };
+
+                    // Pointer events for desktop/tablet
+                    trigger.addEventListener('pointerenter', (e) => {
+                        if (window.innerWidth < 768) return;
+                        placePopup();
+                    });
+
+                    trigger.addEventListener('pointerleave', (e) => {
+                        setTimeout(() => {
+                            const pt = document.elementFromPoint(e.clientX, e.clientY);
+                            if (!popup.contains(pt)) resetPopup();
+                        }, 60);
+                    });
+
+                    popup.addEventListener('pointerenter', () => {
+                        if (window.innerWidth < 768) return;
+                        placePopup();
+                    });
+
+                    popup.addEventListener('pointerleave', (e) => {
+                        setTimeout(() => {
+                            const pt = document.elementFromPoint(e.clientX, e.clientY);
+                            if (!trigger.contains(pt)) resetPopup();
+                        }, 60);
+                    });
+
+                    // On small screens, clicking the title should navigate to detail page
+                    trigger.querySelectorAll('a, h3').forEach(el => {
+                        el.addEventListener('click', (ev) => {
+                            if (window.innerWidth >= 768) return; // keep default on desktop
+                            const link = trigger.querySelector('a[href]');
+                            if (link) {
+                                ev.preventDefault();
+                                window.location.href = link.getAttribute('href');
+                            }
+                        });
+                    });
+                });
+            })();
 
             // Check saved status for each job if user is logged in
             if (authService.isAuthenticated()) {
@@ -1571,13 +1703,13 @@
                 });
             }
 
-            // Add search functionality
-            const searchInputs = document.querySelectorAll('input[placeholder*="từ khóa"]');
-            searchInputs.forEach(input => {
+            // Add search functionality (attach to #keyword-search and any matching placeholder inputs)
+            const searchInputsSelector = document.querySelectorAll('#keyword-search, input[placeholder*="từ khóa"]');
+            searchInputsSelector.forEach(input => {
                 input.addEventListener('input', (e) => {
                     currentFilters.keyword = e.target.value;
                 });
-                
+
                 input.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') {
                         searchJobs(1, true); // fromSearchBar = true
