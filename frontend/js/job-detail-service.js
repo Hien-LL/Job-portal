@@ -99,12 +99,12 @@
             document.getElementById('job-type').textContent = `⏰ ${job.seniority || 'Toàn thời gian'}`;
             document.getElementById('published-date').textContent = formatPublishedDate(job.publishedAt);
 
-            // Job description
-            document.getElementById('job-description').innerHTML = formatDescription(job.description || 'Chưa có mô tả công việc.');
+            // Job description - Display HTML directly (from Quill editor)
+            document.getElementById('job-description').innerHTML = job.description || '<p>Không có mô tả công việc</p>';
 
             // Job requirements (if available in API response)
             if (job.requirements) {
-                document.getElementById('job-requirements').innerHTML = formatDescription(job.requirements);
+                document.getElementById('job-requirements').innerHTML = job.requirements;
             } else {
                 // Hide requirements section if not available
                 const reqSection = document.querySelector('.bg-white:has(#job-requirements)');
@@ -149,7 +149,6 @@
             // Company info
             document.getElementById('company-sidebar-name').textContent = job.company?.name || 'Công ty không xác định';
             document.getElementById('company-size').textContent = formatCompanySize(job.company?.size_min, job.company?.size_max);
-            document.getElementById('company-description').textContent = job.company?.description || 'Chưa có mô tả công ty.';
             
             if (job.company?.website) {
                 const websiteLink = document.querySelector('#company-website a');

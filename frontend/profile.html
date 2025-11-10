@@ -5,8 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hồ sơ cá nhân - JobPortal</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Quill Rich Text Editor -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Quill Editor Custom Styles */
+        .ql-container {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 16px !important;
+        }
+        
+        .ql-editor {
+            min-height: 300px;
+            padding: 12px 16px;
+            line-height: 1.6;
+        }
+        
+        .ql-editor.ql-blank::before {
+            color: #9ca3af;
+            font-style: italic;
+        }
+        
+        .ql-toolbar {
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+            border: 1px solid #e5e7eb;
+            background-color: #f9fafb;
+        }
+        
+        .ql-container {
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            border: 1px solid #e5e7eb;
+            border-top: none;
+        }
+    </style>
 </head>
 <body class="bg-gray-50">
     <!-- Header Fragment -->
@@ -312,31 +346,11 @@
             <!-- Modal Body -->
             <div class="p-6 space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Giới thiệu bản thân</label>
-                    <div class="space-y-2">
-                        <!-- Formatting Buttons -->
-                        <div class="flex flex-wrap gap-2 mb-2">
-                            <button type="button" onclick="insertSummaryMarkdown('**', '**')" class="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded border border-gray-300 font-bold" title="Bold">B</button>
-                            <button type="button" onclick="insertSummaryMarkdown('*', '*')" class="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded border border-gray-300 italic" title="Italic">I</button>
-                            <button type="button" onclick="insertSummaryMarkdown('~~', '~~')" class="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded border border-gray-300 line-through" title="Strikethrough">S</button>
-                            <button type="button" onclick="insertSummaryMarkdown('# ', '')" class="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded border border-gray-300" title="Heading">H1</button>
-                            <button type="button" onclick="insertSummaryMarkdown('## ', '')" class="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded border border-gray-300" title="Heading 2">H2</button>
-                            <button type="button" onclick="insertSummaryMarkdown('- ', '')" class="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded border border-gray-300" title="List">List</button>
-                            <button type="button" onclick="insertSummaryMarkdown('[', '](url)')" class="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded border border-gray-300" title="Link">Link</button>
-                            <span class="ml-2 text-xs text-gray-500 py-1">Markdown được hỗ trợ</span>
-                        </div>
-                        
-                        <!-- Textarea -->
-                        <textarea id="edit-summary-textarea" placeholder="Viết giới thiệu ngắn về bản thân. Hỗ trợ markdown: **bold**, *italic*, ~~strike~~, # heading, ## heading 2, - list, [link](url)" rows="6" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"></textarea>
-                        
-                        <!-- Preview Section -->
-                        <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
-                            <p class="text-xs font-semibold text-gray-600 mb-2">👁️ Preview:</p>
-                            <div id="summary-preview" class="prose prose-sm max-w-none text-gray-700">
-                                <p class="text-gray-400 italic">Sẽ hiển thị ở đây</p>
-                            </div>
-                        </div>
-                    </div>
+                    <label class="block text-sm font-medium text-gray-700 mb-3">Giới thiệu bản thân</label>
+                    <!-- Quill Editor Container -->
+                    <div id="edit-summary-editor" class="border rounded-xl bg-white" style="height: 350px;"></div>
+                    <!-- Hidden input to store HTML content -->
+                    <input type="hidden" id="edit-summary-content">
                 </div>
             </div>
 
@@ -353,6 +367,7 @@
     </div>
 
     <!-- Scripts -->
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script src="js/fragments-loader.js"></script>
     <script src="js/config.js"></script>
     <script src="js/auth.js"></script>

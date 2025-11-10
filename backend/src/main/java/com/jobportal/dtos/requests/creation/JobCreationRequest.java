@@ -3,6 +3,8 @@ package com.jobportal.dtos.requests.creation;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.*;
 import lombok.Data;
+
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -40,9 +42,8 @@ public class JobCreationRequest {
 
     @NotNull(message = "expiresAt không được để trống")
     @Future(message = "expiresAt phải là thời gian trong tương lai")
-    private LocalDateTime expiresAt;
+    private Instant expiresAt;
 
-    @NotBlank(message = "locationCountryCode không được để trống")
     private String locationCountryCode;
 
     @NotNull(message = "categoryId is không được để trống")

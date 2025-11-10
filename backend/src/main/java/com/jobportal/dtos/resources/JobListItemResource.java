@@ -3,6 +3,7 @@ package com.jobportal.dtos.resources;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -18,9 +19,9 @@ public class JobListItemResource {
     private String seniority;
     private boolean published;
     private String employmentType;
-    private LocalDateTime expiresAt;
+    private Instant expiresAt;
     private String currency;
-    private LocalDateTime publishedAt;
+    private Instant publishedAt;
     private String slug;
 
     private LocationListItemResource location;

@@ -3,7 +3,7 @@
     <nav class="p-4">
       <ul class="space-y-2 list-none m-0 p-0">
         <li>
-          <a href="recruiter-company.html" id="nav-dashboard" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-gray-50 p-3 rounded-lg text-sm transition">
+          <a href="recruiter-overview.html" id="nav-dashboard" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-gray-50 p-3 rounded-lg text-sm transition">
              <img src="img/icon-profile.png" alt="Profile Icon" class="w-5 h-5">
             <span class="font-medium">Tổng quan</span>
           </a>
@@ -33,7 +33,13 @@
           </a>
         </li>
         <li>
-          <a href="profile.html" id="nav-settings" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-gray-50 p-3 rounded-lg text-sm transition">
+          <a href="recruiter-contact.html" id="nav-contact" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-gray-50 p-3 rounded-lg text-sm transition">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mail"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m22 7-10 5L2 7"></path></svg>
+            <span class="font-medium">Liên hệ</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" id="nav-settings" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-gray-50 p-3 rounded-lg text-sm transition">
             <img src="img/icon-settings.png" alt="Settings Icon" class="w-5 h-5">
             <span class="font-medium">Cài đặt tài khoản</span>
           </a>
@@ -58,9 +64,13 @@
       nav.classList.add('text-gray-700','hover:bg-gray-50');
     });
     let id = null;
-    if (!currentPage || currentPage === 'recruiter-company.html') id = 'nav-dashboard';
-    else if (currentPage === 'recruiter-company-detail.html') id = 'nav-jobs';
-    else if (currentPage === 'applications.html') id = 'nav-candidates';
+    if (!currentPage || currentPage === 'recruiter-overview.html') id = 'nav-dashboard';
+    else if (currentPage === 'recruiter-company.html') id = 'nav-company-info';
+    else if (currentPage === 'recruiter-company-detail.html') id = 'nav-company-info';
+    else if (currentPage === 'recruiter-jobs.html') id = 'nav-jobs';
+    else if (currentPage === 'recruiter-applications.html') id = 'nav-candidates';
+    else if (currentPage === 'recruiter-job-create.html') id = 'nav-messages';
+    else if (currentPage === 'recruiter-contact.html') id = 'nav-contact';
     else if (currentPage === 'profile.html') id = 'nav-settings';
     const el = id && document.getElementById(id);
     if (el) { el.classList.remove('text-gray-700','hover:bg-gray-50'); el.classList.add('text-blue-600','bg-blue-50'); }

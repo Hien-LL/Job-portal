@@ -1,6 +1,8 @@
 package com.jobportal.dtos.resources;
 
 import lombok.*;
+
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Data
@@ -24,7 +26,7 @@ public class SavedJobResource {
     private String employmentType;
 
     private LocalDateTime savedAt;
-    private LocalDateTime expiresAt;
+    private Instant expiresAt;
 
     private boolean expired;
 }

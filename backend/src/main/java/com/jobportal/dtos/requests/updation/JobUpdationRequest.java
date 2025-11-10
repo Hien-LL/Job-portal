@@ -3,6 +3,7 @@ package com.jobportal.dtos.requests.updation;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -21,7 +22,7 @@ public class JobUpdationRequest {
     private String currency;
     private String slug;
     private Boolean published;
-    private LocalDateTime expiresAt;
+    private Instant expiresAt;
 
     private Long categoryId;            // null: không đụng, có: đổi category
     private String locationCountryCode; // null: không đụng, có: đổi location

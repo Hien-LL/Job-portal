@@ -9,6 +9,47 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/components.css">
+    <!-- Quill Editor CSS -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <style>
+        .ql-container {
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+        }
+
+        .ql-editor {
+            min-height: 350px;
+            padding: 12px;
+            line-height: 1.6;
+        }
+
+        .ql-editor.ql-blank::before {
+            color: #9ca3af;
+            font-style: italic;
+        }
+
+        .ql-toolbar {
+            border-radius: 8px 8px 0 0;
+            background-color: #f9fafb;
+            border: 1px solid #d1d5db;
+            border-bottom: none;
+        }
+
+        .ql-toolbar.ql-snow .ql-stroke {
+            stroke: #6b7280;
+        }
+
+        .ql-toolbar.ql-snow .ql-fill {
+            fill: #6b7280;
+        }
+
+        /* Close dropdowns when clicking outside */
+        .dropdown-open {
+            z-index: 50;
+        }
+    </style>
 </head>
 <body class="bg-gray-50">
     <!-- Header Fragment -->
@@ -89,49 +130,47 @@
                         <!-- Description -->
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Mô tả công việc *</label>
-                            <textarea 
-                                id="job-description"
-                                placeholder="Mô tả chi tiết về công việc"
-                                rows="5"
-                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition resize-none"
-                                required
-                            ></textarea>
+                            <div id="job-description-editor" style="height: 350px;"></div>
+                            <input type="hidden" id="job-description">
                         </div>
 
-                        <!-- Category -->
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Danh mục *</label>
-                            <select 
-                                id="job-category"
-                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                                required
-                            >
-                                <option value="">Chọn danh mục</option>
-                            </select>
-                        </div>
-
-                        <!-- Location -->
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Địa điểm *</label>
-                            <select 
-                                id="job-location"
-                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                                required
-                            >
-                                <option value="">Chọn địa điểm</option>
-                            </select>
-                        </div>
-
-                        <!-- Remote Work -->
-                        <div>
-                            <label class="flex items-center gap-3">
-                                <input 
-                                    type="checkbox" 
-                                    id="job-remote"
-                                    class="w-5 h-5 border border-gray-300 rounded cursor-pointer"
+                        <!-- Category / Location / Remote (aligned in one row on large screens) -->
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                            <!-- Category -->
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Danh mục *</label>
+                                <select 
+                                    id="job-category"
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                    required
                                 >
-                                <span class="text-sm font-semibold text-gray-700">Cho phép làm việc từ xa</span>
-                            </label>
+                                    <option value="">Chọn danh mục</option>
+                                </select>
+                            </div>
+
+                            <!-- Location -->
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Địa điểm *</label>
+                                <select 
+                                    id="job-location"
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                    required
+                                >
+                                    <option value="">Chọn địa điểm</option>
+                                </select>
+                            </div>
+
+                            <!-- Remote Work -->
+                            <div class="flex items-center">
+                                <label class="flex items-center gap-3 w-full">
+                                    <input 
+                                        type="checkbox" 
+                                        id="job-remote"
+                                        class="w-5 h-5 border border-gray-300 rounded cursor-pointer"
+                                    >
+                                    <span class="text-sm font-semibold text-gray-700">Cho phép làm việc từ xa</span>
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -289,6 +328,17 @@
                         >
                     </div>
                 </div>
+                <div class="flex items-start mb-6" data-id="element-1860"><div class="flex items-center h-5" data-id="element-1861"><input id="terms" type="checkbox" required="" class="focus:ring-[#2563eb] h-4 w-4 text-[#2563eb] border-gray-300 rounded" data-id="element-1862"></div><div class="ml-3 text-sm" data-id="element-1863">
+                    <label for="terms" class="font-medium text-gray-700" data-id="element-1864">Tôi xác nhận thông tin trên là chính xác</label>
+                    <p class="text-gray-500" data-id="element-1865">Tôi đã đọc và đồng ý với <a href="#" class="text-[#2563eb] hover:underline" data-id="element-1866">Điều khoản sử dụng</a> và <a href="#" class="text-[#2563eb] hover:underline" data-id="element-1867">Chính sách bảo mật</a> của JobPortal.</p></div>
+                </div>
+                <div class="flex items-center text-yellow-600 bg-yellow-50 px-4 py-3 rounded-lg" data-id="element-1869">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-alert h-5 w-5 mr-2 flex-shrink-0" aria-hidden="true" data-id="element-1870">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" x2="12" y1="8" y2="12"></line>
+                        <line x1="12" x2="12.01" y1="16" y2="16"></line>
+                    </svg><p class="text-sm" data-id="element-1871">Tin tuyển dụng sẽ được kiểm duyệt trước khi hiển thị công khai.</p>
+                </div>
 
                 <!-- Form Actions -->
                 <div class="border-t border-gray-200 pt-8 flex gap-3">
@@ -312,6 +362,7 @@
     <div data-fragment="fragments/footer.html"></div>
 
     <!-- Scripts -->
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script src="js/config.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/utils.js"></script>

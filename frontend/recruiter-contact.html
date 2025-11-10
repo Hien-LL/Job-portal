@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liên hệ - JobPortal Nhà Tuyển Dụng</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/components.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .card-hover {
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(2, 6, 23, 0.08);
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            box-shadow: 0 6px 18px rgba(59, 130, 246, 0.12);
+            outline: none;
+        }
+        
+        .btn-animate {
+            transition: transform 0.12s ease, box-shadow 0.12s ease;
+        }
+        
+        .btn-animate:active {
+            transform: translateY(1px) scale(0.997);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header Fragment -->
+    <div data-fragment="fragments/header-recruiter.html"></div>
+
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h1 class="text-3xl md:text-4xl font-bold">Liên hệ với chúng tôi</h1>
+                <p class="mt-3 text-blue-100">Đội ngũ hỗ trợ của chúng tôi sẵn sàng giúp bạn thành công trong tuyển dụng</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Breadcrumb -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <nav class="text-sm text-gray-600" aria-label="Breadcrumb">
+            <ol class="list-reset flex gap-2 items-center">
+                <li><a href="index.html" class="hover:text-blue-600">Trang chủ</a></li>
+                <li>›</li>
+                <li><a href="recruiter-overview.html" class="hover:text-blue-600">Dashboard</a></li>
+                <li>›</li>
+                <li class="text-gray-900 font-medium">Liên hệ</li>
+            </ol>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Column: Contact Info -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Contact Information -->
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">Thông tin liên hệ</h3>
+                    <div class="space-y-4 text-sm text-gray-700">
+                        <!-- Address -->
+                        <div class="flex items-start gap-3">
+                            <div class="text-blue-600 mt-1">📍</div>
+                            <div>
+                                <div class="font-medium text-gray-900">Địa chỉ văn phòng</div>
+                                <div class="text-gray-600">123 Đường Nguyễn Hữu Cảnh<br>Quận 1, TP. Hồ Chí Minh</div>
+                            </div>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="flex items-start gap-3">
+                            <div class="text-blue-600 mt-1">✉️</div>
+                            <div>
+                                <div class="font-medium text-gray-900">Email hỗ trợ</div>
+                                <a href="mailto:recruiter@jobportal.vn" class="text-blue-600 hover:underline">recruiter@jobportal.vn</a>
+                            </div>
+                        </div>
+
+                        <!-- Phone -->
+                        <div class="flex items-start gap-3">
+                            <div class="text-blue-600 mt-1">📞</div>
+                            <div>
+                                <div class="font-medium text-gray-900">Điện thoại</div>
+                                <a href="tel:0123456789" class="text-blue-600 hover:underline">0123 456 789</a>
+                            </div>
+                        </div>
+
+                        <!-- Hours -->
+                        <div class="flex items-start gap-3">
+                            <div class="text-blue-600 mt-1">⏰</div>
+                            <div>
+                                <div class="font-medium text-gray-900">Giờ làm việc</div>
+                                <div class="text-gray-600">
+                                    Thứ Hai - Thứ Sáu: 8:30 - 17:30<br>
+                                    Thứ Bảy: 9:00 - 12:00<br>
+                                    Chủ Nhật: Nghỉ
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Support Departments -->
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">Các bộ phận hỗ trợ</h3>
+                    <div class="space-y-4 text-sm">
+                        <!-- Sales Support -->
+                        <div class="pb-4 border-b">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="text-lg">💼</span>
+                                <span class="font-medium text-gray-900">Bán hàng & Tư vấn</span>
+                            </div>
+                            <p class="text-gray-600 text-xs ml-6">Hỗ trợ các gói dịch vụ, khuyến mãi<br><a href="tel:0123456789" class="text-blue-600 hover:underline">0123 456 789</a></p>
+                        </div>
+
+                        <!-- Technical Support -->
+                        <div class="pb-4 border-b">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="text-lg">🛠️</span>
+                                <span class="font-medium text-gray-900">Hỗ trợ kỹ thuật</span>
+                            </div>
+                            <p class="text-gray-600 text-xs ml-6">Giải quyết vấn đề kỹ thuật<br><a href="mailto:tech@jobportal.vn" class="text-blue-600 hover:underline">tech@jobportal.vn</a></p>
+                        </div>
+
+                        <!-- Account Management -->
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="text-lg">👤</span>
+                                <span class="font-medium text-gray-900">Quản lý tài khoản</span>
+                            </div>
+                            <p class="text-gray-600 text-xs ml-6">Thay đổi thông tin, nâng cấp gói<br><a href="mailto:account@jobportal.vn" class="text-blue-600 hover:underline">account@jobportal.vn</a></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Frequently Asked Questions -->
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">Câu hỏi thường gặp</h3>
+                    <div class="space-y-3 text-sm">
+                        <div>
+                            <a href="#" class="text-blue-600 hover:underline font-medium">Làm cách nào để nâng cấp gói dịch vụ?</a>
+                        </div>
+                        <div>
+                            <a href="#" class="text-blue-600 hover:underline font-medium">Chi phí quảng cáo bài đăng là bao nhiêu?</a>
+                        </div>
+                        <div>
+                            <a href="#" class="text-blue-600 hover:underline font-medium">Làm cách nào để liên hệ ứng viên?</a>
+                        </div>
+                        <div>
+                            <a href="#" class="text-blue-600 hover:underline font-medium">Xem tất cả FAQ →</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Contact Form -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Gửi tin nhắn cho chúng tôi</h2>
+                    <p class="text-gray-600 mb-6">Hãy điền form bên dưới, chúng tôi sẽ phản hồi trong vòng 24 giờ</p>
+
+                    <form id="contact-form" class="space-y-6">
+                        <!-- Name Field -->
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Họ và tên *</label>
+                            <input 
+                                type="text" 
+                                id="name" 
+                                name="name" 
+                                required
+                                placeholder="Nhập họ và tên"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                            >
+                        </div>
+
+                        <!-- Email Field -->
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email" 
+                                required
+                                placeholder="you@company.com"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                            >
+                        </div>
+
+                        <!-- Phone Field -->
+                        <div>
+                            <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">Số điện thoại</label>
+                            <input 
+                                type="tel" 
+                                id="phone" 
+                                name="phone" 
+                                placeholder="0123 456 789"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                            >
+                        </div>
+
+                        <!-- Company Field -->
+                        <div>
+                            <label for="company" class="block text-sm font-medium text-gray-700 mb-2">Công ty</label>
+                            <input 
+                                type="text" 
+                                id="company" 
+                                name="company" 
+                                placeholder="Tên công ty của bạn"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                            >
+                        </div>
+
+                        <!-- Subject Field -->
+                        <div>
+                            <label for="subject" class="block text-sm font-medium text-gray-700 mb-2">Chủ đề *</label>
+                            <select 
+                                id="subject" 
+                                name="subject" 
+                                required
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                            >
+                                <option value="">-- Chọn chủ đề --</option>
+                                <option value="sales">Tư vấn bán hàng</option>
+                                <option value="technical">Hỗ trợ kỹ thuật</option>
+                                <option value="account">Quản lý tài khoản</option>
+                                <option value="billing">Thanh toán & Hóa đơn</option>
+                                <option value="feedback">Phản hồi & Góp ý</option>
+                                <option value="other">Khác</option>
+                            </select>
+                        </div>
+
+                        <!-- Message Field -->
+                        <div>
+                            <label for="message" class="block text-sm font-medium text-gray-700 mb-2">Nội dung tin nhắn *</label>
+                            <textarea 
+                                id="message" 
+                                name="message" 
+                                required
+                                rows="6"
+                                placeholder="Hãy mô tả vấn đề của bạn chi tiết..."
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition resize-vertical"
+                            ></textarea>
+                        </div>
+
+                        <!-- Checkbox -->
+                        <div class="flex items-center">
+                            <input 
+                                type="checkbox" 
+                                id="agree" 
+                                name="agree" 
+                                required
+                                class="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                            >
+                            <label for="agree" class="ml-2 text-sm text-gray-600">
+                                Tôi đồng ý với <a href="terms.html" class="text-blue-600 hover:underline">Điều khoản dịch vụ</a> và <a href="privacy-policy.html" class="text-blue-600 hover:underline">Chính sách bảo mật</a>
+                            </label>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="flex gap-3">
+                            <button 
+                                type="submit" 
+                                class="btn-animate flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition"
+                            >
+                                Gửi tin nhắn
+                            </button>
+                            <button 
+                                type="reset" 
+                                class="btn-animate flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-300 transition"
+                            >
+                                Xóa
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Response Info -->
+                <div class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-6">
+                    <h3 class="font-semibold text-blue-900 mb-2">ℹ️ Thông tin quan trọng</h3>
+                    <ul class="text-sm text-blue-800 space-y-1 list-disc list-inside">
+                        <li>Chúng tôi sẽ phản hồi email của bạn trong vòng 24 giờ làm việc</li>
+                        <li>Để biết hỗ trợ nhanh hơn, vui lòng gọi hotline: <strong>0123 456 789</strong></li>
+                        <li>Giờ làm việc: Thứ Hai - Thứ Sáu, 8:30 - 17:30</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Fragment -->
+    <div data-fragment="fragments/footer.html"></div>
+
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/fragments-loader.js"></script>
+    <script src="js/common-helpers.js"></script>
+    <script>
+        // Handle contact form submission
+        document.getElementById('contact-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            // Get form data
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                company: document.getElementById('company').value,
+                subject: document.getElementById('subject').value,
+                message: document.getElementById('message').value
+            };
+
+            // Validate
+            if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+                showErrorToast('Vui lòng điền đầy đủ các trường bắt buộc', 3000);
+                return;
+            }
+
+            try {
+                // TODO: Replace with actual API endpoint
+                const url = buildApiUrl('/recruiters/contact/send');
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${getStoredToken()}`
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showSuccessToast('Tin nhắn đã được gửi thành công! Chúng tôi sẽ liên hệ sớm.', 3000);
+                    document.getElementById('contact-form').reset();
+                } else {
+                    showErrorToast(result.message || 'Gửi tin nhắn thất bại', 3000);
+                }
+            } catch (error) {
+                console.error('Error sending contact form:', error);
+                showErrorToast('Có lỗi xảy ra khi gửi tin nhắn', 3000);
+            }
+        });
+    </script>
+</body>
+</html>

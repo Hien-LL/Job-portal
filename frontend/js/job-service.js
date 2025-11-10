@@ -28,6 +28,14 @@
             companies: []
         };
 
+        // Utility: Extract text from HTML (remove tags)
+        function stripHtmlTags(html) {
+            if (!html) return '';
+            const div = document.createElement('div');
+            div.innerHTML = html;
+            return div.textContent || div.innerText || '';
+        }
+
         // Load filter data from APIs
         async function loadFiltersData() {
             try {
@@ -966,9 +974,10 @@
                 const companyLogo = job.company?.logoUrl;
                 const publishedDate = formatPublishedDate(job.publishedAt);
                 
-                // Format description preview (first 200 chars)
-                const descriptionPreview = job.description ? 
-                    (job.description.length > 200 ? job.description.substring(0, 200) + '...' : job.description) : 
+                // Format description preview (first 200 chars, strips HTML tags)
+                const plainDescription = job.description;
+                const descriptionPreview = plainDescription ? 
+                    plainDescription : 
                     'Không có mô tả';
 
                 return `
@@ -1065,7 +1074,9 @@
                                             <!-- Description -->
                                             <div class="border-t pt-3 mb-4">
                                                 <h4 class="font-semibold text-gray-900 text-sm mb-2">Mô tả công việc</h4>
-                                                <p class="text-gray-600 text-sm leading-relaxed line-clamp-4">${descriptionPreview}</p>
+                                                <div class="text-gray-600 text-sm leading-relaxed max-h-48 overflow-y-auto prose prose-sm max-w-none">
+                                                    ${job.description ? job.description : '<p>Không có mô tả</p>'}
+                                                </div>
                                             </div>
 
                                             <!-- Benefits -->

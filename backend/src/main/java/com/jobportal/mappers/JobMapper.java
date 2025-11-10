@@ -15,6 +15,7 @@ public interface JobMapper extends BaseMapper<Job, JobResource, JobCreationReque
     JobListItemResource tListItemResource(Job job);
 
     @Override
+    @Mapping(target = "benefits", source = "benefits")
     @Mapping(target = "skills", source = "skills")
     @Mapping(target = "yearsOfExperience", source = "yearsOfExperience")
     @Mapping(target = "company", source = "company")

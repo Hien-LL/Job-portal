@@ -216,3 +216,71 @@ body {
 .prose li {
   margin-bottom: 0.25rem;
 }
+
+/* Quill Editor HTML Content Display */
+#job-description h1,
+#job-description h2,
+#job-description h3,
+#job-description h4,
+#job-description h5,
+#job-description h6 {
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: #111827;
+}
+
+#job-description h1 { font-size: 1.875rem; }
+#job-description h2 { font-size: 1.5rem; }
+#job-description h3 { font-size: 1.25rem; }
+#job-description h4 { font-size: 1.125rem; }
+
+#job-description p {
+  margin-bottom: 1rem;
+  line-height: 1.6;
+  color: #374151;
+}
+
+#job-description ul,
+#job-description ol {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+  color: #374151;
+}
+
+#job-description li {
+  margin-bottom: 0.5rem;
+}
+
+#job-description strong {
+  font-weight: 600;
+  color: #111827;
+}
+
+#job-description em {
+  font-style: italic;
+}
+
+#job-description code {
+  background-color: #f3f4f6;
+  color: #d97706;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.875rem;
+}
+
+#job-description blockquote {
+  border-left: 4px solid #3b82f6;
+  padding-left: 1rem;
+  margin-left: 0;
+  margin-bottom: 1rem;
+  color: #6b7280;
+  font-style: italic;
+}
+
+#job-description hr {
+  margin: 1.5rem 0;
+  border: none;
+  border-top: 1px solid #e5e7eb;
+}

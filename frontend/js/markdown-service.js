@@ -192,7 +192,7 @@ function formatDescription(description) {
  */
 function formatSalaryRange(min, max, currency = 'VND') {
     const isEmpty = v => v == null || v === '' || Number.isNaN(Number(v));
-    if (isEmpty(min) && isEmpty(max)) return 'Thương lượng';
+    if (isEmpty(min) && isEmpty(max)) return 'Thỏa thuận';
 
     const toNum = v =>
         v == null || v === ''
@@ -237,7 +237,6 @@ function formatSalaryRange(min, max, currency = 'VND') {
 
         if (abs >= 1e9) (val = v / 1e9, suf = 'B');
         else if (abs >= 1e6) (val = v / 1e6, suf = 'M');
-        else if (abs >= 1e3) (val = v / 1e3, suf = 'K');
 
         return suf
             ? `${symbol}${nf(val, decimals(val))}${suf} ${code}`
@@ -288,7 +287,7 @@ function formatSalaryRange(min, max, currency = 'VND') {
     if (hasMin) return `Từ ${fmt(nMin)}`;
     if (hasMax) return `Đến ${fmt(nMax)}`;
 
-    return 'Thương lượng';
+    return 'Thỏa thuận ';
 }
 
 

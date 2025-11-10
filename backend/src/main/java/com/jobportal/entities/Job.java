@@ -3,6 +3,7 @@ package com.jobportal.entities;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -19,14 +20,17 @@ public class Job {
 
     private String title;
 
-    @Column(columnDefinition = "TEXT")
+    @Lob
+    @Column(columnDefinition = "LONGTEXT")
     private String description;
+
     private boolean isRemote;
     private int salaryMax;
     private int salaryMin;
-    private LocalDateTime expiresAt;
-    private boolean published;
-    private LocalDateTime publishedAt;
+    @Column(name = "expires_at", columnDefinition = "TIMESTAMP(6)")
+    private Instant expiresAt;    private boolean published;
+    @Column(name = "published_at", columnDefinition = "TIMESTAMP(6)")
+    private Instant publishedAt;
     private String seniority;
     private String slug;
     private String employmentType;
@@ -53,7 +57,7 @@ public class Job {
             joinColumns = @JoinColumn(name = "job_id"),
             inverseJoinColumns = @JoinColumn(name = "benefit_id")
     )
-    private List<Benefit> benefits = new ArrayList<>();
+    private Set<Benefit> benefits = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "job", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Application> applications = new ArrayList<>();
@@ -69,7 +73,7 @@ public class Job {
 
     @PrePersist
     protected void onCreate() {
-        this.publishedAt = LocalDateTime.now();
+        this.publishedAt = Instant.from(LocalDateTime.now());
     }
 
     @PreUpdate

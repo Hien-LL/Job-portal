@@ -9,6 +9,46 @@ let allSkills = [];
 let selectedBenefits = [];
 let selectedSkills = [];
 let isSavingDraft = false;
+let descriptionEditor = null;
+
+// ==================== Helper Functions ====================
+
+// Convert datetime-local (YYYY-MM-DDTHH:mm) to UTC ISO string
+// Input: 2025-11-30T06:00 (user's local time)
+// Output: 2025-11-30T06:00:00Z (as if they entered UTC time)
+function localDatetimeToUTC(datetimeLocalValue) {
+    // Parse the datetime-local value
+    const [datePart, timePart] = datetimeLocalValue.split('T');
+    const [year, month, day] = datePart.split('-');
+    const [hours, minutes] = timePart.split(':');
+    
+    // Create a date object treating the input as UTC
+    const date = new Date(`${year}-${month}-${day}T${hours}:${minutes}:00Z`);
+    
+    return date.toISOString();
+}
+
+// ==================== Quill Editor ====================
+
+function initializeDescriptionEditor() {
+    if (descriptionEditor) return; // Already initialized
+
+    descriptionEditor = new Quill('#job-description-editor', {
+        theme: 'snow',
+        placeholder: 'Viết mô tả chi tiết về công việc...',
+        modules: {
+            toolbar: [
+                ['bold', 'italic', 'underline', 'strike'],
+                ['blockquote', 'code-block'],
+                [{ 'header': 1 }, { 'header': 2 }],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                [{ 'align': [] }],
+                ['link', 'image'],
+                ['clean']
+            ]
+        }
+    });
+}
 
 // ==================== API Functions ====================
 
@@ -216,7 +256,7 @@ async function populateDropdowns() {
 
 // Render benefits as checkboxes
 function renderBenefits() {
-  const container = document.getElementById("benefits-container");
+  const container = document.getElementById("benefits-dropdown");
   if (!container) return;
 
   container.innerHTML = allBenefits
@@ -227,6 +267,7 @@ function renderBenefits() {
                 type="checkbox" 
                 class="benefit-checkbox w-4 h-4 border border-gray-300 rounded cursor-pointer"
                 value="${benefit.id}"
+                data-name="${benefit.name}"
                 ${selectedBenefits.includes(benefit.id) ? "checked" : ""}
             >
             <span class="text-sm font-medium text-gray-700">${
@@ -246,13 +287,43 @@ function renderBenefits() {
       } else {
         selectedBenefits = selectedBenefits.filter((b) => b !== id);
       }
+      updateBenefitsDisplay();
     });
   });
+
+  updateBenefitsDisplay();
+}
+
+// Update benefits display
+function updateBenefitsDisplay() {
+  const display = document.getElementById("benefits-selected");
+  if (!display) return;
+
+  // Remove duplicates
+  const uniqueBenefitIds = [...new Set(selectedBenefits)];
+  selectedBenefits = uniqueBenefitIds; // Update the global array to remove duplicates
+
+  if (uniqueBenefitIds.length === 0) {
+    document.getElementById("benefits-selected-text").textContent = "Chọn quyền lợi";
+    display.innerHTML = "";
+    return;
+  }
+
+  document.getElementById("benefits-selected-text").textContent = `Đã chọn ${uniqueBenefitIds.length} quyền lợi`;
+
+  const selectedNames = uniqueBenefitIds.map(id => {
+    const benefit = allBenefits.find(b => b.id === id);
+    return benefit ? benefit.name : "";
+  }).filter(name => name);
+
+  display.innerHTML = selectedNames
+    .map(name => `<span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm">✓ ${name}</span>`)
+    .join("");
 }
 
 // Render skills as checkboxes
 function renderSkills() {
-  const container = document.getElementById("skills-container");
+  const container = document.getElementById("skills-dropdown");
   if (!container) return;
 
   container.innerHTML = allSkills
@@ -263,6 +334,7 @@ function renderSkills() {
                 type="checkbox" 
                 class="skill-checkbox w-4 h-4 border border-gray-300 rounded cursor-pointer"
                 value="${skill.id}"
+                data-name="${skill.name}"
                 ${selectedSkills.includes(skill.id) ? "checked" : ""}
             >
             <span class="text-sm font-medium text-gray-700">${skill.name}</span>
@@ -280,8 +352,54 @@ function renderSkills() {
       } else {
         selectedSkills = selectedSkills.filter((s) => s !== id);
       }
+      updateSkillsDisplay();
     });
   });
+
+  updateSkillsDisplay();
+}
+
+// Update skills display
+function updateSkillsDisplay() {
+  const display = document.getElementById("skills-selected");
+  if (!display) return;
+
+  // Remove duplicates
+  const uniqueSkillIds = [...new Set(selectedSkills)];
+  selectedSkills = uniqueSkillIds; // Update the global array to remove duplicates
+
+  if (uniqueSkillIds.length === 0) {
+    document.getElementById("skills-selected-text").textContent = "Chọn kỹ năng";
+    display.innerHTML = "";
+    return;
+  }
+
+  document.getElementById("skills-selected-text").textContent = `Đã chọn ${uniqueSkillIds.length} kỹ năng`;
+
+  const selectedNames = uniqueSkillIds.map(id => {
+    const skill = allSkills.find(s => s.id === id);
+    return skill ? skill.name : "";
+  }).filter(name => name);
+
+  display.innerHTML = selectedNames
+    .map(name => `<span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">✓ ${name}</span>`)
+    .join("");
+}
+
+// Toggle benefits dropdown
+function toggleBenefitsDropdown() {
+  const dropdown = document.getElementById("benefits-dropdown");
+  if (dropdown) {
+    dropdown.classList.toggle("hidden");
+  }
+}
+
+// Toggle skills dropdown
+function toggleSkillsDropdown() {
+  const dropdown = document.getElementById("skills-dropdown");
+  if (dropdown) {
+    dropdown.classList.toggle("hidden");
+  }
 }
 
 // Load job detail for editing
@@ -310,7 +428,11 @@ async function loadJobDetail() {
 function populateJobForm(job) {
   setElementValue("job-id", job.id);
   setElementValue("job-title", job.title);
-  setElementValue("job-description", job.description);
+  
+  // Initialize Quill and load description
+  initializeDescriptionEditor();
+  descriptionEditor.root.innerHTML = job.description || '';
+
   setElementValue("job-category", job.category?.id);
   setElementValue("job-location", job.location?.countryCode);
   document.getElementById("job-remote").checked = job.isRemote;
@@ -354,6 +476,9 @@ async function initializePage() {
 
     await populateDropdowns();
 
+    // Initialize Quill editor
+    initializeDescriptionEditor();
+
     hideElement("loading");
     showElement("job-form");
 
@@ -369,7 +494,7 @@ async function initializePage() {
 // Validate form
 function validateForm() {
   const title = getElementValue("job-title");
-  const description = getElementValue("job-description");
+  const descriptionContent = descriptionEditor.root.innerHTML.replace(/<p><br><\/p>/g, '');
   const category = getElementValue("job-category");
   const location = getElementValue("job-location");
   const salaryMin = parseInt(getElementValue("job-salary-min")) || 0;
@@ -383,7 +508,7 @@ function validateForm() {
     return false;
   }
 
-  if (!description.trim()) {
+  if (!descriptionContent.trim()) {
     showErrorToast("Vui lòng nhập mô tả công việc", 3000);
     return false;
   }
@@ -423,14 +548,32 @@ function validateForm() {
     return false;
   }
 
+  if (selectedBenefits.length === 0) {
+    showErrorToast("Vui lòng chọn ít nhất một quyền lợi", 3000);
+    return false;
+  }
+
+  if (selectedSkills.length === 0) {
+    showErrorToast("Vui lòng chọn ít nhất một kỹ năng", 3000);
+    return false;
+  }
+
   return true;
 }
 
 // Get form data
 function getFormData(publish = true) {
+  // Convert datetime-local to UTC ISO string
+  const expiresAtInput = getElementValue("job-expires-at"); // Format: YYYY-MM-DDTHH:mm
+  const expiresAtISO = localDatetimeToUTC(expiresAtInput);
+
+  // Remove duplicates from arrays
+  const uniqueBenefits = [...new Set(selectedBenefits)];
+  const uniqueSkills = [...new Set(selectedSkills)];
+
   return {
     title: getElementValue("job-title"),
-    description: getElementValue("job-description"),
+    description: descriptionEditor.root.innerHTML.replace(/<p><br><\/p>/g, ''),
     categoryId: parseInt(getElementValue("job-category")),
     locationCountryCode: getElementValue("job-location"),
     isRemote: document.getElementById("job-remote").checked,
@@ -440,9 +583,9 @@ function getFormData(publish = true) {
     seniority: getElementValue("job-seniority"),
     employmentType: getElementValue("job-employment-type"),
     yearsOfExperience: parseInt(getElementValue("job-experience")) || 0,
-    expiresAt: new Date(getElementValue("job-expires-at")).toISOString(),
-    benefitIds: selectedBenefits,
-    skillIds: selectedSkills,
+    expiresAt: expiresAtISO,
+    benefitIds: uniqueBenefits,
+    skillIds: uniqueSkills,
   };
 }
 
@@ -493,8 +636,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const submitBtn = document.getElementById("publish-btn");
         if (submitBtn) {
           submitBtn.disabled = false;
-          submitBtn.textContent =
-            document.getElementById("submit-text").textContent;
+          const submitText = document.getElementById("submit-text");
+          submitBtn.textContent = submitText ? submitText.textContent : "Đăng tin";
         }
       }
     });
@@ -533,6 +676,24 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
   }
+
+  // Close dropdowns when clicking outside
+  document.addEventListener("click", function(e) {
+    const benefitsDropdown = document.getElementById("benefits-dropdown");
+    const skillsDropdown = document.getElementById("skills-dropdown");
+    const benefitsBtn = e.target.closest("[onclick*='toggleBenefitsDropdown']");
+    const skillsBtn = e.target.closest("[onclick*='toggleSkillsDropdown']");
+
+    // Close benefits dropdown if clicking outside
+    if (benefitsDropdown && !benefitsBtn && !benefitsDropdown.contains(e.target)) {
+      benefitsDropdown.classList.add("hidden");
+    }
+
+    // Close skills dropdown if clicking outside
+    if (skillsDropdown && !skillsBtn && !skillsDropdown.contains(e.target)) {
+      skillsDropdown.classList.add("hidden");
+    }
+  });
 
   // Initialize page
   loadFragments().then(() => {

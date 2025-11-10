@@ -44,4 +44,7 @@ public interface FollowCompanyRepository extends JpaRepository<FollowCompany, Fo
     """, nativeQuery = true)
     List<CompanyListItemProjection> findCompaniesByUserIdNative(@Param("userId") Long userId);
 
+    @Query("SELECT COUNT(f) FROM FollowCompany f WHERE f.company.id = :companyId")
+    int countFollowers(Long companyId);
+
 }

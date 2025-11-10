@@ -2,6 +2,29 @@
 // Handles single company profile display and management
 
 let currentCompany = null;
+let descriptionEditor = null;
+
+// ==================== Quill Editor ====================
+
+function initializeDescriptionEditor() {
+    if (descriptionEditor) return; // Already initialized
+
+    descriptionEditor = new Quill('#edit-description-editor', {
+        theme: 'snow',
+        placeholder: 'Viết mô tả công ty...',
+        modules: {
+            toolbar: [
+                ['bold', 'italic', 'underline', 'strike'],
+                ['blockquote', 'code-block'],
+                [{ 'header': 1 }, { 'header': 2 }],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                [{ 'align': [] }],
+                ['link', 'image'],
+                ['clean']
+            ]
+        }
+    });
+}
 
 // ==================== API Functions ====================
 
@@ -213,6 +236,12 @@ function displayCompanyProfile(company) {
 
     // Update description
     setTextContent('company-description', company.description || 'Chưa có mô tả');
+    
+    // Update full description card
+    const descriptionFull = document.getElementById('company-description-full');
+    if (descriptionFull) {
+        descriptionFull.innerHTML = company.description || 'Chưa có mô tả công ty.';
+    }
 
     // Update size
     if (company.size_min && company.size_max) {
@@ -285,10 +314,15 @@ async function loadCompanyProfile() {
 function openEditModal() {
     if (!currentCompany) return;
 
+    // Initialize Quill on first open
+    initializeDescriptionEditor();
+
     setElementValue('edit-company-name', currentCompany.name || '');
-    setElementValue('edit-company-description', currentCompany.description || '');
     setElementValue('edit-size-min', currentCompany.size_min || '');
     setElementValue('edit-size-max', currentCompany.size_max || '');
+
+    // Load description HTML into Quill editor
+    descriptionEditor.root.innerHTML = currentCompany.description || '';
 
     openModal('edit-modal');
 }
@@ -416,7 +450,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const companyData = {
                 name: getElementValue('edit-company-name'),
-                description: getElementValue('edit-company-description'),
+                description: descriptionEditor.root.innerHTML.replace(/<p><br><\/p>/g, ''),
                 size_min: parseInt(getElementValue('edit-size-min')) || 0,
                 size_max: parseInt(getElementValue('edit-size-max')) || 0
             };

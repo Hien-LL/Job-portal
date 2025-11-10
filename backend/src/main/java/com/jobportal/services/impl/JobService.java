@@ -8,6 +8,7 @@ import com.jobportal.dtos.requests.updation.JobUpdationRequest;
 import com.jobportal.dtos.resources.CompanyResource;
 import com.jobportal.dtos.resources.JobResource;
 import com.jobportal.entities.*;
+import com.jobportal.mappers.BenefitMapper;
 import com.jobportal.mappers.CompanyMapper;
 import com.jobportal.mappers.JobMapper;
 import com.jobportal.repositories.*;
@@ -23,10 +24,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -43,6 +43,7 @@ public class JobService extends BaseService implements JobServiceInterface {
     private final SkillRepository skillRepository;
     private final SavedJobRepository savedJobRepository;
     private final CompanyAdminRepository adminRepository;
+    private final BenefitMapper benefitMapper;
 
 
     @Override
@@ -62,7 +63,7 @@ public class JobService extends BaseService implements JobServiceInterface {
         Location location = locationRepository.findByCountryCode(request.getLocationCountryCode())
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy vị trí công việc"));
 
-        List<Benefit> benefits = benefitRepository.findAllById(request.getBenefitIds());
+        Set<Benefit> benefits = (Set<Benefit>) benefitRepository.findAllById(request.getBenefitIds());
         List<Skill> skills =skillRepository.findAllById(request.getSkillIds());
 
         Job job = jobMapper.tEntity(request);
@@ -125,9 +126,9 @@ public class JobService extends BaseService implements JobServiceInterface {
         }
 
         if (request.getBenefitIds() != null) {
-            List<Benefit> benefits = request.getBenefitIds().isEmpty()
-                    ? List.of()
-                    : benefitRepository.findAllById(request.getBenefitIds());
+            Set<Benefit> benefits = request.getBenefitIds().isEmpty()
+                    ? new LinkedHashSet<>()
+                    : new LinkedHashSet<>(benefitRepository.findAllById(request.getBenefitIds()));
             job.setBenefits(benefits);
         }
 
@@ -140,7 +141,7 @@ public class JobService extends BaseService implements JobServiceInterface {
 
         // 3) Parse thời gian nếu có (tránh đè khi null)
         // if (request.getExpiresAt()!=null) job.setExpiresAt(OffsetDateTime.parse(request.getExpiresAt()));
-        // if (request.getPublishedAt()!=null) job.setPublishedAt(OffsetDateTime.parse(request.getPublishedAt()));
+         if (request.getPublishedAt()!=null) job.setPublishedAt(Instant.from(OffsetDateTime.parse(request.getPublishedAt()).toLocalDateTime()));
 
         // 4) Clear có chủ đích (nếu dùng)
         if (request.getFieldsToNullify() != null) {

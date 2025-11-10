@@ -1,6 +1,8 @@
 package com.jobportal.repositories;
 
 import com.jobportal.entities.Application;
+import com.jobportal.repositories.views.ApplicationStatsView;
+import com.jobportal.repositories.views.RecruiterRecentApplicationView;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -10,6 +12,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -108,5 +112,71 @@ public interface ApplicationRepository extends JpaRepository<Application, Long>,
     """)
     Optional<Application> findCandidateByIdForCompanyAdmin(@Param("applicationId") Long applicationId,
                                                            @Param("actorUserId") Long actorUserId);
+
+    @Query("""
+           select count(a)
+           from Application a
+           where a.job.company.id = :companyId
+           """)
+    int countAllByCompanyId(@Param("companyId") Long companyId);
+
+    // Đếm theo mã status (code), VD: "PENDING", "ACCEPTED", "REJECTED"
+    @Query("""
+           select count(a)
+           from Application a
+           where a.job.company.id = :companyId
+             and a.status.code = :code
+           """)
+    int countByCompanyAndStatusCode(@Param("companyId") Long companyId,
+                                    @Param("code") String code);
+
+    @Query("""
+       select count(a)
+       from Application a
+       where a.job.company.id = :companyId
+         and a.appliedAt >= :start
+         and a.appliedAt <  :end
+       """)
+    int countNewInRange(
+            @Param("companyId") Long companyId,
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end
+    );
+
+
+    @Query("""
+        select 
+            a.id as id,
+            j.title as jobTitle,
+            u.name as candidateName,
+            a.appliedAt as createdAt,
+            s.code as statusCode
+        from Application a
+        join a.job j
+        join a.user u
+        join a.status s
+        where j.company.id = :companyId
+          and (:statusCode is null or lower(s.code) = lower(:statusCode))
+        order by a.appliedAt desc
+    """)
+    List<RecruiterRecentApplicationView> findRecentApplications(
+            @Param("companyId") Long companyId,
+            @Param("statusCode") String statusCode,
+            Pageable pageable
+    );
+
+    @Query("""
+        select 
+            count(a) as total,
+            sum(case when lower(s.code) = 'pending'  then 1 else 0 end) as pending,
+            sum(case when lower(s.code) = 'accepted' then 1 else 0 end) as accepted,
+            sum(case when lower(s.code) = 'rejected' then 1 else 0 end) as rejected,
+            sum(case when lower(s.code) = 'viewed'   then 1 else 0 end) as viewed
+        from Application a
+        join a.job j
+        join a.status s
+        where j.company.id = :companyId
+    """)
+    ApplicationStatsView aggregateStatsByCompany(@Param("companyId") Long companyId);
 }
 

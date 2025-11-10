@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tổng quan Dashboard - JobPortal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/components.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .stat-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header Fragment -->
+    <div data-fragment="fragments/header-recruiter.html"></div>
+
+    <!-- Main Content -->
+    <main class="flex-grow">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Breadcrumb -->
+            <nav class="flex mb-6 text-sm text-gray-600" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1">
+                    <li class="inline-flex items-center">
+                        <a href="index.html" class="hover:text-blue-600">
+                            Trang chủ
+                        </a>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <svg class="w-3 h-3 mx-2" fill="currentColor" viewBox="0 0 12 12">
+                                <path d="M4.5 2.5l4 5-4 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+                            <span class="text-gray-900 font-medium">Dashboard nhà tuyển dụng</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+
+            <!-- Page Header -->
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Dashboard Nhà Tuyển Dụng</h1>
+                    <p class="text-gray-600 mt-1">Xem tổng quan hoạt động tuyển dụng của bạn</p>
+                </div>
+                <button id="refresh-btn" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition inline-flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                    </svg>
+                    Làm mới
+                </button>
+            </div>
+
+            <!-- Main Grid Layout with Sidebar -->
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <!-- Sidebar Fragment -->
+                <div data-fragment="fragments/recruiter-sidebar.html" class="relative"></div>
+
+                <!-- Main Content -->
+                <div class="lg:col-span-3 space-y-8">
+
+            <!-- Loading State -->
+            <div id="loading-state" class="flex justify-center items-center py-20">
+                <div class="flex items-center gap-3 text-blue-600">
+                    <svg class="animate-spin h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span class="text-lg font-semibold">Đang tải dữ liệu...</span>
+                </div>
+            </div>
+
+            <!-- Dashboard Content -->
+            <div id="dashboard-content" class="hidden space-y-8">
+                <!-- Statistics Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Total Jobs Card -->
+                    <div class="stat-card bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-sm font-medium text-gray-500">Tin tuyển dụng</h3>
+                            <svg class="w-8 h-8 text-blue-100" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M2 6a2 2 0 012-2h12a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM4 9a1 1 0 011-1h10a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1V9z"/>
+                            </svg>
+                        </div>
+                        <p class="text-3xl font-bold text-gray-900 mb-1" id="total-jobs-count">0</p>
+                        <p class="text-sm text-gray-600" id="total-jobs-desc">0 tin đang hoạt động</p>
+                    </div>
+
+                    <!-- New Applications Card -->
+                    <div class="stat-card bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-sm font-medium text-gray-500">Ứng viên mới</h3>
+                            <svg class="w-8 h-8 text-green-100" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zm-11-1a1 1 0 11-2 0 1 1 0 012 0zM8 8a1 1 0 000 2h4a1 1 0 000-2H8z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <p class="text-3xl font-bold text-gray-900 mb-1" id="new-applications-count">0</p>
+                        <p class="text-sm text-gray-600" id="new-applications-desc">0 chờ xử lý</p>
+                    </div>
+
+                    <!-- Total Views Card -->
+                    <div class="stat-card bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-sm font-medium text-gray-500">Lượt xem</h3>
+                            <svg class="w-8 h-8 text-purple-100" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <p class="text-sm text-gray-600" id="total-view-desc">+0 lượt theo dõi công ty</p>
+                    </div>
+
+                    <!-- Quick Action Card -->
+                    <div class="stat-card bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg shadow-sm border border-blue-600 p-6 text-white">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-sm font-medium text-blue-100">Hành động nhanh</h3>
+                            <svg class="w-8 h-8 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                        </div>
+                        <p class="text-sm font-medium mb-3">Tạo tin tuyển dụng mới</p>
+                        <a href="recruiter-job-create.html" class="inline-flex items-center px-3 py-1.5 bg-white text-blue-600 rounded font-medium text-sm hover:bg-blue-50 transition">
+                            Đăng tin
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Recent Jobs Section -->
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                    <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                        <h2 class="text-lg font-bold text-gray-900">Tin tuyển dụng gần đây</h2>
+                        <a href="recruiter-jobs.html" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Xem tất cả →</a>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50 border-b">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-900">Vị trí</th>
+                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-900">Trạng thái</th>
+                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-900">Ứng viên</th>
+                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-900">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-jobs-list">
+                                <tr>
+                                    <td colspan="4" class="px-6 py-8 text-center text-gray-500">
+                                        Đang tải...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Recent Applications Section -->
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                    <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                        <h2 class="text-lg font-bold text-gray-900">Ứng viên mới nhất</h2>
+                        <a href="recruiter-applications.html" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Xem tất cả →</a>
+                    </div>
+                    <div id="recent-applications-list" class="divide-y">
+                        <div class="px-6 py-8 text-center text-gray-500">
+                            Đang tải...
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Fragment -->
+    <div data-fragment="fragments/footer.html"></div>
+
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/fragments-loader.js"></script>
+    <script src="js/common-helpers.js"></script>
+    <script src="js/recruiter-overview-service.js"></script>
+</body>
+</html>

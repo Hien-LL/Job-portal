@@ -1,6 +1,6 @@
         let currentArticle = null;
 
-        // Sample blog data (same as blog.html - in real app, this would come from API)
+        // Sample blog data with full content (same as blog.html - in real app, this would come from API)
         const blogPosts = [
             {
                 id: 1,

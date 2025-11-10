@@ -3,6 +3,34 @@ let userProfile = null;
         let userResumes = [];
         let allAvailableSkills = []; // Store all available skills from public API
         let currentEditingSkillSlug = null; // Track which skill is being edited
+        let summaryEditor = null; // Quill editor instance for summary
+
+        // ==================== Quill Editor Setup ====================
+
+        function initializeSummaryEditor() {
+            if (summaryEditor) return; // Already initialized
+            
+            try {
+                summaryEditor = new Quill('#edit-summary-editor', {
+                    theme: 'snow',
+                    modules: {
+                        toolbar: [
+                            ['bold', 'italic', 'underline', 'strike'],
+                            ['blockquote', 'code-block'],
+                            [{ 'header': 1 }, { 'header': 2 }],
+                            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                            [{ 'align': [] }],
+                            ['link', 'image'],
+                            ['clean']
+                        ]
+                    },
+                    placeholder: 'Viết giới thiệu ngắn về bản thân...'
+                });
+                console.log('Summary editor initialized successfully');
+            } catch (error) {
+                console.error('Error initializing summary editor:', error);
+            }
+        }
 
         // Load all profile data
         async function loadProfile() {
@@ -440,11 +468,15 @@ let userProfile = null;
         function openEditSummaryModal() {
             if (!userProfile) return;
 
-            // Populate textarea with current summary
-            document.getElementById('edit-summary-textarea').value = userProfile.summary || '';
+            // Initialize Quill editor on first open
+            if (!summaryEditor) {
+                initializeSummaryEditor();
+            }
             
-            // Update preview
-            updateEditSummaryPreview();
+            // Set content in Quill editor
+            if (summaryEditor) {
+                summaryEditor.root.innerHTML = userProfile.summary || '';
+            }
 
             openModal('edit-summary-modal');
         }
@@ -745,7 +777,20 @@ let userProfile = null;
         // Save summary changes - ✅ ĐÃ SỬA
         async function saveSummary() {
             try {
-                const summary = document.getElementById('edit-summary-textarea').value.trim();
+                // Get HTML content from Quill editor
+                let summary = '';
+                if (summaryEditor) {
+                    summary = summaryEditor.root.innerHTML;
+                } else {
+                    summary = document.getElementById('edit-summary-textarea')?.value || '';
+                }
+                
+                // Remove Quill toolbar formatting from HTML (clean empty tags)
+                summary = summary.replace(/<p><br><\/p>/g, '').trim();
+                
+                if (!summary || summary === '<p><br></p>') {
+                    summary = ''; // Allow empty summary
+                }
 
                 // Update profile with summary only
                 const updateSuccess = await updateProfile({

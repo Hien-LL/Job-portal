@@ -96,7 +96,7 @@ let currentCompany = null;
             }
 
             // Company description
-            document.getElementById('company-description').textContent = company.description || 'Chưa có mô tả công ty.';
+            document.getElementById('company-description').innerHTML = company.description || 'Chưa có mô tả công ty.';
 
             // Sidebar info
             document.getElementById('sidebar-company-size').textContent = companySizeText;
@@ -165,8 +165,8 @@ let currentCompany = null;
             <a href="job-detail.html?slug=${job.slug}" class="text-blue-600 text-sm font-medium hover:underline">Xem chi tiết</a>
           </div>
         </div>
-        <div class="text-gray-600 text-sm mb-3 line-clamp-2">
-          ${job.description || 'Chưa có mô tả công việc'}
+        <div class="text-gray-600 text-sm mb-3 line-clamp-2 prose prose-sm max-w-none">
+          ${job.description ? job.description : '<p>Chưa có mô tả công việc</p>'}
         </div>
         ${Array.isArray(job.benefits) && job.benefits.length ? `
           <div class="flex flex-wrap gap-1">

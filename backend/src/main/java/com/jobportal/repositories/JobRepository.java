@@ -1,6 +1,7 @@
 package com.jobportal.repositories;
 
 import com.jobportal.entities.Job;
+import com.jobportal.repositories.views.RecruiterRecentJobView;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -58,4 +59,29 @@ public interface JobRepository extends JpaRepository<Job, Long>, JpaSpecificatio
         Long getCategoryId();
         long getCnt();
     }
+
+    @Query("SELECT COUNT(j) FROM Job j WHERE j.company.id = :companyId")
+    int countAllByCompanyId(Long companyId);
+
+    @Query("SELECT COUNT(j) FROM Job j WHERE j.company.id = :companyId AND j.published = true")
+    int countActiveByCompanyId(Long companyId);
+
+    @Query("""
+        select 
+            j.id as id,
+            j.title as title,
+            j.publishedAt as createdAt,
+            j.published as published,
+            count(a.id) as applicantsCount
+        from Job j
+        left join Application a on a.job.id = j.id
+        where j.company.id = :companyId
+        group by j.id, j.title, j.publishedAt, j.published
+        order by j.publishedAt desc
+    """)
+    List<RecruiterRecentJobView> findRecentJobsWithApplicantCount(
+            @Param("companyId") Long companyId,
+            Pageable pageable
+    );
+
 }

@@ -197,10 +197,6 @@ let isLoading = false;
                                     </p>
                                 </div>
                             </div>
-
-                            <div class="mb-4">
-                                <p class="text-gray-600 text-sm line-clamp-3">${company.description || 'Chưa có mô tả công ty'}</p>
-                            </div>
                         </a>
 
                         <div class="flex items-center justify-between pt-4 border-t border-gray-100">
