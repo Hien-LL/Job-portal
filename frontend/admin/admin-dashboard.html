@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - JobPortal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../css/components.css"> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>body { font-family: 'Inter', sans-serif; } h1,h2,h3 { font-family: 'Poppins', sans-serif; }</style>
+</head>
+<body class="bg-gray-50">
+    <div data-fragment="fragments/admin-header.html"></div> <main class="flex-grow bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <nav class="flex mb-6 text-sm text-gray-600" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1">
+                    <li><a href="../index.html" class="hover:text-blue-600">Trang chủ</a></li> <li>
+                        <div class="flex items-center">
+                            <svg class="w-3 h-3 mx-2" fill="currentColor" viewBox="0 0 12 12"><path d="M4.5 2.5l4 5-4 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                            <span class="text-gray-900 font-medium">Admin Dashboard</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
+                <div data-fragment="fragments/admin-sidebar.html" class="relative"></div> <div class="lg:col-span-3 space-y-8">
+                    <h1 class="text-3xl font-bold text-gray-900">Dashboard Quản trị viên</h1>
+                    <div id="loading-state" class="flex justify-center items-center py-20">...</div>
+                    <div id="dashboard-content" class="hidden space-y-8">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                                <h3 class="text-sm font-medium text-gray-500">Tổng số Người dùng</h3>
+                                <p class="text-3xl font-bold text-gray-900 mt-2" id="total-users">0</p>
+                            </div>
+                            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                                <h3 class="text-sm font-medium text-gray-500">Tổng số Công ty</h3>
+                                <p class="text-3xl font-bold text-gray-900 mt-2" id="total-companies">0</p>
+                            </div>
+                            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                                <h3 class="text-sm font-medium text-gray-500">Tổng tin Tuyển dụng</h3>
+                                <p class="text-3xl font-bold text-gray-900 mt-2" id="total-jobs">0</p>
+                            </div>
+                            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                                <h3 class="text-sm font-medium text-gray-500">Tổng lượt Ứng tuyển</h3>
+                                <p class="text-3xl font-bold text-gray-900 mt-2" id="total-applications">0</p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                                <h2 class="text-lg font-bold text-gray-900 mb-4">Người dùng mới theo tuần</h2>
+                                <div class="h-64"><canvas id="userChart"></canvas></div>
+                            </div>
+                            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                                <h2 class="text-lg font-bold text-gray-900 mb-4">Tin tuyển dụng mới theo tuần</h2>
+                                <div class="h-64"><canvas id="jobChart"></canvas></div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                                <h2 class="text-lg font-bold text-gray-900 p-6 border-b">Người dùng mới nhất</h2>
+                                <div id="recent-users-list" class="divide-y divide-gray-200">...</div>
+                            </div>
+                            <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                                <h2 class="text-lg font-bold text-gray-900 p-6 border-b">Tin tuyển dụng mới nhất</h2>
+                                <div id="recent-jobs-list" class="divide-y divide-gray-200">...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div data-fragment="fragments/admin-footer.html"></div> <script src="../js/config.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/fragments-loader.js"></script>
+    <script src="js/admin-dashboard.js"></script>
+</body>
+</html>

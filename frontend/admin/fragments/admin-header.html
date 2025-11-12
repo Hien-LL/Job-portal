@@ -1,0 +1,94 @@
+<header class="bg-white shadow-sm sticky top-0 border-b border-gray-200" id="main-header" style="z-index: 9999;">
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+        
+        <a href="admin-dashboard.html" class="flex items-center gap-2">
+            <span class="text-2xl font-bold bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent">
+                JobPortal <span class="bg-red-500 text-white text-xs font-semibold px-2 py-0.5 rounded-md align-middle">ADMIN</span>
+            </span>
+        </a>
+
+        <div class="flex items-center gap-3">
+            <div id="logged-in-menu" class="flex items-center gap-3">                
+                <div class="relative">
+                    <button id="user-menu-trigger" class="text-gray-700 text-sm font-medium hover:text-blue-600 flex items-center gap-2">
+                        <img id="admin-avatar-icon" src="img/icon-account.png" alt="Admin Avatar" class="w-6 h-6 rounded-full object-cover bg-gray-200">
+                        <span id="admin-name-text">Admin</span> ▼
+                    </button>
+                    <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200" style="z-index: 9998;">
+                        <div class="py-1">
+                            <a href="admin-settings.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Cài đặt</a>
+                            <a href="index.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Xem trang Client</a>
+                            <hr class="my-1">
+                            <button id="logout-btn" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+                                Đăng xuất
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="not-logged-in-menu" class="hidden">
+                <a href="login.html" class="text-gray-700 text-sm font-medium hover:text-blue-600">Đăng nhập</a>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<script>
+(function() {
+    function setupAdminMenu() {
+        const trigger = document.getElementById('user-menu-trigger');
+        const dropdown = document.getElementById('user-dropdown');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        if (trigger && dropdown) {
+            trigger.addEventListener('click', function(e) {
+                e.stopPropagation();
+                dropdown.classList.toggle('hidden');
+            });
+        }
+        if (logoutBtn && window.logout) {
+            logoutBtn.addEventListener('click', window.logout);
+        }
+    }
+    
+    // Lấy thông tin admin
+    async function loadAdminInfo() {
+        if (typeof authService !== 'undefined' && authService.isAuthenticated()) {
+            try {
+                const profile = await authService.getUserProfile();
+                if (profile) {
+                    const avatarEl = document.getElementById('admin-avatar-icon');
+                    const nameEl = document.getElementById('admin-name-text');
+                    if (nameEl) nameEl.textContent = profile.name || 'Admin';
+                    if (avatarEl && profile.avatarUrl) {
+                        avatarEl.src = `${API_CONFIG.FILE_BASE_URL}${profile.avatarUrl}`;
+                    } else if (avatarEl) {
+                         avatarEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.name || 'A')}&background=E0E7FF&color=3730A3`;
+                    }
+                }
+            } catch (e) {
+                console.warn("Could not load admin info for header", e);
+            }
+        }
+    }
+
+    if (document.readyState !== 'loading') {
+        setupAdminMenu();
+        loadAdminInfo();
+    } else {
+        document.addEventListener('DOMContentLoaded', () => {
+            setupAdminMenu();
+            loadAdminInfo();
+        });
+    }
+    
+    // Đóng dropdown khi click ra ngoài
+    document.addEventListener('click', function() {
+        const dropdown = document.getElementById('user-dropdown');
+        if (dropdown && !dropdown.classList.contains('hidden')) {
+            dropdown.classList.add('hidden');
+        }
+    });
+})();
+</script>

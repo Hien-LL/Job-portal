@@ -1,0 +1,181 @@
+<div class="lg:col-span-1 self-start overflow-visible">
+    <style>
+        /* Đảm bảo sidebar không bị cắt */
+        .sidebar-menu,
+        .sidebar-menu nav,
+        .sidebar-menu ul {
+            max-height: none !important;
+            overflow: visible !important;
+        }
+    </style>
+    
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 sidebar-menu relative z-20">
+        
+        <div class="p-4 border-b border-gray-200">
+            <div class="flex items-center gap-3">
+                <img id="sidebar-admin-avatar" src="img/icon-account.png" alt="Avatar" class="w-12 h-12 rounded-full object-cover bg-gray-200 flex-shrink-0">
+                <div class="min-w-0">
+                    <p id="sidebar-admin-name" class="text-sm font-semibold text-gray-900 truncate">Admin Name</p>
+                    <p id="sidebar-admin-email" class="text-xs text-gray-500 truncate">admin@jobportal.vn</p>
+                </div>
+            </div>
+        </div>
+
+        <nav class="p-4">
+            <ul class="space-y-1 list-none m-0 p-0">
+                
+                <li>
+                    <a href="admin-dashboard.html" id="nav-admin-dashboard" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg text-sm transition">
+                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18M3 6h18M3 18h18"></path></svg>
+                        <span class="font-medium">Tổng quan</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-users.html" id="nav-admin-users" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg text-sm transition">
+                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                        <span class="font-medium">Quản lí người dùng</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-companies.html" id="nav-admin-companies" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg text-sm transition">
+                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                        <span class="font-medium">Quản lí công ty</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-jobs.html" id="nav-admin-jobs" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg text-sm transition">
+                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        <span class="font-medium">Quản lí tin tuyển dụng</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-notifications.html" id="nav-admin-notifications" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg text-sm transition">
+                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                        <span class="font-medium">Quản lí thông báo</span>
+                    </a>
+                </li>
+
+                <li class="pt-2">
+                    <div class="border-t border-gray-200"></div>
+                </li>
+
+                <li>
+                    <a href="admin-settings.html" id="nav-admin-settings" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg text-sm transition">
+                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.096 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        <span class="font-medium">Cài đặt</span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="#" onclick="logout(); return false;" class="flex items-center gap-3 text-red-600 hover:text-red-700 hover:bg-red-50 p-3 rounded-lg text-sm transition">
+                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                        <span class="font-medium">Đăng xuất</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // Highlight active menu item based on current page
+        function highlightActiveMenu() {
+            const currentPage = window.location.pathname.split('/').pop();
+            
+            document.querySelectorAll('[id^="nav-admin-"]').forEach(nav => {
+                nav.classList.remove('text-blue-600','bg-blue-50', 'font-bold');
+                nav.classList.add('text-gray-700','hover:bg-gray-50');
+            });
+
+            let id = null;
+            if (!currentPage || currentPage === 'admin-dashboard.html') id = 'nav-admin-dashboard';
+            else if (currentPage === 'admin-users.html') id = 'nav-admin-users';
+            else if (currentPage === 'admin-companies.html') id = 'nav-admin-companies';
+            else if (currentPage === 'admin-jobs.html') id = 'nav-admin-jobs';
+            else if (currentPage === 'admin-notifications.html') id = 'nav-admin-notifications';
+            else if (currentPage === 'admin-settings.html') id = 'nav-admin-settings';
+            
+            const el = id && document.getElementById(id);
+            if (el) { 
+                el.classList.remove('text-gray-700','hover:bg-gray-50'); 
+                el.classList.add('text-blue-600','bg-blue-50', 'font-bold'); 
+            }
+        }
+
+        // Tải thông tin user cho sidebar card
+        async function loadSidebarAdminInfo() {
+            // Đảm bảo authService đã được load (từ auth.js)
+            if (typeof authService === 'undefined' || !authService.isAuthenticated()) {
+                // Giả lập dữ liệu nếu chưa đăng nhập (để thiết kế)
+                const nameEl = document.getElementById('sidebar-admin-name');
+                if (nameEl) nameEl.textContent = 'Admin (Chưa đăng nhập)';
+                return;
+            }
+
+            try {
+                // Admin cũng là một User, nên có thể dùng chung endpoint /users/me
+                const profile = await authService.getUserProfile(); 
+                if (profile) {
+                    const avatarEl = document.getElementById('sidebar-admin-avatar');
+                    const nameEl = document.getElementById('sidebar-admin-name');
+                    const emailEl = document.getElementById('sidebar-admin-email');
+
+                    if (nameEl) nameEl.textContent = profile.name || 'Admin';
+                    if (emailEl) emailEl.textContent = profile.email || '...';
+                    
+                    if (avatarEl) {
+                        if (profile.avatarUrl) {
+                            avatarEl.src = `${API_CONFIG.FILE_BASE_URL}${profile.avatarUrl}`;
+                        } else {
+                            avatarEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.name || 'A')}&background=E0E7FF&color=3730A3`;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error("Failed to load sidebar admin info:", error);
+                const nameEl = document.getElementById('sidebar-admin-name');
+                if (nameEl) nameEl.textContent = 'Lỗi tải hồ sơ';
+            }
+        }
+
+        // Logout function
+        function logout() {
+            if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+                if (typeof authService !== 'undefined') {
+                    authService.clearAuthData();
+                } else {
+                    // Fallback nếu authService chưa load
+                    localStorage.removeItem('access_token');
+                    localStorage.removeItem('refresh_token');
+                }
+                window.location.href = 'login.html';
+            }
+        }
+        
+        // Chạy script này sau khi fragment được load
+        if (document.readyState !== 'loading') {
+            highlightActiveMenu();
+            // Đảm bảo authService đã load
+            if (typeof authService !== 'undefined') {
+                loadSidebarAdminInfo();
+            } else {
+                // Thử lại sau 100ms
+                setTimeout(loadSidebarAdminInfo, 100);
+            }
+        } else {
+            document.addEventListener('DOMContentLoaded', () => {
+                highlightActiveMenu();
+                // Đảm bảo authService đã load
+                if (typeof authService !== 'undefined') {
+                    loadSidebarAdminInfo();
+                } else {
+                    setTimeout(loadSidebarAdminInfo, 100);
+                }
+            });
+        }
+        
+        // Expose logout cho onclick
+        window.logout = logout;
+    })();
+</script>
