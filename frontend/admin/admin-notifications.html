@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gửi thông báo - Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../css/components.css"> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Inter', sans-serif; } h1,h2,h3 { font-family: 'Poppins', sans-serif; }</style>
+</head>
+<body class="bg-gray-50">
+    <div data-fragment="fragments/admin-header.html"></div>
+
+    <main class="flex-grow bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <nav class="flex mb-6 text-sm text-gray-600" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1">
+                    <li><a href="admin-dashboard.html" class="hover:text-blue-600">Admin Dashboard</a></li>
+                    <li>
+                        <div class="flex items-center">
+                            <svg class="w-3 h-3 mx-2" fill="currentColor" viewBox="0 0 12 12"><path d="M4.5 2.5l4 5-4 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                            <span class="text-gray-900 font-medium">Quản lí thông báo</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
+                <div data-fragment="fragments/admin-sidebar.html" class="relative"></div>
+
+                <div class="lg:col-span-3 space-y-6">
+                    <h1 class="text-3xl font-bold text-gray-900">Gửi thông báo hệ thống</h1>
+                    
+                    <form id="notification-form" class="bg-white rounded-lg shadow-sm p-8 border border-gray-200 space-y-6">
+                        <div id="success-message" class="hidden bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded">
+                            Gửi thông báo thành công!
+                        </div>
+                        <div>
+                            <label for="title" class="block text-sm font-semibold text-gray-700 mb-2">Tiêu đề *</label>
+                            <input type="text" id="title" placeholder="Ví dụ: Thông báo bảo trì hệ thống..." required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label for="body" class="block text-sm font-semibold text-gray-700 mb-2">Nội dung *</label>
+                            <textarea id="body" rows="6" placeholder="Nội dung chi tiết thông báo..." required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                        </div>
+                        <div>
+                            <label for="target-group" class="block text-sm font-semibold text-gray-700 mb-2">Gửi tới *</label>
+                            <select id="target-group" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="ALL">Tất cả người dùng</option>
+                                <option value="CANDIDATE">Chỉ Ứng viên (Candidates)</option>
+                                <option value="RECRUITER">Chỉ Nhà tuyển dụng (Recruiters)</option>
+                            </select>
+                        </div>
+                        <div class="flex justify-end pt-4 border-t border-gray-100">
+                            <button type="submit" id="send-btn" class="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-blue-700 transition inline-flex items-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                                Gửi thông báo
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                         <h2 class="text-xl font-bold text-gray-900 p-6 border-b">Lịch sử thông báo đã gửi</h2>
+                         <div id="history-container" class="overflow-x-auto">
+                            <table class="w-full min-w-[600px]">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Tiêu đề</th>
+                                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Nội dung</th>
+                                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Đối tượng</th>
+                                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Ngày gửi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="history-list" class="divide-y divide-gray-200"></tbody>
+                            </table>
+                         </div>
+                         <div id="loading" class="text-center py-12"><p class="text-gray-600">Đang tải lịch sử...</p></div>
+                         <div id="empty-state" class="hidden text-center py-12"><p class="text-gray-600">Chưa có thông báo nào được gửi.</p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div data-fragment="fragments/admin-footer.html"></div>
+    
+    <script src="../js/config.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/fragments-loader.js"></script>
+    <script src="js/admin-notifications.js"></script>
+</body>
+</html>
