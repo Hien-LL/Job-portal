@@ -10,20 +10,24 @@
     "start": "node scripts/server.js"
   },
   "devDependencies": {
-  "tailwindcss": "^3.3.0",
-  "postcss": "^8.4.31",
-  "postcss-cli": "^10.1.0",
-  "express": "^4.18.2",
-  "fs-extra": "^11.2.0",
-  "chokidar": "^3.5.3",
-  "terser": "^5.20.0",
-  "http-proxy-middleware": "^2.0.6"
- },
+    "chokidar": "^3.5.3",
+    "express": "^4.18.2",
+    "fs-extra": "^11.2.0",
+    "http-proxy-middleware": "^2.0.6",
+    "postcss": "^8.4.31",
+    "postcss-cli": "^10.1.0",
+    "tailwindcss": "^3.3.0",
+    "terser": "^5.20.0"
+  },
   "keywords": [
     "job-portal",
     "recruitment",
     "vanilla-js"
   ],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "compression": "^1.8.1",
+    "morgan": "^1.10.1"
+  }
 }

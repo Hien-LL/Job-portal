@@ -3,9 +3,24 @@ import express from 'express';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import morgan from 'morgan';
-import compression from 'compression';
 import { createProxyMiddleware } from 'http-proxy-middleware';
+
+// Dynamic imports for optional middleware so server doesn't crash
+let morgan;
+try {
+  morgan = (await import('morgan')).default;
+} catch (err) {
+  console.warn('[dev-server] optional package "morgan" not found — using lightweight fallback logger');
+  morgan = () => (req, _res, next) => { console.log(req.method, req.url); next(); };
+}
+
+let compression;
+try {
+  compression = (await import('compression')).default;
+} catch (err) {
+  console.warn('[dev-server] optional package "compression" not found — skipping response compression');
+  compression = () => (_req, _res, next) => next();
+}
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, '..');
