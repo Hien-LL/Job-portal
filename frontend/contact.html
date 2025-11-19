@@ -208,87 +208,31 @@
 
     <script src="js/fragments-loader.js"></script>
     <script src="js/auth.js"></script>
-    <script>
-        // Simple client-side validation + fake submit
-        document.getElementById('contact-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const name = document.getElementById('name').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const subject = document.getElementById('subject').value;
-            const message = document.getElementById('message').value.trim();
-            const feedback = document.getElementById('form-feedback');
+  <script>
+    const OFFICE_ADDRESS = "02 Võ Oanh, Phường 25, Bình Thạnh, Thành phố Hồ Chí Minh, Việt Nam";
 
-            if (!name || !email || !subject || !message) {
-                showToast('Vui lòng điền đầy đủ các trường.', { type: 'error' });
-                return;
-            }
+    function renderGoogleMap(address) {
+        const mapEl = document.getElementById("map");
+        const query = encodeURIComponent(address);
+        const iframe = document.createElement("iframe");
 
-            // simulate send
-            showToast('Đã gửi! Chúng tôi sẽ liên hệ sớm.', { type: 'success' });
-            // reset form
-            this.reset();
-        });
+        iframe.width = "100%";
+        iframe.height = "100%";
+        iframe.style.border = "0";
+        iframe.loading = "lazy";
+        iframe.referrerPolicy = "no-referrer-when-downgrade";
 
-        // Toast helper
-        function showToast(message, opts = { type: 'info', duration: 4000 }) {
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.innerHTML = `
-                <div style="width:10px;height:10px;border-radius:50%;background:${opts.type === 'success' ? '#10B981' : opts.type === 'error' ? '#EF4444' : '#60A5FA'}"></div>
-                <div>${message}</div>
-            `;
-            document.body.appendChild(toast);
-            setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateY(6px)'; }, opts.duration - 300);
-            setTimeout(() => { toast.remove(); }, opts.duration);
-        }
+        iframe.src = `https://www.google.com/maps?q=${query}&output=embed`;
 
-        // Map rendering: default Google Maps iframe (works without API key)
-        // If you want Mapbox, set MAPBOX_API_KEY below (or via server-side templating)
-        const MAPBOX_API_KEY = '';
+        mapEl.innerHTML = "";
+        mapEl.appendChild(iframe);
+    }
 
-        function renderGoogleMap(address) {
-            const mapEl = document.getElementById('map');
-            const query = encodeURIComponent(address || '123 Đường ABC, Quận 1, TP. Hồ Chí Minh');
-            const iframe = document.createElement('iframe');
-            iframe.width = '100%';
-            iframe.height = '100%';
-            iframe.style.border = '0';
-            iframe.loading = 'lazy';
-            iframe.referrerPolicy = 'no-referrer-when-downgrade';
-            iframe.src = `https://www.google.com/maps?q=${query}&output=embed`;
-            mapEl.innerHTML = '';
-            mapEl.appendChild(iframe);
-        }
+    // 👉 Gọi hàm khi trang load xong
+    document.addEventListener("DOMContentLoaded", () => {
+        renderGoogleMap(OFFICE_ADDRESS);
+    });
+</script>
 
-        function renderMapbox(lat = 10.7758, lng = 106.7009) {
-            const mapEl = document.getElementById('map');
-            mapEl.innerHTML = '';
-            const script = document.createElement('script');
-            script.src = `https://api.mapbox.com/mapbox-gl-js/v2.17.0/mapbox-gl.js`;
-            script.onload = () => {
-                const link = document.createElement('link');
-                link.href = 'https://api.mapbox.com/mapbox-gl-js/v2.17.0/mapbox-gl.css';
-                link.rel = 'stylesheet';
-                document.head.appendChild(link);
-                // Initialize map
-                // eslint-disable-next-line no-undef
-                mapboxgl.accessToken = MAPBOX_API_KEY;
-                // eslint-disable-next-line no-undef
-                const map = new mapboxgl.Map({ container: 'map', style: 'mapbox://styles/mapbox/streets-v11', center: [lng, lat], zoom: 14 });
-                // eslint-disable-next-line no-undef
-                new mapboxgl.Marker().setLngLat([lng, lat]).addTo(map);
-            };
-            document.body.appendChild(script);
-        }
-
-        // Decide which map to render
-        document.addEventListener('DOMContentLoaded', () => {
-            if (MAPBOX_API_KEY && MAPBOX_API_KEY.length > 5) {
-                renderMapbox();
-            } else {
-                renderGoogleMap();
-            }
-        });
-    </script>
 </body>
 </html>
