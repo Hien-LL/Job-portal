@@ -84,4 +84,6 @@ public interface JobRepository extends JpaRepository<Job, Long>, JpaSpecificatio
             Pageable pageable
     );
 
+    List<Job> findByCompanyId(Long companyId);
+
 }

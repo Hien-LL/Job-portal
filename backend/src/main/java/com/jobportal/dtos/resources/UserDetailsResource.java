@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,4 +22,5 @@ public class UserDetailsResource {
     private String avatarUrl;
     private UserSkillResource skills;
     private ResumeResource resume;
+    private Set<RoleResource> roles;
 }

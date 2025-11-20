@@ -293,4 +293,16 @@ public class CompanyService extends BaseService implements CompanyServiceInterfa
         r.setFollowerCount((int) followCompanyRepository.countByCompany_Id(company.getId()));
         return r;
     }
+
+    @Override
+    public boolean verifyCompany(Long companyId) {
+        Company company = companyRepository.findById(companyId)
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy company"));
+        if (company.isVerified()) {
+            throw new IllegalStateException("Công ty đã được xác thực");
+        }
+        company.setVerified(true);
+        companyRepository.save(company);
+        return true;
+    }
 }

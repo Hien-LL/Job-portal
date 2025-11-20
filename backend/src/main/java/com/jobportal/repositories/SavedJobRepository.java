@@ -6,7 +6,9 @@ import com.jobportal.entities.SavedJobId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -48,5 +50,9 @@ public interface SavedJobRepository extends JpaRepository<SavedJob, SavedJobId> 
     boolean existsByUserIdAndJobSlug(Long userId, String jobSlug);
 
     void deleteAllByJob_Id(Long jobId);
+
+    @Modifying
+    @Query("DELETE FROM SavedJob s WHERE s.job.id = :jobId")
+    void deleteByJobId(@Param("jobId") Long jobId);
 }
 

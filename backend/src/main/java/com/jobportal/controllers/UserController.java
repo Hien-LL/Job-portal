@@ -47,16 +47,6 @@ public class UserController {
         return ApiResource.ok(me, "SUCCESS");
     }
 
-    @PreAuthorize("hasPermission(null , 'UPDATE_USER')")
-    @PutMapping("/{id}")
-    public ApiResource<UserDetailsResource> updateRolesForUser(
-            @Valid @RequestBody RolesForUserUpdationRequest request,
-            @PathVariable @Positive(message = "id phải lớn hơn 0") Long id
-    ) {
-        UserDetailsResource resource = authService.updateRolesForUser(request.getRoleIds(), id);
-        return ApiResource.ok(resource, "Cập nhật bản ghi thành công");
-    }
-
     @PreAuthorize("hasPermission(null , 'READ_USER')")
     @GetMapping("/list")
     public ApiResource<List<UserResource>> list(HttpServletRequest request) {
@@ -65,13 +55,7 @@ public class UserController {
         return ApiResource.ok(userMapper.tResourceList(users), "SUCCESS");
     }
 
-    @PreAuthorize("hasPermission(null , 'READ_USER')")
-    @GetMapping
-    public ApiResource<Page<UserResource>> index(HttpServletRequest request) {
-        Map<String, String[]> params = request.getParameterMap();
-        Page<User> users = userService.paginate(params);
-        return ApiResource.ok(userMapper.tResourcePage(users), "SUCCESS");
-    }
+
 
     @PreAuthorize("hasPermission(null , 'READ_USER')")
     @GetMapping("/profile/{id}")
@@ -98,13 +82,6 @@ public class UserController {
     ) {
         UserProfileResource resource = userService.update(user.getUserId(), request);
         return ApiResource.ok(resource, "Cập nhật bản ghi thành công");
-    }
-
-    @PreAuthorize("hasPermission(null , 'DELETE_USER')")
-    @DeleteMapping("/{id}")
-    public ApiResource<Void> delete(@PathVariable @Positive(message = "id phải lớn hơn 0") Long id) {
-        userService.delete(id);
-        return ApiResource.ok(null, "Xóa bản ghi thành công");
     }
 
     @PreAuthorize("isAuthenticated()")

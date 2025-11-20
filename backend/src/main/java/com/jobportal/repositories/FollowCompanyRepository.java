@@ -3,6 +3,7 @@ package com.jobportal.repositories;
 import com.jobportal.entities.FollowCompany;
 import com.jobportal.entities.FollowCompanyId;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -47,4 +48,7 @@ public interface FollowCompanyRepository extends JpaRepository<FollowCompany, Fo
     @Query("SELECT COUNT(f) FROM FollowCompany f WHERE f.company.id = :companyId")
     int countFollowers(Long companyId);
 
+    @Modifying
+    @Query("DELETE FROM FollowCompany f WHERE f.company.id = :companyId")
+    void deleteByCompanyId(@Param("companyId") Long companyId);
 }

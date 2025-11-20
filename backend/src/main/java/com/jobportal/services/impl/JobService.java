@@ -278,6 +278,19 @@ public class JobService extends BaseService implements JobServiceInterface {
         return jobRepository.findAll(spec, pageable);
     }
 
+    @Override
+    public boolean publishJob(Long jobId) {
+        Job job = jobRepository.findById(jobId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy việc làm với id: " + jobId));
+        if (job.isPublished()) {
+            throw new IllegalStateException("Việc làm đã được xuất bản");
+        }
+        job.setPublished(true);
+        job.setPublishedAt(Instant.now());
+        jobRepository.save(job);
+        return true;
+    }
+
     private String generateUniqueSlug(String base) {
         String slug = Slugifier.slugify(base);
 

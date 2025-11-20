@@ -20,4 +20,6 @@ public interface CompanyServiceInterface {
 
     List<CompanyResource> getAllCompanies(Map<String, String[]> parameterMap);
     CompanyResource getCompanyById(Long companyId);
+
+    boolean verifyCompany(Long companyId);
 }
