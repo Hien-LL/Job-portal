@@ -21,6 +21,30 @@ for (const file of htmlFiles) {
   await fs.copy(path.join(rootDir, file), path.join(distDir, file));
 }
 
+// 2.1. Copy admin HTML files
+console.log('📄 Copying admin HTML files...');
+const adminDir = path.join(rootDir, 'admin');
+const adminDistDir = path.join(distDir, 'admin');
+if (await fs.pathExists(adminDir)) {
+  await fs.ensureDir(adminDistDir);
+  const adminHtmlFiles = fs.readdirSync(adminDir).filter(f => f.endsWith('.html'));
+  for (const file of adminHtmlFiles) {
+    await fs.copy(path.join(adminDir, file), path.join(adminDistDir, file));
+  }
+}
+
+// 2.2. Replace CDN with compiled CSS in dist HTML files
+console.log('🔄 Updating HTML files for production...');
+const allHtmlFiles = [...htmlFiles, ...adminHtmlFiles.map(f => path.join('admin', f))];
+for (const file of allHtmlFiles) {
+  const filePath = path.join(distDir, file);
+  if (await fs.pathExists(filePath)) {
+    let content = await fs.readFile(filePath, 'utf8');
+    content = content.replace('<script src="https://cdn.tailwindcss.com"></script>', '<link rel="stylesheet" href="css/tailwind.css">');
+    await fs.writeFile(filePath, content);
+  }
+}
+
 // 2.5. Copy root CSS files
 console.log('📄 Copying root CSS files...');
 const cssFiles = fs.readdirSync(rootDir).filter(f => f.endsWith('.css'));
