@@ -5,20 +5,19 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 
-// Dynamic imports for optional middleware so server doesn't crash
 let morgan;
 try {
   morgan = (await import('morgan')).default;
-} catch (err) {
-  console.warn('[dev-server] optional package "morgan" not found — using lightweight fallback logger');
+} catch {
+  console.warn('[dev-server] "morgan" not found — using fallback logger');
   morgan = () => (req, _res, next) => { console.log(req.method, req.url); next(); };
 }
 
 let compression;
 try {
   compression = (await import('compression')).default;
-} catch (err) {
-  console.warn('[dev-server] optional package "compression" not found — skipping response compression');
+} catch {
+  console.warn('[dev-server] "compression" not found — skipping compression');
   compression = () => (_req, _res, next) => next();
 }
 
@@ -27,12 +26,13 @@ const rootDir = path.resolve(__dirname, '..');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+// Backend local: chạy Spring Boot port 8080 (hoặc chỉnh BACKEND_URL)
+// Ví dụ: BACKEND_URL=http://localhost:8080
 const BE = (process.env.BACKEND_URL || 'http://localhost:8080').replace(/\/+$/, '');
 
 app.use(morgan('dev'));
 app.use(compression());
 
-// ⚙️ Common proxy config cho file public
 function createPublicProxy(prefix) {
   return createProxyMiddleware({
     target: BE,
@@ -40,19 +40,17 @@ function createPublicProxy(prefix) {
     secure: false,
     xfwd: true,
     logLevel: 'debug',
-    pathRewrite: (path) => {
-      // luôn giữ prefix đúng cho backend
-      if (!path.startsWith(`${prefix}/`)) {
-        return `${prefix}${path.startsWith('/') ? path : '/' + path}`;
+    pathRewrite: (pathUrl) => {
+      if (!pathUrl.startsWith(`${prefix}/`)) {
+        return `${prefix}${pathUrl.startsWith('/') ? pathUrl : '/' + pathUrl}`;
       }
-      return path;
+      return pathUrl;
     },
     onProxyReq(proxyReq, req) {
-      // bỏ auth token / cookie
       proxyReq.removeHeader?.('authorization');
       proxyReq.removeHeader?.('cookie');
       proxyReq.removeHeader?.('x-access-token');
-      // hỗ trợ tua PDF/video
+
       if (req.headers['range']) proxyReq.setHeader('range', req.headers['range']);
       if (req.headers['if-range']) proxyReq.setHeader('if-range', req.headers['if-range']);
     },
@@ -62,19 +60,20 @@ function createPublicProxy(prefix) {
     },
     onError(err, req, res) {
       console.error(`[proxy-error ${prefix}]`, req.method, req.url, err?.message);
-      if (!res.headersSent)
+      if (!res.headersSent) {
         res.status(502).json({ success: false, error: { message: `Proxy error (${prefix})` } });
+      }
     }
   });
 }
 
-// 🔁 Proxy các path public
-app.use('/resumes', createPublicProxy('/resumes'));
-app.use('/avatars', createPublicProxy('/avatars'));
-app.use('/company-logos', createPublicProxy('/company-logos'));
+// Proxy các đường dẫn static public -> backend (Spring Boot)
+app.use('/resumes',             createPublicProxy('/resumes'));
+app.use('/avatars',             createPublicProxy('/avatars'));
+app.use('/company-logos',       createPublicProxy('/company-logos'));
 app.use('/company-backgrounds', createPublicProxy('/company-backgrounds'));
 
-// ---- Serve static frontend
+// Serve static frontend từ root (dev dùng file gốc, không dùng dist)
 app.use(express.static(rootDir));
 
 // /page -> /page.html

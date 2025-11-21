@@ -1,3 +1,4 @@
+// scripts/watch.js
 import chokidar from 'chokidar';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -33,7 +34,7 @@ watcher
     try {
       execSync('npm run build', { cwd: rootDir, stdio: 'inherit' });
       console.log('\n✅ Build successful! Ready for testing.\n');
-    } catch (error) {
+    } catch {
       console.error('\n❌ Build failed!\n');
     }
   })
@@ -42,8 +43,8 @@ watcher
   });
 
 console.log('Watching files in:');
-console.log(`  - *.html`);
-console.log(`  - css/*.css`);
-console.log(`  - js/*.js`);
-console.log(`  - fragments/*.html\n`);
+console.log('  - *.html');
+console.log('  - css/*.css');
+console.log('  - js/*.js');
+console.log('  - fragments/*.html\n');
 console.log('Press Ctrl+C to stop watching.\n');

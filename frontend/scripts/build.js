@@ -1,3 +1,4 @@
+// scripts/build.js
 import fs from 'fs-extra';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -13,39 +14,40 @@ console.log('🔨 Building Job Portal Frontend...\n');
 console.log('📦 Cleaning dist folder...');
 await fs.emptyDir(distDir);
 
-// 2. Copy HTML files
+// 2. Copy HTML files ở root vào dist
 console.log('📄 Copying HTML files...');
 const htmlFiles = fs.readdirSync(rootDir).filter(f => f.endsWith('.html'));
 for (const file of htmlFiles) {
   await fs.copy(path.join(rootDir, file), path.join(distDir, file));
 }
 
-// 3. Copy CSS, JS, img folders
+// 3. Copy assets: css, js, img, fragments
 console.log('📚 Copying assets...');
 const foldersToCopy = ['css', 'js', 'img', 'fragments'];
 for (const folder of foldersToCopy) {
   const src = path.join(rootDir, folder);
-  if (fs.existsSync(src)) {
+  if (await fs.pathExists(src)) {
     await fs.copy(src, path.join(distDir, folder));
   }
 }
 
-// 4. Build Tailwind CSS
+// 4. Build Tailwind CSS vào dist/css/tailwind.css
 console.log('🎨 Building Tailwind CSS...');
 try {
-  execSync('npx tailwindcss -i ./tailwind.css -o ./dist/css/tailwind.css --minify', {
-    cwd: rootDir,
-    stdio: 'inherit'
-  });
+  await fs.ensureDir(path.join(distDir, 'css'));
+  execSync(
+    'npx tailwindcss -i ./tailwind.css -o ./dist/css/tailwind.css --minify',
+    { cwd: rootDir, stdio: 'inherit' }
+  );
   console.log('✅ Tailwind CSS built\n');
 } catch (error) {
   console.error('❌ Tailwind build failed:', error.message);
 }
 
-// 5. Minify JS files
+// 5. Minify JS files trong dist/js
 console.log('🗜️  Minifying JavaScript files...');
 const jsDir = path.join(distDir, 'js');
-if (fs.existsSync(jsDir)) {
+if (await fs.pathExists(jsDir)) {
   const jsFiles = fs.readdirSync(jsDir).filter(f => f.endsWith('.js'));
   for (const file of jsFiles) {
     const filePath = path.join(jsDir, file);
@@ -59,15 +61,12 @@ if (fs.existsSync(jsDir)) {
 }
 console.log('✅ JavaScript minified\n');
 
-// 6. CSS already minified by Tailwind
-console.log('✅ CSS minified (by Tailwind)\n');
-
-// 7. Summary
+// 6. Summary
 const distSize = getDirectorySize(distDir);
 console.log('✨ Build complete!');
 console.log(`📁 Output: ${distDir}`);
 console.log(`📊 Size: ${(distSize / 1024 / 1024).toFixed(2)} MB\n`);
-console.log('🚀 Ready for deployment!\n');
+console.log('🚀 Ready for deployment (Nginx mount ./dist → /usr/share/nginx/html)!\n');
 
 function getDirectorySize(dir) {
   let size = 0;

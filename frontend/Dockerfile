@@ -9,7 +9,7 @@ COPY package*.json ./
 # Use `npm install` here because package-lock.json and package.json
 # in the repo are out-of-sync. `npm install` will compute deps from
 # package.json and produce a working node_modules for the build.
-RUN npm install --no-audit --no-fund --no-fund
+RUN npm install --no-audit --no-fund
 
 # Copy source and run build script which outputs to ./dist
 COPY . .
@@ -17,6 +17,8 @@ RUN npm run build
 
 # Stage 2: serve the built static files with nginx
 FROM nginx:alpine
+RUN rm /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /app/dist /usr/share/nginx/html
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]

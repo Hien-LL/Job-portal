@@ -2,10 +2,45 @@
 // Centralized API endpoint configuration for Job Portal
 // All API calls should go through this config
 
+// The frontend is served by Nginx in production and proxies API/file
+// requests to the backend. In that case we should use relative
+// paths so browser calls the same origin (Nginx) which forwards to
+// backend (e.g. '/api', '/avatars'). For local development where
+// frontend dev server runs on a different port (e.g. 3000) and the
+// backend is at 8080, fall back to localhost addresses so dev works
+// without changing code.
+// Runtime overrides: define `window.__API_BASE__` or `window.__FILE_BASE__`
+// in a script tag before loading this file to force values.
 const API_CONFIG = {
-    // Base URL for all API requests
-    BASE_URL: 'http://localhost:8080/api',
-    FILE_BASE_URL: 'http://localhost:3000',
+    // Base URL for all API requests. Default is relative '/api'.
+    BASE_URL: (function(){
+        if (typeof window !== 'undefined' && window.__API_BASE__) return window.__API_BASE__;
+        if (typeof window !== 'undefined') {
+            const { hostname } = window.location;
+            const isLocal = hostname === 'localhost' || hostname === '127.0.0.1';
+            if (isLocal) {
+                // frontend dev -> talk to backend dev on 8080
+                return `http://${hostname}:8080/api`;
+            }
+        }
+        // production: use relative path so nginx handles proxying
+        return '/api';
+    })(),
+
+    // Base URL where file assets (avatars, resumes, company logos...) are served.
+    // Default is empty string so code like `FILE_BASE_URL + '/avatars/...'` becomes
+    // '/avatars/...' (same origin). For local dev fallback to backend on 8080.
+    FILE_BASE_URL: (function(){
+        if (typeof window !== 'undefined' && window.__FILE_BASE__) return window.__FILE_BASE__;
+        if (typeof window !== 'undefined') {
+            const { hostname } = window.location;
+            const isLocal = hostname === 'localhost' || hostname === '127.0.0.1';
+            if (isLocal) {
+                return `http://${hostname}:8080`;
+            }
+        }
+        return ''; // production: same-origin, use paths like '/avatars/...'
+    })(),
 
     // Authentication Endpoints
     AUTH: {

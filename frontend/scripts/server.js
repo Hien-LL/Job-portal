@@ -4,21 +4,19 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 
-// Dynamic imports + safe fallbacks so the prod server won't crash if optional
-// middleware isn't available in the environment.
 let morgan;
 try {
   morgan = (await import('morgan')).default;
-} catch (err) {
-  console.warn('[server] optional package "morgan" not found — using minimal logger');
+} catch {
+  console.warn('[server] "morgan" not found — using minimal logger');
   morgan = () => (_opts) => (req, _res, next) => { console.log(req.method, req.url); next(); };
 }
 
 let compression;
 try {
   compression = (await import('compression')).default;
-} catch (err) {
-  console.warn('[server] optional package "compression" not found — skipping compression');
+} catch {
+  console.warn('[server] "compression" not found — skipping compression');
   compression = () => (_req, _res, next) => next();
 }
 
@@ -28,26 +26,34 @@ const distDir = path.join(rootDir, 'dist');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const BE   = process.env.BACKEND_URL || 'http://localhost:8080';
+// Nếu không set BACKEND_URL, mặc định trỏ về backend local
+const BE = (process.env.BACKEND_URL || 'http://localhost:8080').replace(/\/+$/, '');
 
 app.use(morgan('combined'));
 app.use(compression());
 
+// Proxy chung cho /api và các static phục vụ từ backend
 const common = { target: BE, changeOrigin: true, secure: false };
-app.use('/api',     createProxyMiddleware(common));
-app.use('/resumes', createProxyMiddleware(common));
-app.use('/uploads', createProxyMiddleware(common));
 
+app.use('/api',                 createProxyMiddleware(common));
+app.use('/resumes',             createProxyMiddleware(common));
+app.use('/avatars',             createProxyMiddleware(common));
+app.use('/company-logos',       createProxyMiddleware(common));
+app.use('/company-backgrounds', createProxyMiddleware(common));
+
+// Serve static build từ dist/
 app.use(express.static(distDir, { maxAge: '7d', etag: true, lastModified: true }));
 
-// cho các trang .html trong dist
+// Cho các trang .html trong dist (multi-page)
 app.get('/:page', (req, res, next) => {
   const file = path.join(distDir, `${req.params.page}.html`);
   res.sendFile(file, err => (err ? next() : null));
 });
 
+// root
 app.get('/', (_req, res) => res.sendFile(path.join(distDir, 'index.html')));
 
 app.listen(PORT, () => {
-  console.log(`🌐 Prod FE http://0.0.0.0:${PORT} → Proxy ${BE}`);
+  console.log(`🌐 Prod-like FE http://0.0.0.0:${PORT} → Proxy ${BE}`);
+  console.log('⚠ Lưu ý: trên server thật dùng Nginx reverse proxy, không dùng server.js này.');
 });
