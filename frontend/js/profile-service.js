@@ -68,8 +68,7 @@ let userProfile = null;
         // Load user profile data - ✅ ĐÃ SỬA
         async function loadUserProfile() {
             try {
-                const url = buildApiUrl(API_CONFIG.USERS.GET_PROFILE);
-                const response = await authService.apiRequest(url, {
+                const response = await authService.apiRequest(API_CONFIG.USERS.GET_PROFILE, {
                     method: 'GET'
                 });
 
@@ -92,8 +91,7 @@ let userProfile = null;
         // Load user skills - ✅ ĐÃ SỬA
         async function loadUserSkills() {
             try {
-                const url = buildApiUrl(API_CONFIG.USERS.GET_SKILLS);
-                const response = await authService.apiRequest(url, {
+                const response = await authService.apiRequest(API_CONFIG.USERS.GET_SKILLS, {
                     method: 'GET'
                 });
 
@@ -116,8 +114,7 @@ let userProfile = null;
         // Load user resumes - ✅ ĐÃ SỬA
         async function loadUserResumes() {
             try {
-                const url = buildCompleteUrl(API_CONFIG.RESUMES.LIST, {}, { isDefault: true });
-                const response = await authService.apiRequest(url, {
+                const response = await authService.apiRequest(`${API_CONFIG.RESUMES.LIST}?isDefault=true`, {
                     method: 'GET'
                 });
 
@@ -566,8 +563,7 @@ let userProfile = null;
         // Update profile - ✅ ĐÃ SỬA
         async function updateProfile(profileData) {
             try {
-                const url = buildApiUrl(API_CONFIG.USERS.UPDATE_PROFILE);
-                const response = await authService.apiRequest(url, {
+                const response = await authService.apiRequest(API_CONFIG.USERS.UPDATE_PROFILE, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
@@ -637,8 +633,7 @@ let userProfile = null;
                     return;
                 }
 
-                const url = buildApiUrl(API_CONFIG.USERS.ADD_SKILL, { skillSlug });
-                const response = await authService.apiRequest(url, {
+                const response = await authService.apiRequest(API_CONFIG.USERS.ADD_SKILL.replace(':skillSlug', skillSlug), {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -700,8 +695,7 @@ let userProfile = null;
         // Perform the actual delete operation - ✅ ĐÃ SỬA
         async function performDeleteSkill(skillSlug) {
             try {
-                const url = buildApiUrl(API_CONFIG.USERS.DELETE_SKILL, { skillSlug });
-                const response = await authService.apiRequest(url, {
+                const response = await authService.apiRequest(API_CONFIG.USERS.DELETE_SKILL.replace(':skillSlug', skillSlug), {
                     method: 'DELETE'
                 });
 

@@ -12,10 +12,7 @@ let followedCompanies = [];
                     return;
                 }
 
-                const url = buildApiUrl(API_CONFIG.FOLLOW_COMPANY.LIST_FOLLOWED);
-                
-                // ✅ SỬA: Dùng authService.apiRequest()
-                const response = await authService.apiRequest(url, {
+                const response = await authService.apiRequest(API_CONFIG.FOLLOW_COMPANY.LIST_FOLLOWED, {
                     method: 'GET'
                 });
 
