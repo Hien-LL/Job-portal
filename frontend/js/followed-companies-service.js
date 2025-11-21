@@ -94,7 +94,7 @@ let followedCompanies = [];
                     return;
                 }
 
-                const url = buildApiUrl(API_CONFIG.FOLLOW_COMPANY.UNFOLLOW, { companyId });
+                const url = API_CONFIG.FOLLOW_COMPANY.UNFOLLOW.replace(':companyId', companyId);
                 
                 // ✅ SỬA: Dùng authService.apiRequest()
                 const response = await authService.apiRequest(url, {

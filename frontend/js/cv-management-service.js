@@ -39,8 +39,7 @@ async function initializePage() {
 let userProfile = null;
 async function loadUserProfile() {
     try {
-        const profileUrl = buildApiUrl(API_CONFIG.USERS.GET_PROFILE);
-        const response = await authService.apiRequest(profileUrl, {
+        const response = await authService.apiRequest(API_CONFIG.USERS.GET_PROFILE, {
             method: 'GET'
         });
 
@@ -63,8 +62,7 @@ async function loadUserProfile() {
 async function loadResumes() {
     try {
         showLoading();
-        const url = buildApiUrl(API_CONFIG.RESUMES.LIST);
-        const response = await authService.apiRequest(url, {
+        const response = await authService.apiRequest(API_CONFIG.RESUMES.LIST, {
             method: 'GET'
         });
 
@@ -267,10 +265,10 @@ document.getElementById('cv-form').addEventListener('submit', async function(e) 
         let method;
         
         if (isEditing) {
-            url = buildApiUrl(API_CONFIG.RESUMES.GET_DETAIL, { resumeId: editingResumeId });
+            url = API_CONFIG.RESUMES.GET_DETAIL.replace(':resumeId', editingResumeId);
             method = 'PUT';
         } else {
-            url = buildApiUrl(API_CONFIG.RESUMES.LIST);
+            url = API_CONFIG.RESUMES.LIST;
             method = 'POST';
         }
 
@@ -299,8 +297,7 @@ document.getElementById('cv-form').addEventListener('submit', async function(e) 
 // Edit resume - ✅ ĐÃ SỬA
 async function editResume(resumeId) {
     try {
-        const url = buildApiUrl(API_CONFIG.RESUMES.GET_DETAIL, { resumeId });
-        const response = await authService.apiRequest(url, {
+        const response = await authService.apiRequest(API_CONFIG.RESUMES.GET_DETAIL.replace(':resumeId', resumeId), {
             method: 'GET'
         });
 
@@ -422,8 +419,7 @@ async function deleteFile(fileId) {
     if (!confirm('Bạn có chắc chắn muốn xóa file này?')) return;
 
     try {
-        const url = buildApiUrl(API_CONFIG.RESUMES.DELETE_FILE, { fileId });
-        const response = await authService.apiRequest(url, {
+        const response = await authService.apiRequest(API_CONFIG.RESUMES.DELETE_FILE.replace(':fileId', fileId), {
             method: 'DELETE'
         });
 
@@ -440,8 +436,7 @@ async function deleteFile(fileId) {
 // View resume details - ✅ ĐÃ SỬA
 async function viewResumeDetails(resumeId) {
     try {
-        const url = buildApiUrl(API_CONFIG.RESUMES.GET_DETAIL, { resumeId });
-        const response = await authService.apiRequest(url, {
+        const response = await authService.apiRequest(API_CONFIG.RESUMES.GET_DETAIL.replace(':resumeId', resumeId), {
             method: 'GET'
         });
 
@@ -462,8 +457,7 @@ async function deleteResume(resumeId) {
     if (!confirm('Bạn có chắc chắn muốn xóa CV này?')) return;
 
     try {
-        const url = buildApiUrl(API_CONFIG.RESUMES.GET_DETAIL, { resumeId });
-        const response = await authService.apiRequest(url, {
+        const response = await authService.apiRequest(API_CONFIG.RESUMES.GET_DETAIL.replace(':resumeId', resumeId), {
             method: 'DELETE'
         });
 
@@ -560,6 +554,10 @@ function getRandomPlaceholderImg() {
 // Thiết lập biến
 let PLACEHOLDER_IMG = getRandomPlaceholderImg();
 
+async function initPlaceholder() {
+    // Initialize placeholder if needed
+    PLACEHOLDER_IMG = getRandomPlaceholderImg();
+}
 
 // Khi load trang:
 document.addEventListener('DOMContentLoaded', async () => {

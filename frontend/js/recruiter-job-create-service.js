@@ -55,8 +55,7 @@ function initializeDescriptionEditor() {
 // Get categories
 async function getCategories() {
   try {
-    const url = buildApiUrl(API_CONFIG.CATEGORIES.LIST);
-    const response = await authService.apiRequest(url, { method: "GET" });
+    const response = await authService.apiRequest(API_CONFIG.CATEGORIES.LIST, { method: "GET" });
 
     if (!response || !response.ok)
       throw new Error("Failed to fetch categories");
@@ -72,8 +71,7 @@ async function getCategories() {
 // Get locations
 async function getLocations() {
   try {
-    const url = buildApiUrl(API_CONFIG.LOCATIONS.LIST);
-    const response = await authService.apiRequest(url, { method: "GET" });
+    const response = await authService.apiRequest(API_CONFIG.LOCATIONS.LIST, { method: "GET" });
 
     if (!response || !response.ok) throw new Error("Failed to fetch locations");
 
@@ -88,8 +86,7 @@ async function getLocations() {
 // Get benefits
 async function getBenefits() {
   try {
-    const url = buildApiUrl(API_CONFIG.BENEFITS.LIST);
-    const response = await authService.apiRequest(url, { method: "GET" });
+    const response = await authService.apiRequest(API_CONFIG.BENEFITS.LIST, { method: "GET" });
 
     if (!response || !response.ok) throw new Error("Failed to fetch benefits");
 
@@ -104,8 +101,7 @@ async function getBenefits() {
 // Get skills
 async function getSkills() {
   try {
-    const url = buildApiUrl(API_CONFIG.SKILLS.LIST);
-    const response = await authService.apiRequest(url, { method: "GET" });
+    const response = await authService.apiRequest(API_CONFIG.SKILLS.LIST, { method: "GET" });
 
     if (!response || !response.ok) throw new Error("Failed to fetch skills");
 
@@ -120,8 +116,7 @@ async function getSkills() {
 // Get job detail (for editing)
 async function getJobDetail(jobId) {
   try {
-    const url = buildApiUrl(API_CONFIG.JOBS.GET_MY_JOB, { jobId });
-    const response = await authService.apiRequest(url, { method: "GET" });
+    const response = await authService.apiRequest(API_CONFIG.JOBS.GET_MY_JOB.replace(':jobId', jobId), { method: "GET" });
 
     if (!response || !response.ok) throw new Error("Failed to fetch job");
 
@@ -142,11 +137,10 @@ async function getJobDetail(jobId) {
 // Create job
 async function createJob(jobData) {
   try {
-    const url = buildApiUrl(API_CONFIG.JOBS.CREATE_MY_COMPANY);
-    console.log("Creating job at:", url);
+    console.log("Creating job at:", API_CONFIG.JOBS.CREATE_MY_COMPANY);
     console.log("Job data:", jobData);
 
-    const response = await authService.apiRequest(url, {
+    const response = await authService.apiRequest(API_CONFIG.JOBS.CREATE_MY_COMPANY, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(jobData),
@@ -180,7 +174,7 @@ async function createJob(jobData) {
 // Update job
 async function updateJob(jobId, jobData) {
   try {
-    const url = buildApiUrl(API_CONFIG.JOBS.UPDATE_MY_JOB, { jobId });
+    const url = API_CONFIG.JOBS.UPDATE_MY_JOB.replace(':jobId', jobId);
     console.log("Updating job at:", url);
     console.log("Job data:", jobData);
 

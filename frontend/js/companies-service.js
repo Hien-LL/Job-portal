@@ -348,7 +348,7 @@ let isLoading = false;
             try {
                 const endpoint = isFollowing ? 'UNFOLLOW' : 'FOLLOW';
                 const method = isFollowing ? 'DELETE' : 'POST';
-                const url = buildApiUrl(API_CONFIG.FOLLOW_COMPANY[endpoint], { companyId });
+                const url = API_CONFIG.FOLLOW_COMPANY[endpoint].replace(':companyId', companyId);
 
                 // ✅ SỬA: Dùng authService.apiRequest() thay vì fetch trực tiếp
                 const response = await authService.apiRequest(url, {
@@ -383,7 +383,7 @@ let isLoading = false;
         // Check if user is following a company - ✅ ĐÃ SỬA
         async function checkCompanyFollowStatus(companyId) {
             try {
-                const url = buildApiUrl(API_CONFIG.FOLLOW_COMPANY.CHECK_STATUS, { companyId });
+                const url = API_CONFIG.FOLLOW_COMPANY.CHECK_STATUS.replace(':companyId', companyId);
                 
                 // ✅ SỬA: Dùng authService.apiRequest() thay vì fetch trực tiếp
                 const response = await authService.apiRequest(url, {

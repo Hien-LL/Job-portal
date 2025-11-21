@@ -25,7 +25,7 @@ let currentJobFilters = {
 // Get my company's jobs
 async function getMyJobs(page = 1) {
     try {
-        const url = buildApiUrl(API_CONFIG.JOBS.GET_MY_JOBS) + `?page=${page}`; // Backend uses 0-based pagination
+        const url = `${API_CONFIG.JOBS.GET_MY_JOBS}?page=${page}`; // Backend uses 0-based pagination
         console.log('Fetching jobs from:', url);
 
         const response = await authService.apiRequest(url, {
@@ -125,7 +125,7 @@ async function getMyJobs(page = 1) {
 // Delete a job
 async function deleteJob(jobId) {
     try {
-        const url = buildApiUrl(API_CONFIG.JOBS.DELETE_MY_JOB, { jobId });
+        const url = API_CONFIG.JOBS.DELETE_MY_JOB.replace(':jobId', jobId);
         console.log('Deleting job:', url);
 
         const response = await authService.apiRequest(url, {

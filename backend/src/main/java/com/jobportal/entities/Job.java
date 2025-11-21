@@ -73,7 +73,7 @@ public class Job {
 
     @PrePersist
     protected void onCreate() {
-        this.publishedAt = Instant.from(LocalDateTime.now());
+        this.publishedAt = Instant.now();
     }
 
     @PreUpdate

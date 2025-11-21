@@ -24,7 +24,7 @@ let currentApplicationId = null;
                 }
 
                 // ✅ SỬA: Dùng authService.apiRequest() thay vì fetch trực tiếp
-                const url = buildApiUrl(API_CONFIG.APPLICATIONS.GET_DETAIL, { applicationId: appId });
+                const url = API_CONFIG.APPLICATIONS.GET_DETAIL.replace(':applicationId', appId);
                 const response = await authService.apiRequest(url, {
                     method: 'GET'
                 });
@@ -176,7 +176,7 @@ let currentApplicationId = null;
         async function loadApplicationTimeline(appId) {
             try {
                 // ✅ SỬA: Dùng authService.apiRequest() thay vì fetch trực tiếp
-                const url = buildApiUrl(API_CONFIG.APPLICATIONS.GET_TIMELINE, { applicationId: appId });
+                const url = API_CONFIG.APPLICATIONS.GET_TIMELINE.replace(':applicationId', appId);
                 const response = await authService.apiRequest(url, {
                     method: 'GET'
                 });

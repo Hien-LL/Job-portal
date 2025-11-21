@@ -16,10 +16,12 @@ let currentPage = 1;
                 }
 
                 // ✅ SỬA: Dùng authService.apiRequest() thay vì fetch trực tiếp
-                const url = buildCompleteUrl(API_CONFIG.APPLICATIONS.LIST, {}, { 
+                const queryParams = { 
                     page: page - 1, 
                     perPage: 10 
-                });
+                };
+                const queryString = new URLSearchParams(queryParams).toString();
+                const url = `${API_CONFIG.APPLICATIONS.LIST}?${queryString}`;
 
                 const response = await authService.apiRequest(url, {
                     method: 'GET'

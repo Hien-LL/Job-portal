@@ -43,8 +43,7 @@ let currentPage = 1;
         let userProfile = null;
         async function loadUserProfile() {
             try {
-                const profileUrl = buildApiUrl(API_CONFIG.USERS.GET_PROFILE);
-                const response = await window.authUtils.apiRequest(profileUrl, {
+                const response = await window.authUtils.apiRequest(API_CONFIG.USERS.GET_PROFILE, {
                     method: 'GET'
                 });
 
@@ -95,7 +94,8 @@ let currentPage = 1;
                 }
 
                 // ✅ SỬA: Dùng config (cần thêm endpoint mới)
-                const savedJobsUrl = buildCompleteUrl(API_CONFIG.JOBS.SAVED_JOBS_LIST, {}, queryParams);
+                const queryString = new URLSearchParams(queryParams).toString();
+                const savedJobsUrl = `${API_CONFIG.JOBS.SAVED_JOBS_LIST}?${queryString}`;
                 const response = await window.authUtils.apiRequest(savedJobsUrl, {
                     method: 'GET'
                 });

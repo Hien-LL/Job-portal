@@ -21,6 +21,13 @@ for (const file of htmlFiles) {
   await fs.copy(path.join(rootDir, file), path.join(distDir, file));
 }
 
+// 2.5. Copy root CSS files
+console.log('📄 Copying root CSS files...');
+const cssFiles = fs.readdirSync(rootDir).filter(f => f.endsWith('.css'));
+for (const file of cssFiles) {
+  await fs.copy(path.join(rootDir, file), path.join(distDir, file));
+}
+
 // 3. Copy assets: css, js, img, fragments
 console.log('📚 Copying assets...');
 const foldersToCopy = ['css', 'js', 'img', 'fragments'];

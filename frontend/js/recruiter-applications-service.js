@@ -69,7 +69,7 @@ async function getApplicationStatuses() {
 // Get my company's applications
 async function getMyApplications(page = 1) {
     try {
-        const url = buildApiUrl(API_CONFIG.APPLICATIONS.GET_MY_APPLICATIONS) + `?page=${page - 1}`;
+        const url = `${API_CONFIG.APPLICATIONS.GET_MY_APPLICATIONS}?page=${page - 1}`;
         console.log('Fetching applications from:', url);
 
         const response = await authService.apiRequest(url, {
@@ -126,7 +126,7 @@ async function getMyApplications(page = 1) {
 // Get application candidate info
 async function getApplicationDetail(applicationId) {
     try {
-        const url = buildApiUrl(API_CONFIG.APPLICATIONS.GET_CANDIDATE_INFO, { applicationId });
+        const url = API_CONFIG.APPLICATIONS.GET_CANDIDATE_INFO.replace(':applicationId', applicationId);
         console.log('Fetching candidate info from:', url);
 
         const response = await authService.apiRequest(url, {
@@ -157,7 +157,7 @@ async function getApplicationDetail(applicationId) {
 // Get application timeline
 async function getApplicationTimeline(applicationId) {
     try {
-        const url = buildApiUrl(API_CONFIG.APPLICATIONS.GET_TIMELINE, { applicationId });
+        const url = API_CONFIG.APPLICATIONS.GET_TIMELINE.replace(':applicationId', applicationId);
         console.log('Fetching application timeline from:', url);
 
         const response = await authService.apiRequest(url, {
@@ -189,7 +189,7 @@ async function getApplicationTimeline(applicationId) {
 // Update application status
 async function updateApplicationStatus(applicationId, newStatusCode, note) {
     try {
-        const url = buildApiUrl(API_CONFIG.APPLICATIONS.UPDATE_STATUS, { applicationId });
+        const url = API_CONFIG.APPLICATIONS.UPDATE_STATUS.replace(':applicationId', applicationId);
         console.log('Updating application status:', url);
 
         const response = await authService.apiRequest(url, {

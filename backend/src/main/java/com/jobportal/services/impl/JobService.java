@@ -63,8 +63,8 @@ public class JobService extends BaseService implements JobServiceInterface {
         Location location = locationRepository.findByCountryCode(request.getLocationCountryCode())
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy vị trí công việc"));
 
-        Set<Benefit> benefits = (Set<Benefit>) benefitRepository.findAllById(request.getBenefitIds());
-        List<Skill> skills =skillRepository.findAllById(request.getSkillIds());
+        Set<Benefit> benefits = new LinkedHashSet<>(benefitRepository.findAllById(request.getBenefitIds()));
+        List<Skill> skills = skillRepository.findAllById(request.getSkillIds());
 
         Job job = jobMapper.tEntity(request);
         job.setCompany(company);
@@ -141,7 +141,7 @@ public class JobService extends BaseService implements JobServiceInterface {
 
         // 3) Parse thời gian nếu có (tránh đè khi null)
         // if (request.getExpiresAt()!=null) job.setExpiresAt(OffsetDateTime.parse(request.getExpiresAt()));
-         if (request.getPublishedAt()!=null) job.setPublishedAt(Instant.from(OffsetDateTime.parse(request.getPublishedAt()).toLocalDateTime()));
+         if (request.getPublishedAt()!=null) job.setPublishedAt(Instant.parse(request.getPublishedAt()));
 
         // 4) Clear có chủ đích (nếu dùng)
         if (request.getFieldsToNullify() != null) {

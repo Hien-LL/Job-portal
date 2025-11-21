@@ -228,7 +228,7 @@ function showError(message) {
             if (!currentCompany) return;
 
             try {
-                const url = buildApiUrl(API_CONFIG.FOLLOW_COMPANY.FOLLOW, { companyId: currentCompany.id });
+                const url = API_CONFIG.FOLLOW_COMPANY.FOLLOW.replace(':companyId', currentCompany.id);
                 
                 // ✅ SỬA: Dùng authService.apiRequest() thay vì fetch trực tiếp
                 const response = await authService.apiRequest(url, {
@@ -265,7 +265,7 @@ function showError(message) {
             if (!currentCompany) return;
 
             try {
-                const url = buildApiUrl(API_CONFIG.FOLLOW_COMPANY.UNFOLLOW, { companyId: currentCompany.id });
+                const url = API_CONFIG.FOLLOW_COMPANY.UNFOLLOW.replace(':companyId', currentCompany.id);
                 
                 // ✅ SỬA: Dùng authService.apiRequest() thay vì fetch trực tiếp
                 const response = await authService.apiRequest(url, {
@@ -294,7 +294,7 @@ function showError(message) {
         // Check if user is following company - ✅ ĐÃ SỬA
         async function checkFollowStatus(companyId) {
             try {
-                const url = buildApiUrl(API_CONFIG.FOLLOW_COMPANY.CHECK_STATUS, { companyId });
+                const url = API_CONFIG.FOLLOW_COMPANY.CHECK_STATUS.replace(':companyId', companyId);
                 
                 // ✅ SỬA: Dùng authService.apiRequest() thay vì fetch trực tiếp
                 const response = await authService.apiRequest(url, {

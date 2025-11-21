@@ -60,7 +60,7 @@ function localDatetimeToUTC(datetimeLocalValue) {
 // Get job detail
 async function getJobDetail(jobId) {
     try {
-        const url = buildApiUrl(API_CONFIG.JOBS.GET_MY_JOB, { jobId });
+        const url = API_CONFIG.JOBS.GET_MY_JOB.replace(':jobId', jobId);
         console.log('Fetching job detail from:', url);
 
         const response = await authService.apiRequest(url, {
@@ -92,7 +92,7 @@ async function getJobDetail(jobId) {
 // Update job
 async function updateJob(jobId, jobData) {
     try {
-        const url = buildApiUrl(API_CONFIG.JOBS.UPDATE_MY_JOB, { jobId });
+        const url = API_CONFIG.JOBS.UPDATE_MY_JOB.replace(':jobId', jobId);
         console.log('Updating job at:', url);
         console.log('Job data:', jobData);
 
@@ -144,7 +144,7 @@ async function updateJob(jobId, jobData) {
 // Delete job
 async function deleteJob(jobId) {
     try {
-        const url = buildApiUrl(API_CONFIG.JOBS.DELETE_MY_JOB, { jobId });
+        const url = API_CONFIG.JOBS.DELETE_MY_JOB.replace(':jobId', jobId);
         console.log('Deleting job:', url);
 
         const response = await authService.apiRequest(url, {
@@ -178,7 +178,7 @@ async function deleteJob(jobId) {
 // Get categories
 async function getCategories() {
     try {
-        const url = buildApiUrl(API_CONFIG.CATEGORIES.LIST);
+        const url = API_CONFIG.CATEGORIES.LIST;
         const response = await authService.apiRequest(url, { method: 'GET' });
 
         if (!response || !response.ok) throw new Error('Failed to fetch categories');

@@ -31,10 +31,9 @@ function initializeDescriptionEditor() {
 // Get my company details - ✅ API MỚI
 async function getMyCompany() {
     try {
-        const url = buildApiUrl(API_CONFIG.COMPANIES.MY_COMPANY_DETAILS);
-        console.log('Fetching company from:', url);
+        console.log('Fetching company from:', API_CONFIG.COMPANIES.MY_COMPANY_DETAILS);
 
-        const response = await authService.apiRequest(url, {
+        const response = await authService.apiRequest(API_CONFIG.COMPANIES.MY_COMPANY_DETAILS, {
             method: 'GET'
         });
 
@@ -64,11 +63,10 @@ async function getMyCompany() {
 // Update company information - ✅ API MỚI
 async function updateCompany(companyData) {
     try {
-        const url = buildApiUrl(API_CONFIG.COMPANIES.UPDATE_MY_COMPANY);
-        console.log('Updating company at:', url);
+        console.log('Updating company at:', API_CONFIG.COMPANIES.UPDATE_MY_COMPANY);
         console.log('Company data:', companyData);
 
-        const response = await authService.apiRequest(url, {
+        const response = await authService.apiRequest(API_CONFIG.COMPANIES.UPDATE_MY_COMPANY, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'

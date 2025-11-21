@@ -23,10 +23,9 @@ let recentApplications = [];
 // Response: { success, message, data: { totalJobs, activeJobs, newApplications, ... } }
 async function getDashboardOverview() {
     try {
-        const url = buildApiUrl('/recruiters/dashboard/overview');
-        console.log('Fetching dashboard overview from:', url);
+        console.log('Fetching dashboard overview from:', '/recruiters/dashboard/overview');
 
-        const response = await authService.apiRequest(url, {
+        const response = await authService.apiRequest('/recruiters/dashboard/overview', {
             method: 'GET'
         });
 
@@ -57,7 +56,7 @@ async function getDashboardOverview() {
 // Response: { success, message, data: [ { id, title, postedDate, status, applicantsCount }, ... ] }
 async function getRecentJobs(limit = 5) {
     try {
-        const url = buildCompleteUrl('/recruiters/jobs/recent', {}, { limit });
+        const url = `/recruiters/jobs/recent?limit=${limit}`;
         console.log('Fetching recent jobs from:', url);
 
         const response = await authService.apiRequest(url, {
@@ -91,7 +90,7 @@ async function getRecentJobs(limit = 5) {
 // Response: { success, message, data: [ { id, jobTitle, candidateName, appliedDate, status }, ... ] }
 async function getRecentApplications(limit = 5, status = 'pending') {
     try {
-        const url = buildCompleteUrl('/recruiters/applications/recent', {}, { limit, status });
+        const url = `/recruiters/applications/recent?limit=${limit}&status=${status}`;
         console.log('Fetching recent applications from:', url);
 
         const response = await authService.apiRequest(url, {
@@ -125,10 +124,9 @@ async function getRecentApplications(limit = 5, status = 'pending') {
 // Response: { success, message, data: { total, pending, accepted, rejected, viewed } }
 async function getApplicationStatistics() {
     try {
-        const url = buildApiUrl('/recruiters/applications/statistics');
-        console.log('Fetching application statistics from:', url);
+        console.log('Fetching application statistics from:', '/recruiters/applications/statistics');
 
-        const response = await authService.apiRequest(url, {
+        const response = await authService.apiRequest('/recruiters/applications/statistics', {
             method: 'GET'
         });
 

@@ -171,7 +171,7 @@
         // Check if user has already applied for this job - ✅ ĐÃ SỬA
         async function checkJobApplied(jobId) {
             try {
-                const url = buildApiUrl(API_CONFIG.JOBS.CHECK_APPLIED, { jobId });
+                const url = API_CONFIG.JOBS.CHECK_APPLIED.replace(':jobId', jobId);
                 const response = await authService.apiRequest(url, {
                     method: 'GET'
                 });
@@ -191,7 +191,7 @@
         // Check if user has saved this job - ✅ ĐÃ SỬA
         async function checkJobSaved(jobSlug) {
             try {
-                const url = buildApiUrl(API_CONFIG.JOBS.CHECK_SAVED, { jobSlug });
+                const url = API_CONFIG.JOBS.CHECK_SAVED.replace(':jobSlug', jobSlug);
                 const response = await authService.apiRequest(url, {
                     method: 'GET'
                 });
@@ -313,7 +313,7 @@
         // Load user resumes for selection - ✅ ĐÃ SỬA
         async function loadUserResumes() {
             try {
-                const url = buildApiUrl(API_CONFIG.RESUMES.LIST);
+                const url = API_CONFIG.RESUMES.LIST;
                 const response = await authService.apiRequest(url, {
                     method: 'GET'
                 });
@@ -427,7 +427,7 @@
                 submitBtn.disabled = true;
                 submitBtn.textContent = 'Đang ứng tuyển...';
 
-                const url = buildApiUrl(API_CONFIG.JOBS.APPLY, { jobId: currentJobId });
+                const url = API_CONFIG.JOBS.APPLY.replace(':jobId', currentJobId);
                 const response = await authService.apiRequest(url, {
                     method: 'POST',
                     headers: {
@@ -511,7 +511,7 @@
                 const endpoint = isJobSaved ? 
                     API_CONFIG.JOBS.UNSAVE : 
                     API_CONFIG.JOBS.SAVE;
-                const url = buildApiUrl(endpoint, { jobSlug: currentJobSlug });
+                const url = endpoint.replace(':jobSlug', currentJobSlug);
                 
                 const response = await authService.apiRequest(url, {
                     method: method
