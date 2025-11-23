@@ -73,7 +73,7 @@ const API_CONFIG = {
         GET_BY_COMPANY: '/companies/jobs/:companyId',
         CHECK_APPLIED: '/applications/isApplied/:jobId',
         APPLY: '/applications/:jobId/apply',
-        GET_RELATED: '/jobs?category.slug=:categorySlug&perPage=3&published=true',
+        GET_RELATED: '/jobs?category.slug=:categorySlug&size=3&slug%5Bne%5D=:jobSlug',
         CREATE_MY_COMPANY: '/jobs/my-company/create',
         GET_MY_JOBS: '/jobs/my-company/jobs',
         GET_MY_JOB: '/jobs/my-company/job/:jobId',

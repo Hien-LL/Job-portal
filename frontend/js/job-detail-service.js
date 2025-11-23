@@ -232,8 +232,10 @@
             if (!categorySlug) return;
 
             try {
-                const url = buildCompleteUrl(API_CONFIG.JOBS.GET_RELATED, { categorySlug }, { perPage: 3, published: true });
-                const response = await fetch(url);
+                const url = API_CONFIG.JOBS.GET_RELATED.replace(':categorySlug', categorySlug).replace(':jobSlug', currentJobSlug);
+                const response = await authService.apiRequest(url, {
+                    method: 'GET'
+                });
                 const result = await response.json();
 
                 if (result.success && result.data && result.data.content) {
