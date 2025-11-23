@@ -25,9 +25,10 @@ for (const file of htmlFiles) {
 console.log('📄 Copying admin HTML files...');
 const adminDir = path.join(rootDir, 'admin');
 const adminDistDir = path.join(distDir, 'admin');
+let adminHtmlFiles = [];
 if (await fs.pathExists(adminDir)) {
   await fs.ensureDir(adminDistDir);
-  const adminHtmlFiles = fs.readdirSync(adminDir).filter(f => f.endsWith('.html'));
+  adminHtmlFiles = fs.readdirSync(adminDir).filter(f => f.endsWith('.html'));
   for (const file of adminHtmlFiles) {
     await fs.copy(path.join(adminDir, file), path.join(adminDistDir, file));
   }
