@@ -167,17 +167,17 @@
     </section>
 
     <!-- Banner Gradient dưới thanh tìm kiếm -->
-    <section class="px-4 sm:px-6 lg:px-8 -mt-4">
-      <div class="max-w-6xl mx-auto">
+    <section class="py-16 bg-[#005B9A] w-full -mt-4">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div
-          class="bg-gradient-to-r from-[#005B9A] via-[#003B73] to-[#001A33] rounded-3xl p-6 md:p-8 shadow-xl text-white relative overflow-hidden"
+          class="bg-gradient-to-r from-[#005B9A] via-[#003B73] to-[#001A33] rounded-3xl p-6 md:p-8 shadow-xl text-white relative overflow-hidden border border-white/20"
         >
           <div class="mb-4 flex items-center justify-between gap-4">
             <h2 class="text-xl md:text-2xl font-bold">
               Cơ hội việc làm nổi bật hôm nay
             </h2>
             <span class="hidden md:inline-block text-sm text-emerald-100">
-              Xem video giới thiệu & các chương trình tuyển dụng hot
+              Xem video giới thiệu &amp; các chương trình tuyển dụng hot
             </span>
           </div>
 
@@ -187,7 +187,6 @@
               <div
                 class="aspect-video w-full rounded-2xl overflow-hidden border border-white/10 shadow-lg"
               >
-                <!-- Thay link video theo ý bạn -->
                 <iframe
                   src="https://www.youtube.com/embed/MqibnVaNdgo"
                   title="Video giới thiệu"
@@ -286,6 +285,114 @@
       </div>
     </section>
 
+    <!-- Campaign Banners Section (Full Width Blue Background) -->
+    <section class="py-16 bg-[#005B9A] w-full text-white">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="relative">
+          <!-- Nút trái -->
+          <button
+            id="promo-prev"
+            class="hidden md:flex items-center justify-center w-9 h-9 rounded-full bg-white border border-blue-600 shadow-md absolute -left-6 top-1/2 -translate-y-1/2 z-10 transition hover:bg-blue-50"
+          >
+            <svg
+              class="w-4 h-4 text-blue-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+          </button>
+
+          <!-- Track -->
+          <div
+            id="promo-banner-track"
+            class="flex gap-4 overflow-x-auto md:overflow-x-hidden scroll-smooth snap-x snap-mandatory pb-2"
+          >
+            <!-- Banner 1 -->
+            <a
+              href="#"
+              class="flex-none w-[85%] md:w-1/3 snap-start rounded-3xl overflow-hidden shadow-md bg-white block"
+            >
+              <img
+                src="https://tse4.mm.bing.net/th/id/OIP.NGBjsOmCUAPjBKBNiarb7gHaD4?rs=1&pid=ImgDetMain&o=7&rm=3"
+                class="w-full h-40 md:h-48 lg:h-52 object-cover"
+              />
+            </a>
+
+            <!-- Banner 2 -->
+            <a
+              href="#"
+              class="flex-none w-[85%] md:w-1/3 snap-start rounded-3xl overflow-hidden shadow-md bg-white block"
+            >
+              <img
+                src="https://tse1.mm.bing.net/th/id/OIP.7QlwiHDdzRpjjCft0GBU2AHaD3?rs=1&pid=ImgDetMain&o=7&rm=3"
+                class="w-full h-40 md:h-48 lg:h-52 object-cover"
+              />
+            </a>
+
+            <!-- Banner 3 -->
+            <a
+              href="#"
+              class="flex-none w-[85%] md:w-1/3 snap-start rounded-3xl overflow-hidden shadow-md bg-white block"
+            >
+              <img
+                src="https://ub.edu.vn/storage/l2/0m/l20mfdtyissj6u3qsiii8x0xpkqp_1200x800_(3).png"
+                class="w-full h-40 md:h-48 lg:h-52 object-cover"
+              />
+            </a>
+
+            <!-- Banner 4 -->
+            <a
+              href="#"
+              class="flex-none w-[85%] md:w-1/3 snap-start rounded-3xl overflow-hidden shadow-md bg-white block"
+            >
+              <img
+                src="https://tse3.mm.bing.net/th/id/OIP.bOTl5xfKkHXd1Uul88prUQHaFZ?rs=1&pid=ImgDetMain&o=7&rm=3"
+                class="w-full h-40 md:h-48 lg:h-52 object-cover"
+              />
+            </a>
+
+            <!-- Banner 5 -->
+            <a
+              href="#"
+              class="flex-none w-[85%] md:w-1/3 snap-start rounded-3xl overflow-hidden shadow-md bg-white block"
+            >
+              <img
+                src="https://tse1.mm.bing.net/th/id/OIP.JVrnDL2Bfle6EfAUQ7F75AHaEQ?rs=1&pid=ImgDetMain&o=7&rm=3"
+                class="w-full h-40 md:h-48 lg:h-52 object-cover"
+              />
+            </a>
+          </div>
+
+          <!-- Nút phải -->
+          <button
+            id="promo-next"
+            class="hidden md:flex items-center justify-center w-9 h-9 rounded-full bg-white border border-blue-600 shadow-md absolute -right-6 top-1/2 -translate-y-1/2 z-10 transition hover:bg-blue-50"
+          >
+            <svg
+              class="w-4 h-4 text-blue-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
     <!-- Categories Section -->
     <section class="py-12 px-4 sm:px-6 lg:px-8 bg-white">
       <div class="max-w-6xl mx-auto">
@@ -310,119 +417,6 @@
             ></div>
             <p class="text-gray-600 text-sm mt-2">Đang tải danh mục...</p>
           </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Campaign Banners Section -->
-    <section class="py-8 px-4 sm:px-6 lg:px-8 bg-white">
-      <div class="max-w-6xl mx-auto">
-        <div class="relative">
-          <!-- Nút trái -->
-          <button
-            id="promo-prev"
-            class="hidden md:flex items-center justify-center w-9 h-9 rounded-full bg-white border border-blue-600 shadow-md absolute -left-4 top-1/2 -translate-y-1/2 z-10 transition hover:bg-blue-50"
-          >
-            <svg
-              class="w-4 h-4 text-blue-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-          </button>
-
-          <!-- Track các banner -->
-          <div
-            id="promo-banner-track"
-            class="flex gap-4 overflow-x-auto md:overflow-x-hidden scroll-smooth snap-x snap-mandatory pb-2"
-          >
-            <!-- Banner 1 -->
-            <a
-              href="#"
-              class="flex-none w-[85%] md:w-1/3 snap-start rounded-3xl overflow-hidden shadow-md bg-white block"
-            >
-              <img
-                src="https://tse4.mm.bing.net/th/id/OIP.NGBjsOmCUAPjBKBNiarb7gHaD4?rs=1&pid=ImgDetMain&o=7&rm=3"
-                alt="Bizman tuyển dụng"
-                class="w-full h-40 md:h-48 lg:h-52 object-cover"
-              />
-            </a>
-
-            <!-- Banner 2 -->
-            <a
-              href="#"
-              class="flex-none w-[85%] md:w-1/3 snap-start rounded-3xl overflow-hidden shadow-md bg-white block"
-            >
-              <img
-                src="https://tse1.mm.bing.net/th/id/OIP.7QlwiHDdzRpjjCft0GBU2AHaD3?rs=1&pid=ImgDetMain&o=7&rm=3"
-                alt="Highlands Coffee tuyển dụng"
-                class="w-full h-40 md:h-48 lg:h-52 object-cover"
-              />
-            </a>
-
-            <!-- Banner 3 -->
-            <a
-              href="#"
-              class="flex-none w-[85%] md:w-1/3 snap-start rounded-3xl overflow-hidden shadow-md bg-white block"
-            >
-              <img
-                src="https://ub.edu.vn/storage/l2/0m/l20mfdtyissj6u3qsiii8x0xpkqp_1200x800_(3).png"
-                alt="BIDV tuyển dụng"
-                class="w-full h-40 md:h-48 lg:h-52 object-cover"
-              />
-            </a>
-
-            <!-- Banner 4 -->
-            <a
-              href="#"
-              class="flex-none w-[85%] md:w-1/3 snap-start rounded-3xl overflow-hidden shadow-md bg-white block"
-            >
-              <img
-                src="https://tse3.mm.bing.net/th/id/OIP.bOTl5xfKkHXd1Uul88prUQHaFZ?rs=1&pid=ImgDetMain&o=7&rm=3"
-                alt="Banner 4"
-                class="w-full h-40 md:h-48 lg:h-52 object-cover"
-              />
-            </a>
-
-            <!-- Banner 5 -->
-            <a
-              href="#"
-              class="flex-none w-[85%] md:w-1/3 snap-start rounded-3xl overflow-hidden shadow-md bg-white block"
-            >
-              <img
-                src="https://tse1.mm.bing.net/th/id/OIP.JVrnDL2Bfle6EfAUQ7F75AHaEQ?rs=1&pid=ImgDetMain&o=7&rm=3"
-                alt="Banner 5"
-                class="w-full h-40 md:h-48 lg:h-52 object-cover"
-              />
-            </a>
-          </div>
-
-          <!-- Nút phải -->
-          <button
-            id="promo-next"
-            class="hidden md:flex items-center justify-center w-9 h-9 rounded-full bg-white border border-blue-600 shadow-md absolute -right-4 top-1/2 -translate-y-1/2 z-10 transition hover:bg-blue-50"
-          >
-            <svg
-              class="w-4 h-4 text-blue-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-          </button>
         </div>
       </div>
     </section>
@@ -729,6 +723,46 @@
       </div>
     </section>
 
+    <!-- Featured Company Banner (Full width + Blue + Border style like Hotline) -->
+    <section class="py-16 bg-[#005B9A] text-white w-full">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Card giống hotline -->
+        <div
+          class="bg-white/10 backdrop-blur-lg p-10 rounded-3xl shadow-xl border border-white/20"
+        >
+          <div class="grid md:grid-cols-2 gap-12 items-center">
+            <!-- Text Content -->
+            <div>
+              <h2 class="text-3xl font-bold mb-6">
+                Công ty nổi bật trong tháng
+              </h2>
+
+              <p class="text-white/80 text-base md:text-lg mb-6">
+                Tuyển dụng nhiều vị trí lương cao, môi trường chuyên nghiệp và
+                cơ hội phát triển rõ ràng.
+              </p>
+
+              <a
+                href="companies.html"
+                class="inline-block border border-white/60 text-white font-semibold px-7 py-3 rounded-xl hover:bg-white/10 transition shadow"
+              >
+                Xem chi tiết →
+              </a>
+            </div>
+
+            <!-- Banner Image -->
+            <div class="rounded-2xl overflow-hidden shadow-lg">
+              <img
+                src="https://www.businesstoday.com.my/wp-content/uploads/2023/02/FWD-Signage-1.jpg"
+                alt="Banner công ty"
+                class="w-full h-64 object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Featured Companies Section -->
     <section class="py-12 px-4 sm:px-6 lg:px-8 bg-white">
       <div class="max-w-6xl mx-auto">
@@ -752,6 +786,94 @@
               class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"
             ></div>
             <p class="text-gray-600 text-sm mt-2">Đang tải công ty...</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Hotline Tư Vấn Section (FULL WIDTH) -->
+    <section
+      class="py-16 bg-gradient-to-r from-[#004C9A] via-[#0066CC] to-[#0090FF] text-white"
+    >
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div
+          class="bg-white/10 backdrop-blur-lg p-10 rounded-2xl shadow-xl border border-white/20"
+        >
+          <h2 class="text-3xl font-bold mb-6">Hotline Tư Vấn</h2>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+            <!-- Text & Contact -->
+            <div>
+              <p class="text-xl font-semibold mb-5">
+                Cần hỗ trợ tìm việc? Liên hệ ngay đội tư vấn của chúng tôi
+              </p>
+
+              <!-- Phone -->
+              <div
+                class="flex items-center gap-4 bg-white text-blue-700 px-6 py-4 rounded-xl shadow-md font-semibold text-lg"
+              >
+                <div
+                  class="w-10 h-10 flex items-center justify-center bg-[#0066CC] rounded-full"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="w-5 h-5 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M3 5a2 2 0 012-2h2.28a2 2 0 011.789 1.106l1.44 2.885a2 2 0 01-.45 2.366l-1.34 1.34a12.05 12.05 0 005.657 5.657l1.34-1.34a2 2 0 012.366-.45l2.885 1.44A2 2 0 0121 18.72V21a2 2 0 01-2 2h-1C9.163 23 3 16.837 3 9V7a2 2 0 012-2z"
+                    />
+                  </svg>
+                </div>
+                (024) 7107 6480
+              </div>
+
+              <!-- Email -->
+              <div
+                class="flex items-center gap-4 bg-white text-blue-700 px-6 py-4 rounded-xl shadow-md font-medium text-base mt-4"
+              >
+                <div
+                  class="w-10 h-10 flex items-center justify-center bg-[#0066CC] rounded-full"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="w-5 h-5 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8m-18 8h18a2 2 0 002-2V6a2 2 0 00-2-2H3a2 2 0 00-2 2v8a2 2 0 002 2z"
+                    />
+                  </svg>
+                </div>
+                hotro@jobportal.vn
+              </div>
+
+              <!-- Button -->
+              <button
+                class="mt-6 bg-white text-blue-700 font-semibold px-8 py-3 rounded-xl shadow hover:bg-blue-100 transition border border-blue-200"
+              >
+                Liên hệ ngay
+              </button>
+            </div>
+
+            <!-- Support Image -->
+            <div class="flex justify-center">
+              <img
+                src="https://cdn.tuoitre.vn/thumb_w/730/471584752817336320/2023/7/14/photo-1689322997105-1689322997163346894295.jpg"
+                class="w-72 md:w-96 drop-shadow-lg"
+                alt="Tư vấn hỗ trợ"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -979,7 +1101,7 @@
     <section class="py-12 px-4 sm:px-6 lg:px-8 bg-white">
       <div class="max-w-6xl mx-auto">
         <div
-          class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-8 md:p-12"
+          class="py-12 px-4 sm:px-6 lg:px-8 text-white bg-gradient-to-r from-[#005B9A] via-[#003B73] to-[#001A33] rounded-2xl p-8 md:p-12"
         >
           <div
             class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center text-white"
@@ -1225,23 +1347,27 @@
       </div>
     </section>
 
-    <!-- CTA Section -->
-    <section class="bg-blue-600 text-white py-12 px-4 sm:px-6 lg:px-8">
+    <!-- CTA Section (Updated Theme) -->
+    <section
+      class="py-12 px-4 sm:px-6 lg:px-8 text-white bg-gradient-to-r from-[#005B9A] via-[#003B73] to-[#001A33]"
+    >
       <div class="max-w-4xl mx-auto text-center">
         <h2 class="text-3xl font-bold mb-3">Bạn là nhà tuyển dụng?</h2>
         <p class="text-blue-100 text-lg mb-6">
           Đăng tin tuyển dụng ngay để tiếp cận hàng ngàn ứng viên tiềm năng
         </p>
+
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
           <a
             href="register.html"
-            class="inline-block bg-white text-blue-600 px-8 py-3 rounded-md font-semibold hover:bg-gray-100 transition-all"
+            class="inline-block bg-white text-blue-700 px-8 py-3 rounded-md font-semibold hover:bg-blue-100 transition-all"
           >
             Đăng tin tuyển dụng
           </a>
+
           <a
             href="about.html"
-            class="inline-block bg-blue-700 text-white px-8 py-3 rounded-md font-semibold hover:bg-blue-800 transition-all border-2 border-white"
+            class="inline-block bg-transparent text-white px-8 py-3 rounded-md font-semibold border border-white hover:bg-white/20 transition-all"
           >
             Tìm hiểu thêm
           </a>
