@@ -16,6 +16,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
+import java.util.Set;
 
 @CrossOrigin(origins = "*")
 @Validated
@@ -100,9 +101,10 @@ public class AuthController {
 
         String newToken = jwtService.generateToken(userId, email, null);
         String newRefreshToken = jwtService.generateRefreshToken(userId, email);
+        Set<RoleResource> roleResources = userService.getUserRoles(userId);
 
         return ApiResource.ok(
-                new LoginResource(newToken, newRefreshToken, new AuthResource(userId)),
+                new LoginResource(newToken, newRefreshToken, new AuthResource(userId, roleResources)),
                 "Làm mới token thành công"
         );
     }

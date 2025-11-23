@@ -3,6 +3,7 @@ package com.jobportal.services.interfaces;
 import com.jobportal.dtos.requests.LoginRequest;
 import com.jobportal.dtos.requests.RegisterRequest;
 import com.jobportal.dtos.resources.LoginResource;
+import com.jobportal.dtos.resources.RoleResource;
 import com.jobportal.dtos.resources.UserDetailsResource;
 import com.jobportal.dtos.resources.UserProfileResource;
 import jakarta.validation.Valid;
@@ -17,4 +18,6 @@ public interface AuthServiceInterface {
     UserDetailsResource updateRolesForUser(@Valid Set<Long> roleIds, Long id);
     void verifyEmail(String email, String otp);
     void resendOtp(String email);
+
+    Set<RoleResource> getUserRoles(Long userId);
 }

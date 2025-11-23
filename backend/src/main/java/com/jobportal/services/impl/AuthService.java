@@ -6,6 +6,7 @@ import com.jobportal.dtos.requests.RegisterRequest;
 import com.jobportal.dtos.resources.*;
 import com.jobportal.entities.Role;
 import com.jobportal.entities.User;
+import com.jobportal.mappers.RoleMapper;
 import com.jobportal.mappers.UserMapper;
 import com.jobportal.repositories.RoleRepository;
 import com.jobportal.repositories.UserRepository;
@@ -38,6 +39,7 @@ public class AuthService extends BaseService implements AuthServiceInterface {
     private final UserMapper userMapper;
     private final OtpService otpService;
     private final MailService mailService;
+    private final RoleMapper roleMapper;
 
     @Override
     public LoginResource authenticate(LoginRequest request) {
@@ -130,6 +132,15 @@ public class AuthService extends BaseService implements AuthServiceInterface {
         if (!otpService.canResend(email)) throw new IllegalStateException("Too many requests");
         String otp = otpService.generateAndStore(email);
         mailService.sendOtp(email, otp);
+    }
+
+    @Override
+    public Set<RoleResource> getUserRoles(Long userId) {
+        User user = userRepository.findByIdWithRolesAndPermissions(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User không tồn tại"));
+        return user.getRoles().stream()
+                .map(roleMapper::tResource)
+                .collect(Collectors.toSet());
     }
 
     @Override
