@@ -21,7 +21,7 @@ public class MailService {
     private final JavaMailSender mailSender;
     private final TemplateEngine templateEngine;
 
-    @Value("${app.mail.from:JobPortal <no-reply@jobportal.vn>}")
+    @Value("${app.mail.from:JobPortal <no-reply@jobportal.works>}")
     private String mailFrom;
 
     public void sendOtp(String to, String code) {
