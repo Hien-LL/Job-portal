@@ -13,12 +13,22 @@ FROM eclipse-temurin:21-jre
 WORKDIR /app
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 
-# non-root
-RUN useradd -ms /bin/bash appuser && \
-    mkdir -p /app/logs /app/uploads && chown -R appuser:appuser /app
-USER appuser
 
+# install a small MySQL client for readiness checks, then create non-root user
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends default-mysql-client ca-certificates && \
+    rm -rf /var/lib/apt/lists/* && \
+    useradd -ms /bin/bash appuser && \
+    mkdir -p /app/logs /app/uploads && chown -R appuser:appuser /app
+
+# copy jar from build stage
 COPY --from=build /app/target/*.jar /app/app.jar
 
+# add a small wait script to ensure dependent services are up
+COPY wait-and-run.sh /app/wait-and-run.sh
+RUN chmod +x /app/wait-and-run.sh && chown appuser:appuser /app/wait-and-run.sh
+
+USER appuser
+
 EXPOSE 8080
-ENTRYPOINT ["java","-jar","/app/app.jar"]
+ENTRYPOINT ["/bin/bash","/app/wait-and-run.sh"]

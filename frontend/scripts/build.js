@@ -41,7 +41,10 @@ for (const file of allHtmlFiles) {
   const filePath = path.join(distDir, file);
   if (await fs.pathExists(filePath)) {
     let content = await fs.readFile(filePath, 'utf8');
-    content = content.replace('<script src="https://cdn.tailwindcss.com"></script>', '<link rel="stylesheet" href="css/tailwind.css">');
+    // For admin pages (in dist/admin/), the correct relative path is ../css/tailwind.css
+    const isAdmin = file.startsWith('admin' + path.sep) || file.startsWith('admin/');
+    const cssLink = isAdmin ? '<link rel="stylesheet" href="../css/tailwind.css">' : '<link rel="stylesheet" href="css/tailwind.css">';
+    content = content.replace('<script src="https://cdn.tailwindcss.com"></script>', cssLink);
     await fs.writeFile(filePath, content);
   }
 }
@@ -68,7 +71,7 @@ console.log('🎨 Building Tailwind CSS...');
 try {
   await fs.ensureDir(path.join(distDir, 'css'));
   execSync(
-    'npx tailwindcss -i ./tailwind.css -o ./dist/css/tailwind.css --minify',
+    'npx tailwindcss -i ./css/tailwind.css -o ./dist/css/tailwind.css --minify',
     { cwd: rootDir, stdio: 'inherit' }
   );
   console.log('✅ Tailwind CSS built\n');
