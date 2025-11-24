@@ -172,7 +172,7 @@ public class JobService extends BaseService implements JobServiceInterface {
     @Override
     public Page<Job> paginationJob(Map<String, String[]> params, boolean includeAll) {
         int page = params.containsKey("page") ? Integer.parseInt(params.get("page")[0]) - 1 : 0;
-        int size = params.containsKey("size") ? Integer.parseInt(params.get("size")[0]) : 12;
+        int size = params.containsKey("perPage") ? Integer.parseInt(params.get("perPage")[0]) : 12;
         Sort sort = sortParam(params);
         Pageable pageable = PageRequest.of(page, size, sort);
 

@@ -13,6 +13,6 @@ public class AdminStatsResource {
     private Long totalJobs;
     private Long totalApplications;
 
-    private Map<String, Long> userChart;
-    private Map<String, Long> jobChart;
+    private Map<String, Object> chartData;
+
 }

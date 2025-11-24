@@ -19,23 +19,21 @@ public interface AdminRepository extends JpaRepository<User, Long> {
         """, nativeQuery = true)
     Object getTotals();
 
-    // User chart: tháng -> số lượng
     @Query(value = """
-        SELECT DATE_FORMAT(created_at, '%Y-%m') AS month, COUNT(*) AS total
+        SELECT DAYOFWEEK(created_at) AS dow, COUNT(*) AS total
         FROM users
-        WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
-        GROUP BY month
-        ORDER BY month
+        WHERE YEARWEEK(created_at, 1) = YEARWEEK(CURDATE(), 1)
+        GROUP BY dow
+        ORDER BY dow
     """, nativeQuery = true)
     List<Object[]> getUserChart();
 
-    // Job chart: tháng -> số lượng
     @Query(value = """
-        SELECT DATE_FORMAT(published_at, '%Y-%m') AS month, COUNT(*) AS total
+        SELECT DAYOFWEEK(published_at) AS dow, COUNT(*) AS total
         FROM jobs
-        WHERE published_at >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
-        GROUP BY month
-        ORDER BY month
+        WHERE YEARWEEK(published_at, 1) = YEARWEEK(CURDATE(), 1)
+        GROUP BY dow
+        ORDER BY dow
     """, nativeQuery = true)
     List<Object[]> getJobChart();
 }

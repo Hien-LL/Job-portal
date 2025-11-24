@@ -20,42 +20,57 @@ public class AdminService implements AdminServiceInterface {
     private  final AdminRepository adminRepository;
     private final JobRepository jobRepository;
     private final SavedJobRepository savedJobRepository;
+    private static final String[] WEEK_DAYS = {"T2","T3","T4","T5","T6","T7","CN"};
 
     public AdminStatsResource getStats() {
         Object[] totals = (Object[]) adminRepository.getTotals();
 
-        // Convert totals
         Long totalUsers = ((Number) totals[0]).longValue();
         Long totalCompanies = ((Number) totals[1]).longValue();
         Long totalJobs = ((Number) totals[2]).longValue();
         Long totalApplications = ((Number) totals[3]).longValue();
 
-        // Convert chart lists → Map<String, Long>
-        Map<String, Long> userChart = adminRepository.getUserChart()
-                .stream()
-                .collect(Collectors.toMap(
-                        r -> r[0].toString(),
-                        r -> ((Number) r[1]).longValue(),
-                        (a, b) -> a, TreeMap::new
-                ));
+        // --- Base labels ---
+        String[] labels = {"T2","T3","T4","T5","T6","T7","CN"};
+        Map<String, Long> userWeek = buildWeekTemplate();
+        Map<String, Long> jobWeek = buildWeekTemplate();
 
-        Map<String, Long> jobChart = adminRepository.getJobChart()
-                .stream()
-                .collect(Collectors.toMap(
-                        r -> r[0].toString(),
-                        r -> ((Number) r[1]).longValue(),
-                        (a, b) -> a, TreeMap::new
-                ));
+        // Fill userWeek
+        adminRepository.getUserChart().forEach(r -> {
+            String dow = mapDayOfWeek(((Number) r[0]).intValue());
+            userWeek.put(dow, ((Number) r[1]).longValue());
+        });
+
+        // Fill jobWeek
+        adminRepository.getJobChart().forEach(r -> {
+            String dow = mapDayOfWeek(((Number) r[0]).intValue());
+            jobWeek.put(dow, ((Number) r[1]).longValue());
+        });
+
+        // Convert map → array (đúng thứ tự label)
+        long[] userArr = new long[7];
+        long[] jobArr = new long[7];
+        for (int i = 0; i < 7; i++) {
+            userArr[i] = userWeek.get(labels[i]);
+            jobArr[i] = jobWeek.get(labels[i]);
+        }
+
+        // BUILD chartData đúng chuẩn FE
+        Map<String, Object> chartData = Map.of(
+                "labels", labels,
+                "users", userArr,
+                "jobs", jobArr
+        );
 
         return AdminStatsResource.builder()
                 .totalUsers(totalUsers)
                 .totalCompanies(totalCompanies)
                 .totalJobs(totalJobs)
                 .totalApplications(totalApplications)
-                .userChart(userChart)
-                .jobChart(jobChart)
+                .chartData(chartData)
                 .build();
     }
+
 
     @Transactional
     @Override
@@ -69,4 +84,24 @@ public class AdminService implements AdminServiceInterface {
         // 2) Xoá job → cascade xoá Application + histories
         jobRepository.delete(job);
     }
+
+    private Map<String, Long> buildWeekTemplate() {
+        Map<String, Long> map = new TreeMap<>();
+        for (String d : WEEK_DAYS) map.put(d, 0L);
+        return map;
+    }
+
+    private String mapDayOfWeek(int day) {
+        return switch (day) {
+            case 2 -> "T2";
+            case 3 -> "T3";
+            case 4 -> "T4";
+            case 5 -> "T5";
+            case 6 -> "T6";
+            case 7 -> "T7";
+            case 1 -> "CN";
+            default -> "T2";
+        };
+    }
+
 }

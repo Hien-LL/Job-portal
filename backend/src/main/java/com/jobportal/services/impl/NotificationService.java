@@ -81,7 +81,7 @@ public class NotificationService extends BaseService implements NotificationServ
     public Page<NotificationListItemResource> getNotificationsForAdmin(Map<String, String[]> params) {
 
         int page = params.containsKey("page") ? Integer.parseInt(params.get("page")[0]) - 1 : 0;
-        int size = params.containsKey("size") ? Integer.parseInt(params.get("size")[0]) : 10;
+        int size = params.containsKey("perPage") ? Integer.parseInt(params.get("perPage")[0]) : 10;
 
         Pageable pageable = PageRequest.of(page, size);
 

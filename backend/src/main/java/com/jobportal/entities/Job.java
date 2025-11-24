@@ -37,6 +37,7 @@ public class Job {
     private String currency;
     private LocalDateTime updatedAt;
     private int yearsOfExperience;
+    private Instant createdAt;
 
     // --- RELATIONSHIPS ---
     @ManyToOne
@@ -73,7 +74,7 @@ public class Job {
 
     @PrePersist
     protected void onCreate() {
-        this.publishedAt = Instant.now();
+        this.createdAt = Instant.now();
     }
 
     @PreUpdate
