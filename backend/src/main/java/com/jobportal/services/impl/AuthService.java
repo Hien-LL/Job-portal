@@ -57,7 +57,10 @@ public class AuthService extends BaseService implements AuthServiceInterface {
 
             String token = jwtService.generateToken(user.getId(), user.getEmail(), defaultExpiration);
             String refreshToken = jwtService.generateRefreshToken(user.getId(), user.getEmail());
-            return new LoginResource(token, refreshToken, userResource);
+            return new LoginResource(token, refreshToken, userResource,
+                    user.getRoles().stream()
+                            .map(roleMapper::tResource)
+                            .collect(Collectors.toSet()));
     }
 
     @Override

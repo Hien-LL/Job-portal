@@ -13,5 +13,4 @@ import java.util.Set;
 @Builder
 public class AuthResource {
     private  Long id;
-    private Set<RoleResource> roles;
 }

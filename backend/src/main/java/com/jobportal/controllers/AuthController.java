@@ -101,10 +101,9 @@ public class AuthController {
 
         String newToken = jwtService.generateToken(userId, email, null);
         String newRefreshToken = jwtService.generateRefreshToken(userId, email);
-        Set<RoleResource> roleResources = userService.getUserRoles(userId);
 
         return ApiResource.ok(
-                new LoginResource(newToken, newRefreshToken, new AuthResource(userId, roleResources)),
+                new LoginResource(newToken, newRefreshToken, new AuthResource(userId), null),
                 "Làm mới token thành công"
         );
     }
