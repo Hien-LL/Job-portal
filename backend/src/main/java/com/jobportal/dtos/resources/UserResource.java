@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Data
@@ -20,4 +21,6 @@ public class UserResource {
     private String headline;
     private String description;
     private Set<RoleResource> roles;
+    private LocalDateTime createdAt;
+
 }
