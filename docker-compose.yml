@@ -1,11 +1,9 @@
-version: "3.8"
-
 services:
 
   mysql:
     image: mysql:8.0
     container_name: job-portal-mysql
-    env_file: ./backend/.env
+    env_file: ./.env
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -43,12 +41,20 @@ services:
     image: ${BACKEND_IMAGE:-job-portal-backend:latest}
     container_name: job-portal-backend
     user: root
-    env_file: ./backend/.env
+    env_file: ./.env
     environment:
       SPRING_PROFILES_ACTIVE: docker
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_ISSUER: ${JWT_ISSUER}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      MAIL_HOST: ${MAIL_HOST}
+      MAIL_PORT: ${MAIL_PORT}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
     expose:
       - "8080"
     volumes:
