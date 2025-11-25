@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đăng nhập quản trị - JobPortal</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            font-family: "Inter", sans-serif;
+            background: #ffffff;
+            overflow: hidden;
+        }
+        h1, h2, h3, h4 {
+            font-family: "Poppins", sans-serif;
+        }
+
+        /* Canvas bong bóng xanh */
+        #bubbleCanvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+        }
+
+        .login-container {
+            position: relative;
+            z-index: 10;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="bubbleCanvas"></canvas>
+
+    <section class="login-container min-h-screen flex items-center justify-center px-4">
+        <div class="w-full max-w-md bg-white bg-opacity-90 border border-gray-200 rounded-xl shadow-lg p-8">
+
+            <h1 class="text-2xl font-bold text-center text-gray-900 mb-2">
+                Đăng nhập quản trị viên
+            </h1>
+            <p class="text-gray-600 text-sm text-center mb-8">
+                Truy cập bảng quản trị JobPortal
+            </p>
+
+            <form class="space-y-4">
+                <!-- Email -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Email đăng nhập
+                    </label>
+                    <input type="email" placeholder="Email quản trị"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500" />
+                </div>
+
+                <!-- Password -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Mật khẩu
+                    </label>
+                    <input type="password" placeholder="Mật khẩu"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500" />
+                </div>
+
+                <!-- Button -->
+                <button type="submit"
+                    class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition text-sm">
+                    Đăng nhập
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <script src="../js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        // === Canvas bong bóng xanh ===
+        const canvas = document.getElementById("bubbleCanvas");
+        const ctx = canvas.getContext("2d");
+
+        let w, h;
+
+        function resize() {
+            w = canvas.width = window.innerWidth;
+            h = canvas.height = window.innerHeight;
+        }
+        window.addEventListener("resize", resize);
+        resize();
+
+        const bubbles = [];
+        const bubbleCount = 45;
+
+        function random(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+        // Tạo bong bóng
+        for (let i = 0; i < bubbleCount; i++) {
+            bubbles.push({
+                x: random(0, w),
+                y: random(0, h),
+                r: random(8, 20),
+                speedX: random(-0.3, 0.3),
+                speedY: random(-0.3, 0.3),
+            });
+        }
+
+        let mouse = { x: 0, y: 0 };
+
+        window.addEventListener("mousemove", (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+
+        function animate() {
+            ctx.clearRect(0, 0, w, h);
+
+            bubbles.forEach((b) => {
+                const dx = b.x - mouse.x;
+                const dy = b.y - mouse.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < 100) {
+                    b.x += dx * 0.06;
+                    b.y += dy * 0.06;
+                }
+
+                b.x += b.speedX;
+                b.y += b.speedY;
+
+                if (b.x < 0 || b.x > w) b.speedX *= -1;
+                if (b.y < 0 || b.y > h) b.speedY *= -1;
+
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+                ctx.fillStyle = "rgba(37, 99, 235, 0.15)"; /* xanh dương chủ đạo JOBPORTAL */
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = "rgba(37, 99, 235, 0.20)";
+                ctx.fill();
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
