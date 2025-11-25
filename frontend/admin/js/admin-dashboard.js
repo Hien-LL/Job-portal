@@ -4,10 +4,16 @@
  */
 
 // Token thật của bạn
-const HARDCODED_TOKEN = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBkZXYuY29tIiwidWlkIjoxLCJpc3MiOiJodHRwczovL2FwaS5qb2Jwb3J0YWwuZGV2IiwiaWF0IjoxNzY0MDA3OTQwLCJleHAiOjE3NjQwNTExNDB9.SuRHrNbYJMglI2HToocjdxuGvI2jdgYectYXy2GaqYshPIemHzKt3vu7HBNrnQ6RFbLJ1Two1DB_ESs96BZnog";
-const API_BASE_URL = "https://jobportal.works/api";
+// const HARDCODED_TOKEN = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBkZXYuY29tIiwidWlkIjoxLCJpc3MiOiJodHRwczovL2FwaS5qb2Jwb3J0YWwuZGV2IiwiaWF0IjoxNzY0MDA3OTQwLCJleHAiOjE3NjQwNTExNDB9.SuRHrNbYJMglI2HToocjdxuGvI2jdgYectYXy2GaqYshPIemHzKt3vu7HBNrnQ6RFbLJ1Two1DB_ESs96BZnog";
+// const API_BASE_URL = "https://jobportal.works/api";
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Check authentication
+    if (!authService.isAuthenticated()) {
+        window.location.href = 'login.html';
+        return;
+    }
+
     loadFragments().then(() => {
         loadDashboardData();
     });
@@ -19,35 +25,29 @@ async function loadDashboardData() {
     try {
         console.log('🔄 Đang gọi đồng thời 3 API...');
 
-        // Chuẩn bị Headers
-        const headers = {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${HARDCODED_TOKEN}`
-        };
-
         // Gọi 3 API song song (Promise.all) để tiết kiệm thời gian
         const [statsRes, usersRes, jobsRes] = await Promise.all([
             // 1. API Thống kê tổng
-            fetch(`${API_BASE_URL}/admins/stats`, { headers }),
+            authService.apiRequest('/admins/stats'),
             
             // 2. API Người dùng mới nhất (sort=createdAt,desc & perPage=5)
-            fetch(`${API_BASE_URL}/users/list?page=1&perPage=5&sort=createdAt,desc`, { headers }),
+            authService.apiRequest('/users/list?page=1&perPage=5&sort=createdAt,desc'),
             
             // 3. API Tin tuyển dụng mới nhất (sort=createdAt,desc & perPage=5)
-            fetch(`${API_BASE_URL}/jobs?page=1&perPage=5&sort=createdAt,desc`, { headers })
+            authService.apiRequest('/jobs?page=1&perPage=5&sort=createdAt,desc')
         ]);
 
         // Xử lý kết quả
         let dashboardData = {};
 
         // --- Xử lý Stats ---
-        if (statsRes.ok) {
+        if (statsRes && statsRes.ok) {
             const statsJson = await statsRes.json();
             if (statsJson.success) dashboardData = { ...dashboardData, ...statsJson.data };
         }
 
         // --- Xử lý Recent Users ---
-        if (usersRes.ok) {
+        if (usersRes && usersRes.ok) {
             const usersJson = await usersRes.json();
             if (usersJson.success) {
                 // API trả về Page object, danh sách nằm trong .content
@@ -56,7 +56,7 @@ async function loadDashboardData() {
         }
 
         // --- Xử lý Recent Jobs ---
-        if (jobsRes.ok) {
+        if (jobsRes && jobsRes.ok) {
             const jobsJson = await jobsRes.json();
             if (jobsJson.success) {
                 dashboardData.recentJobs = jobsJson.data.content || jobsJson.data;

@@ -13,7 +13,7 @@
         
         <div class="p-4 border-b border-gray-200">
             <div class="flex items-center gap-3">
-                <img id="sidebar-admin-avatar" src="img/icon-account.png" alt="Avatar" class="w-12 h-12 rounded-full object-cover bg-gray-200 flex-shrink-0">
+                <img id="sidebar-admin-avatar" src="../img/icon-account.png" alt="Avatar" class="w-12 h-12 rounded-full object-cover bg-gray-200 flex-shrink-0">
                 <div class="min-w-0">
                     <p id="sidebar-admin-name" class="text-sm font-semibold text-gray-900 truncate">Admin Name</p>
                     <p id="sidebar-admin-email" class="text-xs text-gray-500 truncate">admin@jobportal.vn</p>
@@ -124,12 +124,30 @@
                     if (nameEl) nameEl.textContent = profile.name || 'Admin';
                     if (emailEl) emailEl.textContent = profile.email || '...';
                     
+                    // Resolve avatar URL safely (handle absolute URLs, protocol-relative, and server file base)
+                    function resolveAvatarUrl(path) {
+                        if (!path) return null;
+                        // If already absolute or protocol-relative, use as-is
+                        if (/^https?:\/\//i.test(path) || /^\/\//.test(path)) return path;
+                        const base = (typeof API_CONFIG !== 'undefined' && API_CONFIG.FILE_BASE_URL) ? API_CONFIG.FILE_BASE_URL : '';
+                        if (base) {
+                            return base.replace(/\/$/, '') + (path.startsWith('/') ? path : '/' + path);
+                        }
+                        return path.startsWith('/') ? path : '/' + path;
+                    }
+
                     if (avatarEl) {
-                        if (profile.avatarUrl) {
-                            avatarEl.src = `${API_CONFIG.FILE_BASE_URL}${profile.avatarUrl}`;
+                        const finalUrl = resolveAvatarUrl(profile.avatarUrl);
+                        if (finalUrl) {
+                            avatarEl.src = finalUrl;
                         } else {
                             avatarEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.name || 'A')}&background=E0E7FF&color=3730A3`;
                         }
+                        avatarEl.loading = 'lazy';
+                        avatarEl.onerror = function() {
+                            this.onerror = null;
+                            this.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.name || 'A')}&background=E0E7FF&color=3730A3`;
+                        };
                     }
                 }
             } catch (error) {

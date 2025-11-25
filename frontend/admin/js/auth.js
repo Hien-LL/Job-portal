@@ -6,7 +6,10 @@
 const AUTH_CONFIG = {
     STORAGE_KEYS: {
         ACCESS_TOKEN: 'token',
-        REFRESH_TOKEN: 'refreshToken'
+        REFRESH_TOKEN: 'refreshToken',
+        USER_DATA: 'userData',
+        LOGIN_TIME: 'loginTime',
+        LOGIN_EXPIRY: 'loginExpiry'
     },
     // Duration (ms) for login_time: 12 hours
     LOGIN_DURATION_MS: 12 * 60 * 60 * 1000
@@ -21,7 +24,8 @@ class AuthService {
     // Check if user is authenticated
     isAuthenticated() {
         const token = this.getToken();
-        return !!(token && userId);
+        const userData = this.getUserData();
+        return !!(token && userData);
     }
 
     // Get stored access token
@@ -32,6 +36,12 @@ class AuthService {
     // Get stored refresh token
     getRefreshToken() {
         return localStorage.getItem(AUTH_CONFIG.STORAGE_KEYS.REFRESH_TOKEN);
+    }
+
+    // Get stored user data
+    getUserData() {
+        const data = localStorage.getItem(AUTH_CONFIG.STORAGE_KEYS.USER_DATA);
+        return data ? JSON.parse(data) : null;
     }
 
     // Get login time
@@ -45,13 +55,14 @@ class AuthService {
         try {
             localStorage.setItem(AUTH_CONFIG.STORAGE_KEYS.ACCESS_TOKEN, data.token);
             localStorage.setItem(AUTH_CONFIG.STORAGE_KEYS.REFRESH_TOKEN, data.refreshToken);
+            localStorage.setItem(AUTH_CONFIG.STORAGE_KEYS.USER_DATA, JSON.stringify(data.user));
             // Store login time as current timestamp
             localStorage.setItem(AUTH_CONFIG.STORAGE_KEYS.LOGIN_TIME, Date.now().toString());
             // Store login expiry timestamp (ms). Set to now + LOGIN_DURATION_MS (12 hours)
             const expiry = Date.now() + AUTH_CONFIG.LOGIN_DURATION_MS;
             localStorage.setItem(AUTH_CONFIG.STORAGE_KEYS.LOGIN_EXPIRY, expiry.toString());
             
-            console.log('Auth data stored successfully', { userType });
+            console.log('Auth data stored successfully');
             return true;
         } catch (error) {
             console.error('Error storing auth data:', error);
@@ -85,7 +96,7 @@ class AuthService {
 
             const data = await response.json();
 
-            if (response.ok && data.success && data.data.roles.priority == 2) {
+            if (response.ok && data.success && data.data.roles && data.data.roles.some(role => role.priority === 2)) {
                 this.storeAuthData(data.data);
                 return {
                     success: true,
@@ -95,7 +106,7 @@ class AuthService {
             } else {
                 return {
                     success: false,
-                    message: data.error.message || 'Đăng nhập thất bại'
+                    message: data.error?.message || 'Đăng nhập thất bại'
                 };      
             }
         } catch (error) {
@@ -129,18 +140,18 @@ class AuthService {
         }
     }
 
-    // Get authorization headers for API calls
-    getAuthHeaders() {
-        const token = this.getToken();
-        if (token) {
-            return {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            };
+    // Get user profile
+    async getUserProfile() {
+        try {
+            const response = await this.apiRequest(API_CONFIG.USERS.GET_PROFILE);
+            if (response.ok) {
+                const data = await response.json();
+                return data.success ? data.data : null;
+            }
+        } catch (error) {
+            console.error('Get profile error:', error);
         }
-        return {
-            'Content-Type': 'application/json'
-        };
+        return null;
     }
 
     // Make authenticated API request - ✅ ĐÃ SỬA
@@ -258,4 +269,10 @@ if (typeof module !== 'undefined' && module.exports) {
 } else {
     window.authService = authService;
     window.AUTH_CONFIG = AUTH_CONFIG;
+    
+    // Global logout function for fragments
+    window.logout = async function() {
+        await authService.logout();
+        window.location.href = 'login.html';
+    };
 }

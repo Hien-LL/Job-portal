@@ -11,7 +11,7 @@
             <div id="logged-in-menu" class="flex items-center gap-3">                
                 <div class="relative">
                     <button id="user-menu-trigger" class="text-gray-700 text-sm font-medium hover:text-blue-600 flex items-center gap-2">
-                        <img id="admin-avatar-icon" src="img/icon-account.png" alt="Admin Avatar" class="w-6 h-6 rounded-full object-cover bg-gray-200">
+                        <img id="admin-avatar-icon" src="../img/icon-account.png" alt="Admin Avatar" class="w-6 h-6 rounded-full object-cover bg-gray-200">
                         <span id="admin-name-text">Admin</span> ▼
                     </button>
                     <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200" style="z-index: 9998;">
@@ -61,10 +61,21 @@
                     const avatarEl = document.getElementById('admin-avatar-icon');
                     const nameEl = document.getElementById('admin-name-text');
                     if (nameEl) nameEl.textContent = profile.name || 'Admin';
-                    if (avatarEl && profile.avatarUrl) {
-                        avatarEl.src = `${API_CONFIG.FILE_BASE_URL}${profile.avatarUrl}`;
-                    } else if (avatarEl) {
-                         avatarEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.name || 'A')}&background=E0E7FF&color=3730A3`;
+                    // Resolve avatar and set with fallback
+                    function resolveAvatarUrl(path) {
+                        if (!path) return null;
+                        if (/^https?:\/\//i.test(path) || /^\/\//.test(path)) return path;
+                        const base = (typeof API_CONFIG !== 'undefined' && API_CONFIG.FILE_BASE_URL) ? API_CONFIG.FILE_BASE_URL : '';
+                        if (base) return base.replace(/\/$/, '') + (path.startsWith('/') ? path : '/' + path);
+                        return path.startsWith('/') ? path : '/' + path;
+                    }
+
+                    if (avatarEl) {
+                        const finalUrl = resolveAvatarUrl(profile.avatarUrl);
+                        if (finalUrl) avatarEl.src = finalUrl;
+                        else avatarEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.name || 'A')}&background=E0E7FF&color=3730A3`;
+                        avatarEl.loading = 'lazy';
+                        avatarEl.onerror = function() { this.onerror = null; this.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.name || 'A')}&background=E0E7FF&color=3730A3`; };
                     }
                 }
             } catch (e) {
