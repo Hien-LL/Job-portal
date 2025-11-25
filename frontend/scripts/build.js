@@ -32,6 +32,16 @@ if (await fs.pathExists(adminDir)) {
   for (const file of adminHtmlFiles) {
     await fs.copy(path.join(adminDir, file), path.join(adminDistDir, file));
   }
+
+  // Also copy admin-specific assets (js and fragments) into dist/admin
+  const adminJsSrc = path.join(adminDir, 'js');
+  const adminFragmentsSrc = path.join(adminDir, 'fragments');
+  if (await fs.pathExists(adminJsSrc)) {
+    await fs.copy(adminJsSrc, path.join(adminDistDir, 'js'));
+  }
+  if (await fs.pathExists(adminFragmentsSrc)) {
+    await fs.copy(adminFragmentsSrc, path.join(adminDistDir, 'fragments'));
+  }
 }
 
 // 2.2. Replace CDN with compiled CSS in dist HTML files
