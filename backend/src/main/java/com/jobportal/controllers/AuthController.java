@@ -32,9 +32,11 @@ public class AuthController {
     private final NotificationServiceInterface notificationService;
 
     @PostMapping("register")
-    public ApiResource<RegisterResource> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
-        // Gợi ý: đổi service trả thẳng RegisterResource. Nếu chưa đổi, tạm cast cứng và fail rõ ràng.
-        Object result = userService.createUser(registerRequest);
+    public ApiResource<RegisterResource> registerUser(
+            @Valid @RequestBody RegisterRequest registerRequest,
+            @RequestParam(name = "role", required = false) String role
+    ) {
+        Object result = userService.createUser(registerRequest, role);
         if (result instanceof RegisterResource resource) {
             return ApiResource.ok(resource, "Đăng kí thành công");
         }
@@ -74,7 +76,6 @@ public class AuthController {
         return ApiResource.ok(result, "Đã thêm token vào blacklist");
     }
 
-    // Khuyên đổi sang POST cho chuẩn, nhưng giữ GET nếu m đang dùng ở FE.
     @GetMapping("logout")
     public ApiResource<Void> logout(@RequestHeader("Authorization") String bearerToken) {
         String token = bearerToken.substring(7);

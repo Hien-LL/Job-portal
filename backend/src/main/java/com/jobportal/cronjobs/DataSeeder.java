@@ -23,6 +23,7 @@ public class DataSeeder implements ApplicationRunner {
     private static final String ROLE_DEV = "DEV";
     private static final String ROLE_BUSINESS = "BUSINESS";
     private static final String ROLE_CANDIDATE = "CANDIDATE";
+    private static final String ROLE_RECRUITER = "RECRUITER";
     private static final String ROLE_EMPLOYER = "EMPLOYER";
 
     private final RoleRepository roleRepository;
@@ -63,7 +64,8 @@ public class DataSeeder implements ApplicationRunner {
                 Role.builder().name(ROLE_DEV).priority(2).build(),
                 Role.builder().name(ROLE_BUSINESS).priority(1).build(),
                 Role.builder().name(ROLE_CANDIDATE).priority(1).build(),
-                Role.builder().name(ROLE_EMPLOYER).priority(1).build()
+                Role.builder().name(ROLE_EMPLOYER).priority(1).build(),
+                Role.builder().name(ROLE_RECRUITER).priority(1).build()
         );
         roleRepository.saveAll(roles);
         log.info("✅ Seeded default roles");
@@ -118,6 +120,7 @@ public class DataSeeder implements ApplicationRunner {
         adminUser.setPhone("0775472894");
         adminUser.setAddress("Hồ Chí Minh");
         adminUser.setRoles(Set.of(adminRole));
+        adminUser.setEmailVerified(true);
 
         userRepository.save(adminUser);
         log.info("✅ Seeded admin user {}", adminUser.getEmail());

@@ -14,7 +14,7 @@ public interface AuthServiceInterface {
     LoginResource authenticate(LoginRequest request);
     UserProfileResource getUserFromEmail(String email);
     UserProfileResource getProfileById(Long id);
-    Object createUser(RegisterRequest request);
+    Object createUser(RegisterRequest request, String role);
     UserDetailsResource updateRolesForUser(@Valid Set<Long> roleIds, Long id);
     void verifyEmail(String email, String otp);
     void resendOtp(String email);

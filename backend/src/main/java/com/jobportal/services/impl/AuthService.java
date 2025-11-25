@@ -77,12 +77,12 @@ public class AuthService extends BaseService implements AuthServiceInterface {
 
 
     @Override
-    public RegisterResource createUser(RegisterRequest request) {
+    public RegisterResource createUser(RegisterRequest request, String roleStr) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new UserAlreadyExistsException("Email đã tồn tại");
         }
 
-        Role role = roleRepository.findByName("USER")
+        Role role = roleRepository.findByName(roleStr.toUpperCase())
                 .orElseThrow(() -> new EntityNotFoundException("Role USER không tồn tại trong hệ thống"));
 
         User user = userMapper.tEntity(request);
