@@ -65,107 +65,108 @@
     <div data-fragment="fragments/header.html" data-header-type="auto"></div>
 
     <!-- Hero Section -->
-    <section class="bg-white py-16 px-4 sm:px-6 lg:px-8">
-      <div class="max-w-5xl mx-auto text-center">
-        <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-          Tìm việc làm phù hợp với bạn
-        </h1>
-        <p class="text-gray-600 text-lg mb-8">
-          Hàng ngàn cơ hội việc làm đang chờ đón bạn
-        </p>
+<!-- Hero Section -->
+<section class="pt-16 pb-6 bg-[#005B9A] w-full">
+  <div class="max-w-6xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+    <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">
+      Tìm việc làm phù hợp với bạn
+    </h1>
+    <p class="text-blue-100 text-lg mb-6">
+      Hàng ngàn cơ hội việc làm đang chờ đón bạn
+    </p>
 
-        <!-- Search Bar -->
-        <div class="max-w-3xl mx-auto">
+    <!-- Search Bar -->
+    <div class="max-w-4xl mx-auto">
+      <div
+        class="bg-white rounded-lg shadow-lg border-2 border-gray-200 p-3 md:p-4"
+      >
+        <div class="flex flex-col md:flex-row gap-2">
+          <!-- Keyword Input -->
           <div
-            class="bg-white rounded-lg shadow-lg border-2 border-gray-200 p-2"
+            class="flex-1 flex items-center px-4 py-2 bg-gray-50 rounded-md"
           >
-            <div class="flex flex-col md:flex-row gap-2">
-              <!-- Keyword Input -->
-              <div
-                class="flex-1 flex items-center px-4 py-2 bg-gray-50 rounded-md"
-              >
-                <svg
-                  class="w-5 h-5 text-gray-400 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
-                <input
-                  type="text"
-                  id="home-keyword-search"
-                  placeholder="Vị trí tuyển dụng, tên công ty..."
-                  class="flex-1 bg-transparent text-gray-900 focus:outline-none text-sm"
-                />
-              </div>
+            <svg
+              class="w-5 h-5 text-gray-400 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+            <input
+              type="text"
+              id="home-keyword-search"
+              placeholder="Vị trí tuyển dụng, tên công ty..."
+              class="flex-1 bg-transparent text-gray-900 placeholder:text-gray-400 focus:outline-none text-sm"
+            />
+          </div>
 
-              <!-- Location Input -->
-              <div
-                class="flex-1 flex items-center px-4 py-2 bg-gray-50 rounded-md relative"
-              >
-                <svg
-                  class="w-5 h-5 text-gray-400 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                  />
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                </svg>
+          <!-- Location Input -->
+          <div
+            class="flex-1 flex items-center px-4 py-2 bg-gray-50 rounded-md relative"
+          >
+            <svg
+              class="w-5 h-5 text-gray-400 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+              />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+            </svg>
+            <input
+              type="text"
+              id="home-location-search"
+              placeholder="Địa điểm"
+              class="flex-1 bg-transparent text-gray-900 placeholder:text-gray-400 focus:outline-none text-sm"
+              autocomplete="off"
+            />
+            <!-- Location Suggestions Dropdown giữ nguyên -->
+            <div
+              id="home-location-suggestions"
+              class="absolute top-full left-0 mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg hidden max-h-80 overflow-y-auto z-50"
+            >
+              <div class="p-3">
                 <input
                   type="text"
-                  id="home-location-search"
-                  placeholder="Địa điểm"
-                  class="flex-1 bg-transparent text-gray-900 focus:outline-none text-sm"
-                  autocomplete="off"
+                  id="home-location-filter-input"
+                  placeholder="Tìm Tỉnh/Thành"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 mb-3"
                 />
-                <!-- Location Suggestions Dropdown -->
-                <div
-                  id="home-location-suggestions"
-                  class="absolute top-full left-0 mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg hidden max-h-80 overflow-y-auto z-50"
-                >
-                  <div class="p-3">
-                    <input
-                      type="text"
-                      id="home-location-filter-input"
-                      placeholder="Tìm Tỉnh/Thành"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 mb-3"
-                    />
-                    <div id="home-location-list" class="space-y-1">
-                      <!-- Will be populated by JavaScript -->
-                    </div>
-                  </div>
+                <div id="home-location-list" class="space-y-1">
+                  <!-- Will be populated by JavaScript -->
                 </div>
               </div>
-
-              <!-- Search Button -->
-              <button
-                onclick="handleSearch()"
-                class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-md font-medium text-sm transition-all flex items-center justify-center gap-2"
-              >
-                Tìm kiếm
-              </button>
             </div>
           </div>
+
+          <!-- Search Button -->
+          <button
+            onclick="handleSearch()"
+            class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-md font-medium text-sm transition-all flex items-center justify-center gap-2"
+          >
+            Tìm kiếm
+          </button>
         </div>
       </div>
-    </section>
+    </div>
+  </div>
+</section>
 
     <!-- Banner Gradient dưới thanh tìm kiếm -->
     <section class="py-16 bg-[#005B9A] w-full -mt-4">
