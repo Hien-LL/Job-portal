@@ -1,109 +1,406 @@
-/* File: frontend/admin/js/admin-companies.js */
-document.addEventListener('DOMContentLoaded', function() {
+/*
+ * File: frontend/admin/js/admin-companies.js
+ * Quản lí công ty: gọi /companies/list, render bảng, search, filter, verify, delete
+ */
+
+let companiesCache = [];
+let currentPage = 1;
+let pageSize = 10;
+let totalPages = 1;
+let totalElements = 0;
+
+document.addEventListener("DOMContentLoaded", () => {
+    // Kiểm tra đăng nhập
+    if (!authService.isAuthenticated()) {
+        window.location.href = "login.html";
+        return;
+    }
+
+    // Load header/sidebar/footer rồi mới gọi API
     loadFragments().then(() => {
-        // Tạm thời vô hiệu hóa
-        /*
-        if (!authService.isAuthenticated()) {
-            window.location.href = '../login.html'; // Sửa đường dẫn
-            return;
-        }
-        */
-        loadCompanies(1, '', 'all');
-        const searchInput = document.getElementById('company-search-input');
-        const verifiedFilter = document.getElementById('verified-filter');
-        let searchTimeout;
-        searchInput.addEventListener('input', () => {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                loadCompanies(1, searchInput.value, verifiedFilter.value);
-            }, 500);
-        });
-        verifiedFilter.addEventListener('change', () => {
-            loadCompanies(1, searchInput.value, verifiedFilter.value);
-        });
+        attachFilterHandlers();
+        loadCompanies();
     });
 });
-async function loadCompanies(page = 1, keyword = '', verifiedStatus = 'all') {
-    showLoading();
+
+/* ============== GỌI API LẤY DANH SÁCH COMPANY ============== */
+
+async function loadCompanies() {
+    const loading = document.getElementById("loading");
+    const errorState = document.getElementById("error-state");
+    const companiesContainer = document.getElementById("companies-container");
+    const emptyState = document.getElementById("empty-state");
+    const pagination = document.getElementById("pagination");
+
+    loading.classList.remove("hidden");
+    companiesContainer.classList.add("hidden");
+    emptyState.classList.add("hidden");
+    errorState.classList.add("hidden");
+    pagination.classList.add("hidden");
+
     try {
-        console.log(`Đang tải (giả lập) trang ${page} với từ khóa "${keyword}" và trạng thái "${verifiedStatus}"`);
-        const mockCompanies = [
-            { id: 1, name: 'Tech Solutions Inc.', website: 'techsolutions.com', verified: true, followerCount: 1200, slug: 'tech-solutions-inc' },
-            { id: 2, name: 'Creative Agency', website: 'creative.vn', verified: false, followerCount: 300, slug: 'creative-agency' },
-            { id: 3, name: 'Global Tech', website: 'globaltech.com', verified: true, followerCount: 5000, slug: 'global-tech' },
-            { id: 4, name: 'FPT Software', website: 'fpt-software.com', verified: true, followerCount: 15000, slug: 'fpt-software' },
-            { id: 5, name: 'Startup Mới', website: 'startup.io', verified: false, followerCount: 10, slug: 'startup-moi' },
-        ];
-        let filtered = mockCompanies.filter(c => c.name.toLowerCase().includes(keyword.toLowerCase()));
-        if (verifiedStatus === 'true') { filtered = filtered.filter(c => c.verified === true); }
-        else if (verifiedStatus === 'false') { filtered = filtered.filter(c => c.verified === false); }
-        const mockPageData = { content: filtered.slice(0, 10), totalPages: 1, number: page - 1, first: page === 1, last: page === 1 };
-        await new Promise(resolve => setTimeout(resolve, 500)); 
-        displayCompanies(mockPageData.content || []);
-        displayPagination(mockPageData);
-        if (mockPageData.content.length === 0) { showEmptyState(); } else { showContent(); }
-    } catch (error) { showError(error.message); }
-    finally { hideLoading(); }
-}
-function displayCompanies(companies) {
-    const companyList = document.getElementById('companies-list');
-    companyList.innerHTML = '';
-    if (companies.length === 0) { showEmptyState(); return; }
-    companies.forEach(company => {
-        const statusBadge = company.verified ? `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Đã xác thực</span>` : `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Chờ xác thực</span>`;
-        const actionButton = company.verified ? `<button onclick="toggleVerify(${company.id}, false)" class="ml-4 text-yellow-600 hover:text-yellow-900 transition" title="Hủy xác thực">Hủy</button>` : `<button onclick="toggleVerify(${company.id}, true)" class="ml-4 text-green-600 hover:text-green-900 transition" title="Xác thực công ty này">Xác thực</button>`;
-        const row = `
-            <tr class="hover:bg-gray-50 transition">
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${company.id}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                    <div class="font-medium text-gray-900">${company.name}</div>
-                    <div class="text-xs text-gray-500">${company.followerCount} theo dõi</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                    <a href="https://${company.website}" target="_blank" class="text-blue-600 hover:underline">${company.website}</a>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm">${statusBadge}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                    <a href="../company-detail.html?slug=${company.slug}" target="_blank" class="text-blue-600 hover:text-blue-900 transition" title="Xem chi tiết">Xem</a> ${actionButton}
-                    <button onclick="deleteCompany(${company.id})" class="ml-4 text-red-600 hover:text-red-900 transition" title="Xóa công ty">Xóa</button>
-                </td>
-            </tr>`;
-        companyList.innerHTML += row;
-    });
-}
-function displayPagination(paginationData) {
-    const { totalPages, number, first, last } = paginationData;
-    const currentPage = number + 1;
-    const paginationContainer = document.getElementById('pagination');
-    if (totalPages <= 1) { paginationContainer.innerHTML = ''; hideElement(paginationContainer); return; }
-    let paginationHtml = '<div class="flex items-center gap-2">';
-    paginationHtml += `<button onclick="loadCompanies(${currentPage - 1}, document.getElementById('company-search-input').value, document.getElementById('verified-filter').value)" class="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 ${first ? 'opacity-50 cursor-not-allowed' : ''}" ${first ? 'disabled' : ''}>&larr; Trước</button>`;
-    for (let i = 1; i <= totalPages; i++) {
-        paginationHtml += `<button onclick="loadCompanies(${i}, document.getElementById('company-search-input').value, document.getElementById('verified-filter').value)" class="px-4 py-2 border ${i === currentPage ? 'border-blue-600 bg-blue-50 text-blue-600' : 'border-gray-300 text-gray-700 hover:bg-gray-50'} rounded-lg text-sm font-semibold">${i}</button>`;
+        currentPage = 1;
+
+        // API: /companies/list?sort=followerCount,desc
+        const res = await authService.apiRequest(
+            `/companies/list?sort=followerCount,desc`
+        );
+
+        if (!res || !res.ok) throw new Error("Request failed");
+
+        const json = await res.json();
+        if (!json.success || !json.data) {
+            throw new Error(json.message || "API error");
+        }
+
+        // Ở đây data là 1 mảng company
+        companiesCache = json.data || [];
+        totalElements = companiesCache.length;
+
+        applyFiltersAndRender();
+
+        loading.classList.add("hidden");
+        companiesContainer.classList.remove("hidden");
+        if (totalElements > 0) {
+            pagination.classList.remove("hidden");
+        }
+    } catch (err) {
+        console.error("❌ Lỗi load companies:", err);
+        loading.classList.add("hidden");
+        showErrorState("Không thể tải danh sách công ty. Vui lòng thử lại.");
     }
-    paginationHtml += `<button onclick="loadCompanies(${currentPage + 1}, document.getElementById('company-search-input').value, document.getElementById('verified-filter').value)" class="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 ${last ? 'opacity-50 cursor-not-allowed' : ''}" ${last ? 'disabled' : ''}>Sau &rarr;</button>`;
-    paginationHtml += '</div>';
-    paginationContainer.innerHTML = paginationHtml;
-    showElement(paginationContainer);
 }
-function showLoading() { hideElement('error-state'); hideElement('empty-state'); hideElement('companies-container'); hideElement('pagination'); showElement('loading'); }
-function hideLoading() { hideElement('loading'); }
-function showContent() { hideElement('loading'); hideElement('error-state'); hideElement('empty-state'); showElement('companies-container'); showElement('pagination'); }
-function showEmptyState() { hideElement('loading'); hideElement('error-state'); hideElement('companies-container'); hideElement('pagination'); showElement('empty-state'); }
-function showError(message) { hideElement('loading'); hideElement('empty-state'); hideElement('companies-container'); hideElement('pagination'); document.getElementById('error-text').textContent = message || 'Đã có lỗi xảy ra.'; showElement('error-state'); }
-async function toggleVerify(companyId, shouldVerify) {
-    const action = shouldVerify ? 'Xác thực' : 'Hủy xác thực';
-    if (!confirm(`(Thiết kế) Bạn có chắc muốn ${action} Công ty ID: ${companyId} không?`)) { return; }
-    showSuccessToast(`(Giả lập) Đã ${action} công ty ${companyId}!`);
-    loadCompanies(currentPage, document.getElementById('company-search-input').value, document.getElementById('verified-filter').value);
+
+/* ======================= FILTER + SEARCH ======================= */
+
+function normalizeText(str) {
+    if (!str) return "";
+    return str
+        .toString()
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/đ/g, "d")
+        .replace(/Đ/g, "D");
 }
-async function deleteCompany(companyId) {
-    if (!confirm(`(Thiết kế) Bạn có chắc chắn muốn XÓA Công ty ID: ${companyId} không?`)) { return; }
-    showSuccessToast(`(Giả lập) Đã xóa công ty ${companyId}!`);
-    loadCompanies(currentPage, document.getElementById('company-search-input').value, document.getElementById('verified-filter').value);
+
+function attachFilterHandlers() {
+    const searchInput = document.getElementById("company-search-input");
+    const verifiedSelect = document.getElementById("verified-filter");
+
+    if (searchInput) {
+        searchInput.addEventListener("input", () => {
+            currentPage = 1;
+            applyFiltersAndRender();
+        });
+    }
+
+    if (verifiedSelect) {
+        verifiedSelect.addEventListener("change", () => {
+            currentPage = 1;
+            applyFiltersAndRender();
+        });
+    }
 }
-function clearFilters() { document.getElementById('company-search-input').value = ''; document.getElementById('verified-filter').value = 'all'; loadCompanies(1, '', 'all'); }
-window.loadCompanies = loadCompanies;
-window.toggleVerify = toggleVerify;
-window.deleteCompany = deleteCompany;
-window.clearFilters = clearFilters;
+
+function applyFiltersAndRender() {
+    const companiesContainer = document.getElementById("companies-container");
+    const emptyState = document.getElementById("empty-state");
+
+    let filtered = [...companiesCache];
+
+    const searchInput = document.getElementById("company-search-input");
+    const verifiedSelect = document.getElementById("verified-filter");
+
+    const keyword = searchInput ? normalizeText(searchInput.value.trim()) : "";
+    const verifiedFilter = verifiedSelect ? verifiedSelect.value : "all";
+
+    if (keyword) {
+        filtered = filtered.filter((c) => {
+            const name = normalizeText(c.name || "");
+            return name.includes(keyword);
+        });
+    }
+
+    if (verifiedFilter === "true") {
+        filtered = filtered.filter((c) => c.verified === true);
+    } else if (verifiedFilter === "false") {
+        filtered = filtered.filter((c) => c.verified === false);
+    }
+
+    totalElements = filtered.length;
+    totalPages = Math.max(1, Math.ceil(totalElements / pageSize));
+
+    if (currentPage > totalPages) currentPage = totalPages;
+
+    if (!filtered.length) {
+        document.getElementById("companies-list").innerHTML = `
+            <tr>
+                <td colspan="5" class="px-6 py-6 text-center text-sm text-gray-500">
+                    Không có công ty nào.
+                </td>
+            </tr>
+        `;
+        companiesContainer.classList.remove("hidden");
+        emptyState.classList.add("hidden");
+        renderPagination(); // hiển thị 0/0
+        return;
+    }
+
+    const start = (currentPage - 1) * pageSize;
+    const end = start + pageSize;
+    const pageItems = filtered.slice(start, end);
+
+    renderCompaniesTable(pageItems);
+    renderPagination();
+
+    companiesContainer.classList.remove("hidden");
+    emptyState.classList.add("hidden");
+}
+
+/* ================= RENDER BẢNG COMPANY ================= */
+
+function renderCompaniesTable(companies) {
+    const tbody = document.getElementById("companies-list");
+    if (!tbody) return;
+
+    if (!companies || !companies.length) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5" class="px-6 py-6 text-center text-sm text-gray-500">
+                    Không có dữ liệu.
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    tbody.innerHTML = companies
+        .map((c) => {
+            const id = c.id ?? "";
+            const name = c.name || "Không tên";
+            const website = c.website || "";
+            const verified = !!c.verified;
+
+            const statusBadge = verified
+                ? `<span class="inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800">Đã xác thực</span>`
+                : `<span class="inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">Chờ xác thực</span>`;
+
+            const verifyButtonLabel = verified ? "Bỏ xác thực" : "Xác thực";
+
+            return `
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 text-sm text-gray-900">#${id}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900">
+                        <div class="flex items-center gap-3">
+                            ${
+                                c.logoUrl
+                                    ? `<img src="${escapeHtml(
+                                          c.logoUrl
+                                      )}" alt="${escapeHtml(
+                                          name
+                                      )}" class="w-8 h-8 rounded object-cover border border-gray-200" />`
+                                    : ""
+                            }
+                            <div>
+                                <div class="font-medium">${escapeHtml(name)}</div>
+                                ${
+                                    c.slug
+                                        ? `<div class="text-xs text-gray-400">/${escapeHtml(
+                                              c.slug
+                                          )}</div>`
+                                        : ""
+                                }
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-blue-600">
+                        ${
+                            website
+                                ? `<a href="${escapeHtml(
+                                      website
+                                  )}" target="_blank" rel="noopener" class="hover:underline">${escapeHtml(
+                                      website
+                                  )}</a>`
+                                : `<span class="text-gray-400 text-xs">Không có</span>`
+                        }
+                    </td>
+                    <td class="px-6 py-4 text-sm">
+                        ${statusBadge}
+                    </td>
+                    <td class="px-6 py-4 text-sm">
+                        <div class="flex items-center justify-center gap-2">
+                            <button
+                                type="button"
+                                class="inline-flex items-center justify-center whitespace-nowrap px-3 py-1.5 
+                                       border border-amber-300 rounded-md text-xs font-medium text-amber-700 hover:bg-amber-50"
+                                onclick="verifyCompany(${id}, ${verified})"
+                            >
+                                ${verifyButtonLabel}
+                            </button>
+                            <button
+                                type="button"
+                                class="inline-flex items-center justify-center whitespace-nowrap px-3 py-1.5 
+                                       border border-red-300 rounded-md text-xs font-medium text-red-700 hover:bg-red-50"
+                                onclick="deleteCompany(${id})"
+                            >
+                                Xoá
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        })
+        .join("");
+}
+
+/* =================== PHÂN TRANG =================== */
+
+function renderPagination() {
+    const pagination = document.getElementById("pagination");
+    if (!pagination) return;
+
+    if (totalElements === 0) {
+        pagination.innerHTML = `
+            <div class="text-sm text-gray-600">
+                Không có công ty nào.
+            </div>
+        `;
+        pagination.classList.remove("hidden");
+        return;
+    }
+
+    const from = (currentPage - 1) * pageSize + 1;
+    const to = Math.min(currentPage * pageSize, totalElements);
+
+    pagination.innerHTML = `
+        <div class="text-sm text-gray-600">
+            Hiển thị <span class="font-medium">${from}</span>–<span class="font-medium">${to}</span>
+            trên tổng <span class="font-medium">${totalElements}</span> công ty
+        </div>
+        <div class="flex items-center gap-2">
+            <button
+                type="button"
+                class="px-3 py-1.5 border rounded-md text-sm ${
+                    currentPage === 1
+                        ? "text-gray-400 border-gray-200 cursor-not-allowed"
+                        : "text-gray-700 border-gray-300 hover:bg-gray-50"
+                }"
+                ${currentPage === 1 ? "disabled" : ""}
+                onclick="gotoCompanyPage(${currentPage - 1})"
+            >
+                Trước
+            </button>
+            <span class="text-sm text-gray-600">Trang ${currentPage} / ${totalPages}</span>
+            <button
+                type="button"
+                class="px-3 py-1.5 border rounded-md text-sm ${
+                    currentPage === totalPages
+                        ? "text-gray-400 border-gray-200 cursor-not-allowed"
+                        : "text-gray-700 border-gray-300 hover:bg-gray-50"
+                }"
+                ${currentPage === totalPages ? "disabled" : ""}
+                onclick="gotoCompanyPage(${currentPage + 1})"
+            >
+                Sau
+            </button>
+        </div>
+    `;
+
+    pagination.classList.remove("hidden");
+}
+
+window.gotoCompanyPage = function (page) {
+    if (page < 1 || page > totalPages) return;
+    currentPage = page;
+    applyFiltersAndRender();
+};
+
+/* =================== VERIFY & DELETE =================== */
+
+// PATCH /admins/companies/{id}/verify
+window.verifyCompany = async function (id, currentlyVerified) {
+    if (!id) return;
+
+    const confirmMsg = currentlyVerified
+        ? "Bạn có chắc muốn bỏ xác thực công ty này?"
+        : "Bạn có chắc muốn xác thực công ty này?";
+
+    if (!window.confirm(confirmMsg)) return;
+
+    try {
+        const res = await authService.apiRequest(`/admins/companies/${id}/verify`, {
+            method: "PATCH",
+        });
+
+        if (!res || !res.ok) {
+            const txt = await res.text().catch(() => "");
+            console.error("Verify company HTTP error:", txt);
+            alert("Cập nhật trạng thái xác thực thất bại.");
+            return;
+        }
+
+        alert("Cập nhật trạng thái xác thực thành công.");
+        await loadCompanies();
+    } catch (err) {
+        console.error("❌ Lỗi verify company:", err);
+        alert("Đã xảy ra lỗi khi cập nhật trạng thái xác thực.");
+    }
+};
+
+// DELETE /admins/companies/{id}
+window.deleteCompany = async function (id) {
+    if (!id) return;
+
+    if (!window.confirm(`Bạn có chắc chắn muốn xoá công ty #${id} không?`)) return;
+
+    try {
+        const res = await authService.apiRequest(`/admins/companies/${id}`, {
+            method: "DELETE",
+        });
+
+        if (!res || !res.ok) {
+            const txt = await res.text().catch(() => "");
+            console.error("Delete company HTTP error:", txt);
+            alert("Xoá công ty thất bại.");
+            return;
+        }
+
+        alert("Đã xoá công ty thành công.");
+        await loadCompanies();
+    } catch (err) {
+        console.error("❌ Lỗi delete company:", err);
+        alert("Đã xảy ra lỗi khi xoá công ty.");
+    }
+};
+
+/* ======================= ERROR & HELPER ======================= */
+
+function showErrorState(message) {
+    const errorState = document.getElementById("error-state");
+    if (!errorState) return;
+
+    errorState.classList.remove("hidden");
+    errorState.innerHTML = `
+        <div class="bg-red-50 text-red-700 px-4 py-3 rounded-lg text-sm flex items-center justify-between">
+            <span>${escapeHtml(message || "Đã xảy ra lỗi.")}</span>
+            <button
+                type="button"
+                class="ml-4 inline-flex items-center px-3 py-1.5 border border-red-300 rounded-md text-xs font-medium text-red-700 hover:bg-red-100"
+                onclick="loadCompanies()"
+            >
+                Thử lại
+            </button>
+        </div>
+    `;
+}
+
+function escapeHtml(str) {
+    if (!str) return "";
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}

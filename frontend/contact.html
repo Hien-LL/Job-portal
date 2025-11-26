@@ -6,30 +6,26 @@
     <title>Liên hệ - JobPortal</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
         body { font-family: 'Inter', sans-serif; }
-        /* Micro-interactions and improved visuals */
         .card-hover { transition: transform .18s ease, box-shadow .18s ease; }
         .card-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 25px rgba(2,6,23,0.08); }
         input:focus, textarea:focus, select:focus { box-shadow: 0 6px 18px rgba(59,130,246,0.12); outline: none; }
         .btn-animate { transition: transform .12s ease, box-shadow .12s ease; }
         .btn-animate:active { transform: translateY(1px) scale(.997); }
-        .toast {
-            position: fixed; right: 20px; bottom: 20px; z-index: 60;
-            background: rgba(17,24,39,0.95); color: white; padding: 12px 16px; border-radius: 8px; box-shadow: 0 6px 20px rgba(2,6,23,0.2);
-            display: flex; gap: 10px; align-items: center; font-size: 14px;
-        }
         .map-legend { font-size: 12px; color: #6b7280; margin-top: 6px; }
     </style>
 </head>
 <body class="bg-gray-50">
 
-    <!-- Header fragment -->
     <div data-fragment="fragments/header.html" data-header-type="auto"></div>
 
-    <!-- Hero -->
     <section class="bg-blue-600 text-white py-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center">
@@ -39,27 +35,26 @@
         </div>
     </section>
 
-    <!-- Breadcrumb -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <nav class="text-sm text-gray-600" aria-label="Breadcrumb">
             <ol class="list-reset flex gap-2 items-center">
                 <li><a href="index.html" class="hover:text-blue-600">Trang chủ</a></li>
-                <li>›</li>
+                <li><i class="fa-solid fa-chevron-right text-xs text-gray-400"></i></li>
                 <li class="text-gray-900">Liên hệ</li>
             </ol>
         </nav>
     </div>
 
-    <!-- Main -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Left column: Contact info & support boxes -->
             <div class="lg:col-span-1 space-y-6">
                 <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">Thông tin liên hệ</h3>
                     <div class="space-y-4 text-sm text-gray-700">
                         <div class="flex items-start gap-3">
-                            <div class="text-blue-600 mt-1">📍</div>
+                            <div class="text-blue-600 mt-1 w-5 text-center">
+                                <i class="fa-solid fa-location-dot text-lg"></i>
+                            </div>
                             <div>
                                 <div class="font-medium text-gray-900">Địa chỉ văn phòng</div>
                                 <div class="text-gray-500">123 Đường ABC, Quận 1, TP. Hồ Chí Minh</div>
@@ -67,7 +62,9 @@
                         </div>
 
                         <div class="flex items-start gap-3">
-                            <div class="text-blue-600 mt-1">✉️</div>
+                            <div class="text-blue-600 mt-1 w-5 text-center">
+                                <i class="fa-solid fa-envelope text-lg"></i>
+                            </div>
                             <div>
                                 <div class="font-medium text-gray-900">Email hỗ trợ</div>
                                 <div class="text-gray-500">contact@jobportal.vn</div>
@@ -75,7 +72,9 @@
                         </div>
 
                         <div class="flex items-start gap-3">
-                            <div class="text-blue-600 mt-1">📞</div>
+                            <div class="text-blue-600 mt-1 w-5 text-center">
+                                <i class="fa-solid fa-phone text-lg"></i>
+                            </div>
                             <div>
                                 <div class="font-medium text-gray-900">Điện thoại</div>
                                 <div class="text-gray-500">0123 456 789</div>
@@ -83,7 +82,9 @@
                         </div>
 
                         <div class="flex items-start gap-3">
-                            <div class="text-blue-600 mt-1">⏰</div>
+                            <div class="text-blue-600 mt-1 w-5 text-center">
+                                <i class="fa-solid fa-clock text-lg"></i>
+                            </div>
                             <div>
                                 <div class="font-medium text-gray-900">Giờ làm việc</div>
                                 <div class="text-gray-500">Thứ Hai - Thứ Sáu: 8:30 - 17:30<br>Thứ Bảy: 9:00 - 12:00<br>Chủ Nhật: Nghỉ</div>
@@ -97,7 +98,9 @@
                     <div class="space-y-6 text-gray-700 text-sm">
                         <div>
                             <div class="flex items-center gap-3">
-                                <div class="text-blue-600">👥</div>
+                                <div class="text-blue-600 w-5 text-center">
+                                    <i class="fa-solid fa-users text-lg"></i>
+                                </div>
                                 <div>
                                     <div class="font-medium">Hỗ trợ ứng viên</div>
                                     <div class="text-gray-500">candidate@jobportal.vn</div>
@@ -107,7 +110,9 @@
 
                         <div>
                             <div class="flex items-center gap-3">
-                                <div class="text-blue-600">🏢</div>
+                                <div class="text-blue-600 w-5 text-center">
+                                    <i class="fa-solid fa-building text-lg"></i>
+                                </div>
                                 <div>
                                     <div class="font-medium">Hỗ trợ nhà tuyển dụng</div>
                                     <div class="text-gray-500">employer@jobportal.vn</div>
@@ -117,7 +122,9 @@
 
                         <div>
                             <div class="flex items-center gap-3">
-                                <div class="text-blue-600">🛠️</div>
+                                <div class="text-blue-600 w-5 text-center">
+                                    <i class="fa-solid fa-screwdriver-wrench text-lg"></i>
+                                </div>
                                 <div>
                                     <div class="font-medium">Hỗ trợ kỹ thuật</div>
                                     <div class="text-gray-500">tech@jobportal.vn</div>
@@ -128,7 +135,6 @@
                 </div>
             </div>
 
-            <!-- Right column: Contact form + map -->
             <div class="lg:col-span-2 space-y-6">
                 <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">Gửi tin nhắn cho chúng tôi</h3>
@@ -158,43 +164,44 @@
                         </div>
 
                         <div class="md:col-span-2 flex items-center gap-4">
-                            <button type="submit" class="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                            <button type="submit" class="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+                                <i class="fa-solid fa-paper-plane"></i>
                                 Gửi tin nhắn
                             </button>
-                            <div id="form-feedback" class="text-sm text-green-600 hidden">Đã gửi! Chúng tôi sẽ liên hệ sớm.</div>
+                            <div id="form-feedback" class="text-sm text-green-600 hidden">
+                                <i class="fa-solid fa-check-circle mr-1"></i> Đã gửi! Chúng tôi sẽ liên hệ sớm.
+                            </div>
                         </div>
                     </form>
                 </div>
 
                 <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 card-hover">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">Bản đồ</h3>
-                    <!-- Map will render here: default Google Maps iframe (no API key required) -->
-                    <div id="map" class="w-full h-64 bg-gray-100 rounded overflow-hidden"></div>
-                    <div class="map-legend">Bản đồ mặc định: vị trí văn phòng. Muốn dùng Mapbox, đặt MAPBOX_API_KEY trong script.</div>
+                    <div id="map" class="w-full h-64 bg-gray-100 rounded overflow-hidden relative">
+                         <div class="absolute inset-0 flex items-center justify-center text-gray-400">
+                            <i class="fa-solid fa-spinner fa-spin text-2xl"></i>
+                         </div>
+                    </div>
                 </div>
 
                 <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
                     <h3 class="text-lg font-semibold text-gray-900 mb-6 text-center">Câu hỏi thường gặp</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-700">
                         <div>
-                            <h4 class="font-medium">Làm thế nào để tạo tài khoản ứng viên?</h4>
-                            <p class="text-gray-500">Bạn có thể tạo tài khoản ứng viên bằng cách nhấp vào "Đăng ký" ở góc phải trên cùng của trang web, sau đó chọn "Tôi là ứng viên" và điền thông tin cần thiết.</p>
+                            <h4 class="font-medium"><i class="fa-regular fa-circle-question text-blue-600 mr-1"></i> Làm thế nào để tạo tài khoản?</h4>
+                            <p class="text-gray-500 mt-1">Bạn có thể tạo tài khoản ứng viên bằng cách nhấp vào "Đăng ký" ở góc phải trên cùng.</p>
                         </div>
-
                         <div>
-                            <h4 class="font-medium">Làm thế nào để đăng tin tuyển dụng?</h4>
-                            <p class="text-gray-500">Nhà tuyển dụng cần đăng ký tài khoản doanh nghiệp, sau đó đăng nhập và chọn "Đăng tin tuyển dụng" từ dashboard nhà tuyển dụng.</p>
+                            <h4 class="font-medium"><i class="fa-regular fa-circle-question text-blue-600 mr-1"></i> Làm thế nào để đăng tin?</h4>
+                            <p class="text-gray-500 mt-1">Nhà tuyển dụng cần đăng ký tài khoản doanh nghiệp, sau đó chọn "Đăng tin" từ dashboard.</p>
                         </div>
-
                         <div>
-                            <h4 class="font-medium">Chi phí đăng tin tuyển dụng là bao nhiêu?</h4>
-                            <p class="text-gray-500">Chúng tôi cung cấp nhiều gói dịch vụ khác nhau. Vui lòng xem chi tiết tại trang "Bảng giá" hoặc liên hệ support để được tư vấn.</p>
+                            <h4 class="font-medium"><i class="fa-regular fa-circle-question text-blue-600 mr-1"></i> Chi phí dịch vụ?</h4>
+                            <p class="text-gray-500 mt-1">Chúng tôi cung cấp nhiều gói dịch vụ. Vui lòng xem tại trang "Bảng giá".</p>
                         </div>
-
                         <div>
-                            <h4 class="font-medium">Tôi quên mật khẩu, phải làm sao?</h4>
-                            <p class="text-gray-500">Bạn có thể sử dụng chức năng "Quên mật khẩu" trên trang đăng nhập. Hệ thống sẽ gửi hướng dẫn đặt lại mật khẩu đến email đã đăng ký.</p>
+                            <h4 class="font-medium"><i class="fa-regular fa-circle-question text-blue-600 mr-1"></i> Quên mật khẩu?</h4>
+                            <p class="text-gray-500 mt-1">Sử dụng chức năng "Quên mật khẩu" trên trang đăng nhập để đặt lại.</p>
                         </div>
                     </div>
                 </div>
@@ -203,39 +210,54 @@
         </div>
     </main>
 
-    <!-- Footer fragment -->
     <div data-fragment="fragments/footer.html"></div>
 
     <script src="js/fragments-loader.js"></script>
     <script src="js/auth.js"></script>
-  <script>
-    const OFFICE_ADDRESS = "02 Võ Oanh, Phường 25, Bình Thạnh, Thành phố Hồ Chí Minh, Việt Nam";
-
-    function renderGoogleMap(address) {
-        const mapEl = document.getElementById("map");
-        const query = encodeURIComponent(address);
-        const iframe = document.createElement("iframe");
-
-        iframe.width = "100%";
-        iframe.height = "100%";
-        iframe.style.border = "0";
-        iframe.loading = "lazy";
-        iframe.referrerPolicy = "no-referrer-when-downgrade";
-
-        iframe.src = `https://www.google.com/maps?q=${query}&output=embed`;
-
-        mapEl.innerHTML = "";
-        mapEl.appendChild(iframe);
-    }
-
-    // 👉 Gọi hàm khi trang load xong
-    document.addEventListener("DOMContentLoaded", () => {
-        renderGoogleMap(OFFICE_ADDRESS);
-    });
-</script>
+    
+    <script>
+        // CẬP NHẬT: Địa chỉ thực tế để hiển thị trên bản đồ
+        const OFFICE_ADDRESS = "02 Võ Oanh, Phường 25, Bình Thạnh, Thành phố Hồ Chí Minh, Việt Nam";
+    
+        function renderGoogleMap(address) {
+            const mapEl = document.getElementById("map");
+            const query = encodeURIComponent(address);
+            const iframe = document.createElement("iframe");
+    
+            iframe.width = "100%";
+            iframe.height = "100%";
+            iframe.style.border = "0";
+            iframe.loading = "lazy";
+            iframe.referrerPolicy = "no-referrer-when-downgrade";
+            
+            // CẬP NHẬT: Link embed chuẩn của Google Maps
+            iframe.src = `https://maps.google.com/maps?q=${query}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+    
+            mapEl.innerHTML = "";
+            mapEl.appendChild(iframe);
+        }
+    
+        document.addEventListener("DOMContentLoaded", () => {
+            renderGoogleMap(OFFICE_ADDRESS);
+            
+            // Xử lý form submit (Demo)
+            const contactForm = document.getElementById('contact-form');
+            if(contactForm) {
+                contactForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    // Giả lập gửi thành công
+                    const btn = contactForm.querySelector('button');
+                    const feedback = document.getElementById('form-feedback');
+                    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang gửi...';
+                    setTimeout(() => {
+                        btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Gửi tin nhắn';
+                        feedback.classList.remove('hidden');
+                        contactForm.reset();
+                    }, 1500);
+                });
+            }
+        });
+    </script>
 
 </body>
 </html>
-
-
-
