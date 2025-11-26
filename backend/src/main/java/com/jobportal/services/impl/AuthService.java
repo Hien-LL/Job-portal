@@ -82,6 +82,10 @@ public class AuthService extends BaseService implements AuthServiceInterface {
             throw new UserAlreadyExistsException("Email đã tồn tại");
         }
 
+        if (roleStr == null || roleStr.isEmpty()) {
+            roleStr = "USER";
+        }
+
         Role role = roleRepository.findByName(roleStr.toUpperCase())
                 .orElseThrow(() -> new EntityNotFoundException("Role USER không tồn tại trong hệ thống"));
 
