@@ -94,9 +94,9 @@
             const locationText = job.isRemote ? 'Remote' : (job.location?.displayName || 'Không xác định');
             const salaryText = formatSalaryRange(job.salaryMin, job.salaryMax, job.salaryCurrency);
             
-            document.getElementById('job-location').textContent = `📍 ${locationText}`;
-            document.getElementById('job-salary').textContent = `💰 ${salaryText}`;
-            document.getElementById('job-type').textContent = `⏰ ${job.seniority || 'Toàn thời gian'}`;
+            document.getElementById('job-location').textContent = ` ${locationText}`;
+            document.getElementById('job-salary').textContent = ` ${salaryText}`;
+            document.getElementById('job-type').textContent = ` ${job.seniority || 'Toàn thời gian'}`;
             document.getElementById('published-date').textContent = formatPublishedDate(job.publishedAt);
 
             // Job description - Display HTML directly (from Quill editor)

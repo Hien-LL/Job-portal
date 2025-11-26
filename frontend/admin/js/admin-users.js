@@ -1,6 +1,10 @@
 /*
  * File: frontend/admin/js/admin-users.js
- * Quản lí người dùng: gọi /admins/users, render bảng, search, phân trang, xóa, cập nhật vai trò
+ * Quản lí người dùng:
+ *  - GET  /admins/users?page=&perPage=&sort=&keyword=
+ *  - GET  /roles/list      (lấy toàn bộ danh sách vai trò)
+ *  - PUT  /admins/users/{id}  (body: { roleIds: [...] })
+ *  - DELETE /admins/users/{id}
  */
 
 let usersCache = [];
@@ -8,6 +12,12 @@ let currentPage = 1;
 let pageSize = 10;
 let totalPages = 1;
 let totalElements = 0;
+// Từ khóa search USER gửi lên API: ?keyword=
+let currentKeyword = "";
+
+// Danh sách role toàn hệ thống
+let allRoles = [];
+let roleNameToIdMap = {};
 
 document.addEventListener("DOMContentLoaded", () => {
   // Kiểm tra đăng nhập
@@ -17,27 +27,46 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Load header/sidebar/footer rồi mới gọi API
-  loadFragments().then(() => {
+  loadFragments().then(async () => {
+    // Load danh sách role 1 lần
+    await loadRolesList().catch((err) =>
+      console.error("❌ Lỗi load roles list:", err)
+    );
     attachSearchHandler();
     loadUsers(1);
   });
 });
 
-/* ================== HÀM PHỤ ROLE MAP ================== */
+/* ============== LOAD DANH SÁCH ROLE ============== */
 
-/**
- * Từ usersCache build map: { "ADMIN": 1, "USER": 2, ... }
- */
-function buildRoleIdMapFromCache() {
-  const map = {};
-  usersCache.forEach((u) => {
-    (u.roles || []).forEach((r) => {
-      if (r && r.name && r.id != null) {
-        map[r.name.toUpperCase()] = r.id;
-      }
-    });
+async function loadRolesList() {
+  const res = await authService.apiRequest(`/roles/list`);
+
+  if (!res) {
+    throw new Error("No response from server when loading roles");
+  }
+  if (!res.ok) {
+    const txt = await res.text().catch(() => "");
+    console.error("Load roles HTTP error:", txt);
+    throw new Error("HTTP error when loading roles");
+  }
+
+  const json = await res.json();
+  if (!json.success || !Array.isArray(json.data)) {
+    throw new Error(json.message || "API error when loading roles");
+  }
+
+  allRoles = json.data || [];
+  buildRoleNameMap();
+}
+
+function buildRoleNameMap() {
+  roleNameToIdMap = {};
+  allRoles.forEach((r) => {
+    if (r && r.name && r.id != null) {
+      roleNameToIdMap[r.name.toUpperCase()] = r.id;
+    }
   });
-  return map;
 }
 
 /* ============== GỌI API LẤY DANH SÁCH USER ============== */
@@ -58,12 +87,27 @@ async function loadUsers(page = 1) {
   try {
     currentPage = page;
 
-    // Endpoint đúng: /admins/users (nhóm Admin/User trong Postman)
+    // Build query params: page, perPage, sort, keyword (search user)
+    const params = new URLSearchParams();
+    params.set("page", page);
+    params.set("perPage", pageSize);
+    params.set("sort", "createdAt,desc");
+    if (currentKeyword && currentKeyword.trim()) {
+      params.set("keyword", currentKeyword.trim());
+    }
+
     const res = await authService.apiRequest(
-      `/admins/users?page=${page}&perPage=${pageSize}&sort=createdAt,desc`
+      `/admins/users?${params.toString()}`
     );
 
-    if (!res || !res.ok) throw new Error("Request failed");
+    if (!res) {
+      throw new Error("No response from server");
+    }
+    if (!res.ok) {
+      const txt = await res.text().catch(() => "");
+      console.error("Load users HTTP error:", txt);
+      throw new Error("HTTP error");
+    }
 
     const json = await res.json();
     if (!json.success || !json.data) {
@@ -107,12 +151,12 @@ function renderUsersTable(users) {
 
   if (!users || !users.length) {
     tbody.innerHTML = `
-            <tr>
-                <td colspan="6" class="px-6 py-6 text-center text-sm text-gray-500">
-                    Không có dữ liệu.
-                </td>
-            </tr>
-        `;
+      <tr>
+        <td colspan="6" class="px-6 py-6 text-center text-sm text-gray-500">
+          Không có dữ liệu.
+        </td>
+      </tr>
+    `;
     return;
   }
 
@@ -126,94 +170,66 @@ function renderUsersTable(users) {
         (user.roles || []).map((r) => r.name).join(", ") || "USER";
 
       return `
-                <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-4 text-sm text-gray-900">#${id}</td>
-                    <td class="px-6 py-4 text-sm text-gray-900">${escapeHtml(
-                      name
-                    )}</td>
-                    <td class="px-6 py-4 text-sm text-gray-700">${escapeHtml(
-                      email
-                    )}</td>
-                    <td class="px-6 py-4 text-sm text-gray-700">${escapeHtml(
-                      phone
-                    )}</td>
-                    <td class="px-6 py-4 text-sm text-gray-700">${escapeHtml(
-                      rolesLabel
-                    )}</td>
-<td class="px-6 py-4 text-sm">
-    <div class="flex items-center justify-center gap-2">
-        <a href="admin-user-detail.html?id=${id}"
-           class="inline-flex items-center px-3 py-1.5 border border-gray-300 
-                  rounded-md text-xs font-medium text-gray-700 hover:bg-gray-50">
-            Xem
-        </a>
+        <tr class="hover:bg-gray-50">
+          <td class="px-6 py-4 text-sm text-gray-900">#${id}</td>
+          <td class="px-6 py-4 text-sm text-gray-900">${escapeHtml(name)}</td>
+          <td class="px-6 py-4 text-sm text-gray-700">${escapeHtml(email)}</td>
+          <td class="px-6 py-4 text-sm text-gray-700">${escapeHtml(phone)}</td>
+          <td class="px-6 py-4 text-sm text-gray-700">${escapeHtml(
+            rolesLabel
+          )}</td>
+          <td class="px-6 py-4 text-sm">
+            <div class="flex items-center justify-center gap-2">
+              <a href="admin-user-detail.html?id=${id}"
+                class="inline-flex items-center px-3 py-1.5 border border-gray-300 
+                       rounded-md text-xs font-medium text-gray-700 hover:bg-gray-50">
+                Xem
+              </a>
 
-<button
-    type="button"
-    class="inline-flex items-center justify-center whitespace-nowrap 
-           px-6 py-1.5 border border-amber-300 rounded-md text-xs 
-           font-medium text-amber-700 hover:bg-amber-50"
-    onclick="openUpdateRoleDialog(${id})"
->
-    Cập nhật
-</button>
+              <button
+                type="button"
+                class="inline-flex items-center justify-center whitespace-nowrap 
+                       px-6 py-1.5 border border-amber-300 rounded-md text-xs 
+                       font-medium text-amber-700 hover:bg-amber-50"
+                onclick="openUpdateRoleDialog(${id})"
+              >
+                Cập nhật
+              </button>
 
-        <button
-            type="button"
-            class="inline-flex items-center px-3 py-1.5 border border-red-300 
-                   rounded-md text-xs font-medium text-red-700 hover:bg-red-50"
-            onclick="deleteUser(${id})"
-        >
-            Xoá
-        </button>
-    </div>
-</td>
-
-                </tr>
-            `;
+              <button
+                type="button"
+                class="inline-flex items-center px-3 py-1.5 border border-red-300 
+                       rounded-md text-xs font-medium text-red-700 hover:bg-red-50"
+                onclick="deleteUser(${id})"
+              >
+                Xoá
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
     })
     .join("");
 }
 
-/* ======================= SEARCH ======================= */
-
-function normalizeText(str) {
-  if (!str) return "";
-  return str
-    .toString()
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/đ/g, "d")
-    .replace(/Đ/g, "D");
-}
+/* ======================= SEARCH USER ======================= */
 
 function attachSearchHandler() {
   const input = document.getElementById("user-search-input");
   if (!input) return;
 
   input.addEventListener("input", () => {
-    const keyword = normalizeText(input.value.trim());
-
-    if (!keyword) {
-      // Không search → render lại nguyên trang hiện tại
-      renderUsersTable(usersCache);
-      return;
-    }
-
-    const filtered = usersCache.filter((user) => {
-      const name = normalizeText(user.name || user.fullName || "");
-      const email = normalizeText(user.email || "");
-      return name.includes(keyword) || email.includes(keyword);
-    });
-
-    renderUsersTable(filtered);
+    const keyword = input.value.trim();
+    // Luôn search server-side bằng ?keyword=
+    currentKeyword = keyword;
+    loadUsers(1);
   });
 
   // Hàm global cho nút "Xóa bộ lọc"
   window.clearFilters = function () {
+    currentKeyword = "";
     input.value = "";
-    renderUsersTable(usersCache);
+    loadUsers(1);
   };
 }
 
@@ -227,38 +243,38 @@ function renderPagination() {
   const to = Math.min(currentPage * pageSize, totalElements);
 
   pagination.innerHTML = `
-        <div class="text-sm text-gray-600">
-            Hiển thị <span class="font-medium">${from}</span>–<span class="font-medium">${to}</span>
-            trên tổng <span class="font-medium">${totalElements}</span> người dùng
-        </div>
-        <div class="flex items-center gap-2">
-            <button
-                type="button"
-                class="px-3 py-1.5 border rounded-md text-sm ${
-                  currentPage === 1
-                    ? "text-gray-400 border-gray-200 cursor-not-allowed"
-                    : "text-gray-700 border-gray-300 hover:bg-gray-50"
-                }"
-                ${currentPage === 1 ? "disabled" : ""}
-                onclick="gotoPage(${currentPage - 1})"
-            >
-                Trước
-            </button>
-            <span class="text-sm text-gray-600">Trang ${currentPage} / ${totalPages}</span>
-            <button
-                type="button"
-                class="px-3 py-1.5 border rounded-md text-sm ${
-                  currentPage === totalPages
-                    ? "text-gray-400 border-gray-200 cursor-not-allowed"
-                    : "text-gray-700 border-gray-300 hover:bg-gray-50"
-                }"
-                ${currentPage === totalPages ? "disabled" : ""}
-                onclick="gotoPage(${currentPage + 1})"
-            >
-                Sau
-            </button>
-        </div>
-    `;
+    <div class="text-sm text-gray-600">
+      Hiển thị <span class="font-medium">${from}</span>–<span class="font-medium">${to}</span>
+      trên tổng <span class="font-medium">${totalElements}</span> người dùng
+    </div>
+    <div class="flex items-center gap-2">
+      <button
+        type="button"
+        class="px-3 py-1.5 border rounded-md text-sm ${
+          currentPage === 1
+            ? "text-gray-400 border-gray-200 cursor-not-allowed"
+            : "text-gray-700 border-gray-300 hover:bg-gray-50"
+        }"
+        ${currentPage === 1 ? "disabled" : ""}
+        onclick="gotoPage(${currentPage - 1})"
+      >
+        Trước
+      </button>
+      <span class="text-sm text-gray-600">Trang ${currentPage} / ${totalPages}</span>
+      <button
+        type="button"
+        class="px-3 py-1.5 border rounded-md text-sm ${
+          currentPage === totalPages
+            ? "text-gray-400 border-gray-200 cursor-not-allowed"
+            : "text-gray-700 border-gray-300 hover:bg-gray-50"
+        }"
+        ${currentPage === totalPages ? "disabled" : ""}
+        onclick="gotoPage(${currentPage + 1})"
+      >
+        Sau
+      </button>
+    </div>
+  `;
 
   pagination.classList.remove("hidden");
 }
@@ -274,17 +290,17 @@ function showErrorState(message) {
 
   errorState.classList.remove("hidden");
   errorState.innerHTML = `
-        <div class="bg-red-50 text-red-700 px-4 py-3 rounded-lg text-sm flex items-center justify-between">
-            <span>${escapeHtml(message || "Đã xảy ra lỗi.")}</span>
-            <button
-                type="button"
-                class="ml-4 inline-flex items-center px-3 py-1.5 border border-red-300 rounded-md text-xs font-medium text-red-700 hover:bg-red-100"
-                onclick="loadUsers(${currentPage || 1})"
-            >
-                Thử lại
-            </button>
-        </div>
-    `;
+    <div class="bg-red-50 text-red-700 px-4 py-3 rounded-lg text-sm flex items-center justify-between">
+      <span>${escapeHtml(message || "Đã xảy ra lỗi.")}</span>
+      <button
+        type="button"
+        class="ml-4 inline-flex items-center px-3 py-1.5 border border-red-300 rounded-md text-xs font-medium text-red-700 hover:bg-red-100"
+        onclick="loadUsers(${currentPage || 1})"
+      >
+        Thử lại
+      </button>
+    </div>
+  `;
 }
 
 /* ======================= XOÁ USER ======================= */
@@ -299,12 +315,17 @@ window.deleteUser = async function (id) {
   if (!confirmDelete) return;
 
   try {
-    // Gọi API xoá
     const res = await authService.apiRequest(`/admins/users/${id}`, {
       method: "DELETE",
     });
 
-    if (!res || !res.ok) {
+    if (!res) {
+      console.error("Delete user: no response from server");
+      alert("Không nhận được phản hồi từ server.");
+      return;
+    }
+
+    if (!res.ok) {
       const txt = await res.text().catch(() => "");
       console.error("Delete user HTTP error:", txt);
       alert("Xoá người dùng thất bại (HTTP error).");
@@ -323,9 +344,13 @@ window.deleteUser = async function (id) {
       return;
     }
 
-    // Xoá thành công → load lại danh sách trang hiện tại
     alert(`Đã xoá người dùng #${id} thành công.`);
-    loadUsers(currentPage);
+
+    // Load lại trang hiện tại, nếu rỗng thì lùi 1 trang (nếu có)
+    await loadUsers(currentPage);
+    if (!usersCache.length && currentPage > 1) {
+      await loadUsers(currentPage - 1);
+    }
   } catch (err) {
     console.error("❌ Lỗi khi xoá user:", err);
     alert("Đã xảy ra lỗi khi xoá người dùng. Vui lòng thử lại.");
@@ -362,27 +387,36 @@ window.openUpdateRoleDialog = function (userId) {
 
 async function updateUserRoles(userId, roles) {
   try {
-    // 1) Lấy map name -> id từ usersCache
-    const roleIdMap = buildRoleIdMapFromCache();
+    // Đảm bảo đã có roleNameToIdMap
+    if (!allRoles.length) {
+      await loadRolesList().catch((err) =>
+        console.error("❌ Lỗi reload roles list:", err)
+      );
+    }
 
     const roleIds = roles
-      .map((name) => roleIdMap[name])
+      .map((name) => roleNameToIdMap[name.toUpperCase()])
       .filter((id) => id != null);
 
     if (!roleIds.length) {
       alert(
-        "Không tìm thấy role hợp lệ trong hệ thống. Kiểm tra lại tên role (ADMIN, USER, COMPANY...)."
+        "Không tìm thấy role hợp lệ trong hệ thống. Kiểm tra lại tên role (ADMIN, USER, TESTER, DEV, BUSINESS, CANDIDATE, EMPLOYER, RECRUITER...)."
       );
       return;
     }
 
-    if (roleIds.length !== roles.length) {
+    const missingRoles = roles.filter(
+      (name) => !roleNameToIdMap[name.toUpperCase()]
+    );
+    if (missingRoles.length) {
       alert(
-        "Một số role không hợp lệ (không có trong hệ thống). Chỉ các role có sẵn mới được chấp nhận."
+        `Một số role không hợp lệ hoặc không tìm thấy: ${missingRoles.join(
+          ", "
+        )}.\nChỉ các role tìm thấy mới được áp dụng.`
       );
     }
 
-    // 2) Gọi API PUT /admins/users/{id} với roleIds
+    // Gọi API PUT /admins/users/{id} với roleIds
     const res = await authService.apiRequest(`/admins/users/${userId}`, {
       method: "PUT",
       headers: {
@@ -391,7 +425,13 @@ async function updateUserRoles(userId, roles) {
       body: JSON.stringify({ roleIds: roleIds }),
     });
 
-    if (!res || !res.ok) {
+    if (!res) {
+      console.error("Update role: no response from server");
+      alert("Không nhận được phản hồi từ server.");
+      return;
+    }
+
+    if (!res.ok) {
       const txt = await res.text().catch(() => "");
       console.error("Update role HTTP error:", txt);
       alert("Cập nhật vai trò thất bại (HTTP error).");
@@ -415,7 +455,7 @@ async function updateUserRoles(userId, roles) {
     // Reload lại danh sách để thấy roles mới
     loadUsers(currentPage);
   } catch (err) {
-    console.error("❌ Lỗi khi cập nhật role:", err);
+    console.error("❌ Lỗi khi cập nhật vai trò:", err);
     alert("Đã xảy ra lỗi khi cập nhật vai trò. Vui lòng thử lại.");
   }
 }

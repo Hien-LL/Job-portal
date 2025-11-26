@@ -156,9 +156,9 @@ let currentCompany = null;
           <div>
             <h3 class="font-semibold text-gray-900 mb-1">${job.title}</h3>
             <div class="flex items-center gap-4 text-sm text-gray-600">
-              <span>💰 ${salaryText}</span>
-              <span>📍 ${locationText}</span>
-              <span>⏰ ${publishedDate}</span>
+              <span><i class="fa-solid fa-money-bill-wave"></i> ${salaryText}</span>
+              <span><i class="fa-solid fa-map-marker-alt"></i> ${locationText}</span>
+              <span><i class="fa-regular fa-clock"></i> ${publishedDate}</span>
             </div>
           </div>
           <div class="flex gap-2">
