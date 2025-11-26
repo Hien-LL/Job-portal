@@ -84,7 +84,9 @@ class AuthService {
         console.log('Auth data cleared');
     }
 
-    // Login API call - ✅ ĐÃ SỬA
+    // Login API call
+    // NOTE: This method will NOT store auth data automatically anymore.
+    // Callers should verify returned roles and then call `storeAuthData` with the appropriate userType.
     async login(email, password, userType = 'candidate') {
         try {
             const loginUrl = buildApiUrl(API_CONFIG.AUTH.LOGIN);
@@ -97,15 +99,14 @@ class AuthService {
                 body: JSON.stringify({ 
                     email, 
                     password,
-                    user_type: userType // ✅ Gửi user_type lên backend
+                    user_type: userType // still sent to backend
                 })
             });
 
             const data = await response.json();
 
             if (response.ok && data.success) {
-                // ✅ SỬA: Truyền userType vào storeAuthData
-                this.storeAuthData(data.data, userType);
+                // Return raw data; caller will decide whether to store it after role checks
                 return {
                     success: true,
                     data: data.data,
@@ -114,8 +115,8 @@ class AuthService {
             } else {
                 return {
                     success: false,
-                    message: data.error.message || 'Đăng nhập thất bại'
-                };      
+                    message: data.error?.message || data.message || 'Đăng nhập thất bại'
+                };
             }
         } catch (error) {
             console.error('Login API Error:', error);

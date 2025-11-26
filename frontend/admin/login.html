@@ -98,6 +98,21 @@
             try {
                 const result = await authService.login(email, password);
                 if (result.success) {
+                    // Ensure user has ADMIN role before allowing access to admin panel
+                    const roles = (result.data && result.data.roles) || [];
+                    const roleNames = roles.map(r => (r.name || '').toString().toUpperCase());
+                    if (!roleNames.includes('ADMIN')) {
+                        alert('Tài khoản này không có quyền truy cập trang quản trị');
+                        return;
+                    }
+
+                    // Store auth data as admin
+                    try {
+                        authService.storeAuthData(result.data, 'admin');
+                    } catch (err) {
+                        console.warn('Failed to store auth data:', err);
+                    }
+
                     window.location.href = 'admin-dashboard.html';
                 } else {
                     alert(result.message);

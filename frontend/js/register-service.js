@@ -135,10 +135,15 @@ function showSuccess(message) {
   }, 3000);
 }
 
-// API: Register - ✅ ĐÃ SỬA
-async function registerUser(email, password) {
+// API: Register - accepts optional role (e.g., 'CANDIDATE' or 'RECRUITER')
+async function registerUser(email, password, role) {
   try {
-    const registerUrl = buildApiUrl(API_CONFIG.AUTH.REGISTER);
+    let registerUrl = buildApiUrl(API_CONFIG.AUTH.REGISTER);
+    if (role) {
+      const sep = registerUrl.includes("?") ? "&" : "?";
+      registerUrl = `${registerUrl}${sep}role=${encodeURIComponent(role)}`;
+    }
+
     const response = await fetch(registerUrl, {
       method: "POST",
       headers: {
@@ -334,7 +339,8 @@ document
     showLoading(submitButton, "Đang đăng ký...");
 
     try {
-      const result = await registerUser(email, password);
+      // Always register candidate users from this flow
+      const result = await registerUser(email, password, "CANDIDATE");
 
       if (result.success) {
         userData.email = email;
@@ -451,6 +457,7 @@ if (candidateProfileForm) {
         address,
         headline: headline || null,
         summary: summary || null,
+        user_type: 'CANDIDATE'
       };
 
       const result = await updateProfile(profileData, userData.accessToken);

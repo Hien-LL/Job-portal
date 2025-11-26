@@ -137,10 +137,14 @@ function showSuccess(message) {
 
 // ==================== API Functions ====================
 
-// API: Register
+// API: Register (recruiter) - request includes role=RECRUITER
 async function registerRecruiter(email, password) {
     try {
-        const response = await fetch(`${API_CONFIG.BASE_URL}/auth/register`, {
+        let registerUrl = `${API_CONFIG.BASE_URL}/auth/register`;
+        registerUrl += registerUrl.includes('?') ? '&' : '?';
+        registerUrl += `role=${encodeURIComponent('RECRUITER')}`;
+
+        const response = await fetch(registerUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -498,6 +502,13 @@ if (recruiterProfileForm) {
             if (result.success) {
                 showSuccess('Tạo công ty thành công! Đang chuyển hướng...');
                 
+                // Try to set user_type on recruiter account (best-effort)
+                try {
+                    await updateRecruiterProfile({ user_type: 'RECRUITER' }, recruiterData.accessToken);
+                } catch (err) {
+                    console.warn('Setting user_type failed:', err);
+                }
+
                 setTimeout(() => {
                     window.location.href = 'index.html';
                 }, 2000);

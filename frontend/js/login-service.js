@@ -109,15 +109,36 @@ document.querySelector("form").addEventListener("submit", async function (e) {
   // Show loading
   showLoading(submitButton);
 
-  try {
-    // ✅ SỬA: Truyền selectedUserType vào login
+    try {
+    // Send selectedUserType to backend (server will validate)
     const result = await authService.login(email, password, selectedUserType);
 
     if (result.success) {
-      // Show success message
-      showSuccess("Đăng nhập thành công! Đang chuyển hướng...");
+      // Validate returned roles against selected tab
+      const roles = (result.data && result.data.roles) || [];
+      const roleNames = roles.map(r => (r.name || '').toString().toUpperCase());
 
-      // Redirect after 1.5 seconds
+      const wantsCandidate = selectedUserType === 'candidate';
+      const isCandidate = roleNames.includes('CANDIDATE');
+      const isRecruiter = roleNames.includes('RECRUITER') || roleNames.includes('EMPLOYER') || roleNames.includes('BUSINESS');
+
+      const allowed = wantsCandidate ? isCandidate : isRecruiter;
+
+      if (!allowed) {
+        showError('Tài khoản bạn không đủ quyền đăng nhập vào tab này');
+        return;
+      }
+
+      // Store auth data with derived user_type
+      const storeType = isCandidate ? 'candidate' : 'recruiter';
+      try {
+        authService.storeAuthData(result.data, storeType);
+      } catch (err) {
+        console.warn('Failed to store auth data:', err);
+      }
+
+      // Show success message and redirect
+      showSuccess("Đăng nhập thành công! Đang chuyển hướng...");
       setTimeout(() => {
         window.location.href = "index.html";
       }, 1500);
