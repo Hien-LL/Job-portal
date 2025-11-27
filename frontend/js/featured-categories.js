@@ -33,47 +33,44 @@
                 return;
             }
 
-        // Fake job count cho từng danh mục
-        const fakeJobCountMap = {
-            'Phân tích kinh doanh (Business Analyst)': 1251,
-            'Lập trình Backend': 1125,
-            'Kế toán / Kiểm toán': 1318,
-            'Lập trình Fullstack': 992,
-            'Kỹ thuật cơ khí': 1114,
-            'Dịch vụ cộng đồng': 217,
-            'Bán hàng (Sales)': 930
-        };
+            // Fake job count cho từng danh mục
+            const fakeJobCountMap = {
+                'Phân tích kinh doanh (Business Analyst)': 1251,
+                'Lập trình Backend': 1125,
+                'Kế toán / Kiểm toán': 1318,
+                'Lập trình Fullstack': 992,
+                'Kỹ thuật cơ khí': 1114,
+                'Dịch vụ cộng đồng': 217,
+                'Bán hàng (Sales)': 930
+            };
 
-        // Chỉ lấy 6 category nổi bật nhất
-        const displayCategories = categories.slice(0, 6);
-        
-        grid.innerHTML = displayCategories.map(category => {
+            // Chỉ lấy 6 category nổi bật nhất
+            const displayCategories = categories.slice(0, 6);
             
-            const categoryIcon = getCategoryIcon(category.name);
+            grid.innerHTML = displayCategories.map(category => {
+                const categoryIcon = getCategoryIcon(category.name);
 
-            // Nếu API trả jobCount > 0 thì dùng thật  
-            // Nếu không thì fake theo map, nếu không có trong map thì mặc định 20
-            const jobCount =
-                (typeof category.jobCount === 'number' && category.jobCount > 0)
-                    ? category.jobCount
-                    : (fakeJobCountMap[category.name] || 20);
+                // ❌ Không dùng jobCount từ backend nữa
+                // ✅ Luôn dùng số fake, nếu không có trong map thì mặc định 20
+                const jobCount = fakeJobCountMap[category.name] || 20;
 
-            return `
-                <a href="job.html?category=${category.slug}" 
-                class="block bg-white rounded-lg p-5 hover:shadow-md hover:border-blue-500 transition border border-gray-200 group">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-100 transition">
-                            ${categoryIcon}
+                return `
+                    <a href="job.html?category=${category.slug}" 
+                    class="block bg-white rounded-lg p-5 hover:shadow-md hover:border-blue-500 transition border border-gray-200 group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-100 transition">
+                                ${categoryIcon}
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="font-semibold text-gray-900 text-sm mb-1 truncate">${category.name}</h3>
+                                <p class="text-gray-500 text-xs">${jobCount} việc làm</p>
+                            </div>
                         </div>
-                        <div class="flex-1 min-w-0">
-                            <h3 class="font-semibold text-gray-900 text-sm mb-1 truncate">${category.name}</h3>
-                            <p class="text-gray-500 text-xs">${jobCount} việc làm</p>
-                        </div>
-                    </div>
-                </a>
-            `;
-        }).join('');
+                    </a>
+                `;
+            }).join('');
         }
+
 
         function getCategoryIcon(categoryName) {
             // Map category names to appropriate SVG icons
