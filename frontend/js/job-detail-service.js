@@ -92,7 +92,7 @@
 
             // Job info
             const locationText = job.isRemote ? 'Remote' : (job.location?.displayName || 'Không xác định');
-            const salaryText = formatSalaryRange(job.salaryMin, job.salaryMax, job.salaryCurrency);
+            const salaryText = formatSalaryRange(job.salaryMin, job.salaryMax, job.currency);
             
             document.getElementById('job-location').textContent = ` ${locationText}`;
             document.getElementById('job-salary').textContent = ` ${salaryText}`;
@@ -165,6 +165,12 @@
             `;
 
             // Apply button functionality will be set by updateApplyButton()
+            // Ensure the apply button is initialized immediately so clicks work when not authenticated
+            try {
+                updateApplyButton();
+            } catch (err) {
+                console.warn('updateApplyButton init failed:', err);
+            }
             // Initial state will be updated after checking application status
         }
 
@@ -261,7 +267,7 @@
                     <h4 class="font-medium text-gray-900 text-sm mb-1">${job.title}</h4>
                     <p class="text-gray-600 text-xs mb-2">${job.company?.name}</p>
                     <div class="flex items-center justify-between text-xs text-gray-500">
-                        <span>💰 ${formatSalary(job.salaryMin, job.salaryMax)}</span>
+                        <span>💰 ${formatSalary(job.salaryMin, job.salaryMax, job.currency)}</span>
                         <span>${formatPublishedDate(job.publishedAt)}</span>
                     </div>
                 </div>
@@ -301,7 +307,7 @@
         function applyToJob(slug, jobId) {
             // Check if user is logged in - ✅ SỬA
             if (!authService.isAuthenticated()) {
-                showErrorNotification('Vui lòng đăng nhập để ứng tuyển', 4000);
+                showErrorToast('Vui lòng đăng nhập để ứng tuyển', 4000);
                 setTimeout(() => authService.requireAuth(), 1000);
                 return;
             }
@@ -403,19 +409,24 @@
         });
 
         // Submit application - ✅ ĐÃ SỬA
-        async function submitApplication(event) { // ✅ THÊM event parameter
+        async function submitApplication(event) {
+            if (!authService.isAuthenticated()) {
+                showErrorToast('Vui lòng đăng nhập để ứng tuyển', 4000);
+                setTimeout(() => authService.requireAuth(), 1000);
+                return;
+            } // ✅ THÊM event parameter
             try {
                 const resumeId = getElementValue('resume-select');
                 const coverLetter = getElementValue('cover-letter').trim();
 
                 // Validation
                 if (!resumeId) {
-                    showErrorNotification('Vui lòng chọn CV', 4000);
+                    showErrorToast('Vui lòng chọn CV', 4000);
                     return;
                 }
 
                 if (!currentJobId) {
-                    showErrorNotification('Không có thông tin việc làm', 4000);
+                    showErrorToast('Không có thông tin việc làm', 4000);
                     return;
                 }
 
@@ -448,7 +459,7 @@
 
                 const result = await response.json();
                 if (result.success) {
-                    showSuccessNotification('Ứng tuyển thành công! Chúc bạn may mắn.', 5000);
+                    showSuccessToast('Ứng tuyển thành công! Chúc bạn may mắn.', 5000);
                     closeApplyModal();
                     
                     // Update application status
@@ -459,7 +470,7 @@
                 }
             } catch (error) {
                 console.error('Error submitting application:', error);
-                showErrorNotification(`Lỗi: ${error.message}`, 5000);
+                showErrorToast(`Lỗi: ${error.message}`, 5000);
             } finally {
                 const btn =
                     event?.target
@@ -497,13 +508,13 @@
         async function toggleSaveJob() {
             // ✅ SỬA: Dùng authService.requireAuth()
             if (!authService.isAuthenticated()) {
-                showErrorNotification('Vui lòng đăng nhập để lưu việc làm', 4000);
+                showErrorToast('Vui lòng đăng nhập để lưu việc làm', 4000);
                 setTimeout(() => authService.requireAuth(), 1000);
                 return;
             }
 
             if (!currentJobSlug) {
-                showErrorNotification('Không thể lưu việc làm này', 4000);
+                showErrorToast('Không thể lưu việc làm này', 4000);
                 return;
             }
 

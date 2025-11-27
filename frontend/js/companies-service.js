@@ -166,9 +166,9 @@ let isLoading = false;
                     <div class="bg-white rounded-2xl shadow-md border border-gray-200 p-6 hover:shadow-xl hover:border-blue-300 transition-all group">
                         <a href="company-detail.html?slug=${company.slug}" class="block">
                             <div class="flex items-start gap-4 mb-4">
-                                <div class="w-20 h-20 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl flex-shrink-0 flex items-center justify-center p-3 group-hover:scale-105 transition-transform">
+                                <div class="w-20 h-20 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl overflow-hidden flex-shrink-0 group-hover:scale-105 transition-transform">
                                     ${logoUrl ? 
-                                        `<img src="${logoUrl}" alt="${company.name}" class="w-full h-full object-contain">` :
+                                        `<img src="${logoUrl}" alt="${company.name}" class="w-full h-full object-cover">` :
                                         `<svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                                         </svg>`

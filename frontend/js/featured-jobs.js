@@ -39,7 +39,7 @@
             
             grid.innerHTML = displayJobs.map(job => {
                 // Format salary
-                const salaryText = formatSalaryRange(job.salaryMin, job.salaryMax, job.salaryCurrency);
+                const salaryText = formatSalaryRange(job.salaryMin, job.salaryMax, job.currency);
                 
                 // Format location
                 const locationText = job.isRemote ? 'Remote' : 
@@ -117,25 +117,6 @@
                     </div>
                 `;
             }).join('');
-        }
-
-        function formatSalary(min, max) {
-            if (!min && !max) return 'Thỏa thuận';
-            
-            const formatAmount = (amount) => {
-                if (amount >= 1000000) {
-                    return (amount / 1000000).toFixed(0) + ' triệu';
-                }
-                return amount.toLocaleString('vi-VN');
-            };
-
-            if (min && max) {
-                return `${formatAmount(min)} - ${formatAmount(max)}`;
-            } else if (min) {
-                return `Từ ${formatAmount(min)}`;
-            } else {
-                return `Lên đến ${formatAmount(max)}`;
-            }
         }
 
         function formatPublishedDate(dateString) {
