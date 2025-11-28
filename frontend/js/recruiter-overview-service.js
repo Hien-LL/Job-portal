@@ -284,7 +284,7 @@ async function loadDashboardData() {
         }
 
         // Load recent applications
-        const appsResult = await getRecentApplications(5, 'pending');
+        const appsResult = await getRecentApplications(5, 'all');
         if (appsResult.success && appsResult.data) {
             recentApplications = appsResult.data;
             displayRecentApplications(appsResult.data);

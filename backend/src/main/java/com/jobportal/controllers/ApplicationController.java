@@ -76,6 +76,7 @@ public class ApplicationController {
         return ApiResource.ok(data, "Lấy chi tiết ứng tuyển thành công");
     }
 
+    @PreAuthorize("hasRole('RECRUITER')")
     @PutMapping("{applicationId}/change-status")
     public ApiResource<ApplicationStatusChangeResource> changeStatus(
             @AuthenticationPrincipal CustomUserDetails user,

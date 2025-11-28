@@ -41,11 +41,9 @@ public class ApplicationWorkflowService extends BaseService implements Applicati
         Application app = applicationRepository.findByIdWithJoins(applicationId)
                 .orElseThrow(() -> new EntityNotFoundException("Application không tồn tại"));
 
-        Long ownerId   = app.getUser().getId();
         Long companyId = app.getJob().getCompany().getId();
 
-        boolean allowed = ownerId.equals(actorUserId) ||
-                companyAdminRepository.existsByCompany_IdAndUser_Id(actorUserId, companyId);
+        boolean allowed = companyAdminRepository.existsByCompany_IdAndUser_Id(actorUserId, companyId);
         if (!allowed) throw new SecurityException("Bạn không có quyền thay đổi thông tin này");
 
         String newCode = request.getNewStatusCode().trim().toUpperCase();
