@@ -43,7 +43,7 @@ public class ApplicationWorkflowService extends BaseService implements Applicati
 
         Long companyId = app.getJob().getCompany().getId();
 
-        boolean allowed = companyAdminRepository.existsByCompany_IdAndUser_Id(actorUserId, companyId);
+        boolean allowed = companyAdminRepository.existsByCompany_IdAndUser_Id(companyId, actorUserId);
         if (!allowed) throw new SecurityException("Bạn không có quyền thay đổi thông tin này");
 
         String newCode = request.getNewStatusCode().trim().toUpperCase();
