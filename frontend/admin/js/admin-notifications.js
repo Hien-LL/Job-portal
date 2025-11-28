@@ -1,11 +1,4 @@
-/*
- * File: frontend/admin/js/admin-notifications.js
- * Quản lí thông báo:
- *  - GET  /admins/notifications              (lấy lịch sử thông báo đã gửi)
- *  - POST /admins/notifications/all          (gửi cho tất cả user)
- *  - POST /admins/notifications/candidates   (gửi cho Candidates)
- *  - POST /admins/notifications/recruiters   (gửi cho Recruiters)
- */
+
 
 let notificationsCache = [];
 
@@ -32,13 +25,6 @@ function attachNotificationFormHandler() {
   form.addEventListener("submit", handleSendNotification);
 }
 
-/**
- * Xác định endpoint theo target-group:
- *  - ALL        -> POST /admins/notifications/all
- *  - CANDIDATE  -> POST /admins/notifications/candidates
- *  - RECRUITER  -> POST /admins/notifications/recruiters
- * (Nếu sau này bạn muốn gửi riêng 1 user: thêm case "USER" trả về /admins/notifications/{userId})
- */
 function buildSendNotificationPath(targetType) {
   switch (targetType) {
     case "ALL":
@@ -115,10 +101,6 @@ async function handleSendNotification(e) {
       }, 3000);
     }
 
-    // Nếu muốn reset form:
-    // titleInput.value = "";
-    // bodyInput.value = "";
-    // targetSelect.value = "ALL";
 
     // Load lại lịch sử thông báo
     loadAdminNotifications();
