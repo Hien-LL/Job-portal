@@ -229,31 +229,55 @@ function displayRecentApplications(applications) {
         return;
     }
 
-    const html = applications.map(app => `
-        <div class="flex items-center justify-between py-3 px-4 border-b hover:bg-gray-50">
-            <div class="flex-1">
-                <p class="font-medium text-gray-900">${app.candidateName || 'N/A'}</p>
-                <p class="text-sm text-gray-600">${app.jobTitle || 'N/A'}</p>
-                <p class="text-xs text-gray-500">${app.appliedDate || 'N/A'}</p>
+    const html = applications.map(app => {
+        const statusKey = (app.status || '').toString().toUpperCase();
+        let badgeClass = 'bg-gray-100 text-gray-800';
+        let statusLabel = 'N/A';
+
+        switch (statusKey) {
+            case 'APPLIED':
+                badgeClass = 'bg-blue-100 text-blue-800';
+                statusLabel = 'Đã ứng tuyển';
+                break;
+            case 'REVIEWED':
+                badgeClass = 'bg-yellow-100 text-yellow-800';
+                statusLabel = 'Đang xem xét';
+                break;
+            case 'INTERVIEWED':
+                badgeClass = 'bg-purple-100 text-purple-800';
+                statusLabel = 'Phỏng vấn';
+                break;
+            case 'OFFERED':
+                badgeClass = 'bg-green-100 text-green-800';
+                statusLabel = 'Đề nghị nhận việc';
+                break;
+            case 'REJECTED':
+                badgeClass = 'bg-red-100 text-red-800';
+                statusLabel = 'Từ chối';
+                break;
+            default:
+                badgeClass = 'bg-gray-100 text-gray-800';
+                statusLabel = app.status || 'N/A';
+        }
+
+        return `
+            <div class="flex items-center justify-between py-3 px-4 border-b hover:bg-gray-50">
+                <div class="flex-1">
+                    <p class="font-medium text-gray-900">${app.candidateName || 'N/A'}</p>
+                    <p class="text-sm text-gray-600">${app.jobTitle || 'N/A'}</p>
+                    <p class="text-xs text-gray-500">${app.appliedDate || 'N/A'}</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${badgeClass}">
+                        ${statusLabel}
+                    </span>
+                    <a href="recruiter-applications.html?applicationId=${app.id}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                        Xem
+                    </a>
+                </div>
             </div>
-            <div class="flex items-center gap-3">
-                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                    app.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                    app.status === 'accepted' ? 'bg-green-100 text-green-800' :
-                    'bg-red-100 text-red-800'
-                }">
-                    ${
-                        app.status === 'pending' ? 'Chờ xử lý' :
-                        app.status === 'accepted' ? 'Chấp nhận' :
-                        'Từ chối'
-                    }
-                </span>
-                <a href="recruiter-applications.html?applicationId=${app.id}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                    Xem
-                </a>
-            </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 
     container.innerHTML = html;
 }
