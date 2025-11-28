@@ -15,4 +15,7 @@ public interface NotificationServiceInterface {
     void markAsRead(Long userId, Long notificationId);
     void markAllAsRead(Long userId);
     Page<NotificationListItemResource> getNotificationsForAdmin(Map<String, String[]> params);
+    void sendNotificationToAllUsers(NotificationRequest request);
+    void sendNotificationToAllRecruiters(NotificationRequest request);
+    void sendNotificationToAllCandidates(NotificationRequest request);
 }

@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -39,4 +40,10 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
            """)
     Optional<User> findByIdWithRolesAndPermissions(@Param("id") Long id);
     Optional<User> findByEmail(String email);
+    @Query("""
+        select distinct u from User u
+        join u.roles r
+        where r.name = :roleName
+    """)
+    List<User> findAllByRoleName(@Param("roleName") String roleName);
 }

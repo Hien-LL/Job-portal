@@ -4,7 +4,6 @@ import com.jobportal.commons.BaseService;
 import com.jobportal.dtos.requests.NotificationRequest;
 import com.jobportal.dtos.resources.NotificationListItemResource;
 import com.jobportal.dtos.resources.UserListItemForNotiResource;
-import com.jobportal.dtos.resources.UserResource;
 import com.jobportal.entities.Notification;
 import com.jobportal.entities.User;
 import com.jobportal.mappers.NotificationMapper;
@@ -29,6 +28,7 @@ public class NotificationService extends BaseService implements NotificationServ
     private final NotificationRepository notificationRepository;
     private final NotificationMapper notificationMapper;
     private final UserRepository userRepository;
+    private final UserService userService;
 
     @Override
     public void sendNotification(Long userId, NotificationRequest request) {
@@ -113,5 +113,36 @@ public class NotificationService extends BaseService implements NotificationServ
                 .build();
     }
 
+    @Override
+    public void sendNotificationToAllUsers(NotificationRequest request) {
+        List<User> users = userRepository.findAll();
+        saveBroadcast(users, request);
+    }
 
+    @Override
+    public void sendNotificationToAllRecruiters(NotificationRequest request) {
+        List<User> users = userRepository.findAllByRoleName("RECRUITER");
+        saveBroadcast(users, request);
+    }
+
+    @Override
+    public void sendNotificationToAllCandidates(NotificationRequest request) {
+        List<User> users = userRepository.findAllByRoleName("CANDIDATE");
+        saveBroadcast(users, request);
+    }
+
+    private void saveBroadcast(List<User> users, NotificationRequest request) {
+        if (users.isEmpty()) return;
+
+
+        List<Notification> notifications = users.stream()
+                .map(u -> Notification.builder()
+                        .user(u)
+                        .title(request.getTitle())
+                        .body(request.getBody())
+                        .build())
+                .toList();
+
+        notificationRepository.saveAll(notifications);
+    }
 }

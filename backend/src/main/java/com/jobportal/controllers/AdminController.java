@@ -117,21 +117,38 @@ public class AdminController {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/notifications/{userId}")
     public ApiResource<Void> createNotificationForUser(
-            @Valid @RequestBody NotificationRequest request,
-            @PathVariable @Positive(message = "userId phải lớn hơn 0") Long userId) {
+            @PathVariable("userId") Long userId,
+            @Valid @RequestBody NotificationRequest request) {
+
         notificationService.sendNotification(userId, request);
-        return ApiResource.ok(null, "Notification created successfully");
+        return ApiResource.ok(null, "Notification created for user successfully");
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/notifications/all")
     public ApiResource<Void> createNotificationForAllUsers(
             @Valid @RequestBody NotificationRequest request) {
-        // Lấy tất cả user
-        Page<User> users = userService.paginate(Map.of("size", new String[]{"1000"})); // Giới hạn 1000 user mỗi lần
-        for (User user : users.getContent()) {
-            notificationService.sendNotification(user.getId(), request);
-        }
+
+        notificationService.sendNotificationToAllUsers(request);
         return ApiResource.ok(null, "Notification created for all users successfully");
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/notifications/recruiters")
+    public ApiResource<Void> createNotificationForAllRecruiters(
+            @Valid @RequestBody NotificationRequest request) {
+
+        notificationService.sendNotificationToAllRecruiters(request);
+        return ApiResource.ok(null, "Notification created for all recruiters successfully");
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/notifications/candidates")
+    public ApiResource<Void> createNotificationForAllCandidates(
+            @Valid @RequestBody NotificationRequest request) {
+
+        notificationService.sendNotificationToAllCandidates(request);
+        return ApiResource.ok(null, "Notification created for all candidates successfully");
+    }
+
 }
