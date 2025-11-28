@@ -83,7 +83,7 @@ public class ApplicationService extends BaseService implements ApplicationServic
             Long actorUserId, Long companyId, Long jobId, String status, Pageable pageable) {
 
         // Quyền: user phải là admin của company
-        if (!companyAdminRepository.existsByCompany_IdAndUser_Id(actorUserId, companyId)) {
+        if (!companyAdminRepository.existsByCompany_IdAndUser_Id(companyId, actorUserId)) {
             throw new SecurityException("Bạn không có quyền truy cập ứng viên của công ty này");
         }
 
@@ -110,7 +110,7 @@ public class ApplicationService extends BaseService implements ApplicationServic
 
         // Quyền: là chủ đơn, hoặc admin của company
         boolean allowed = ownerId.equals(actorUserId) ||
-                companyAdminRepository.existsByCompany_IdAndUser_Id(actorUserId, companyId);
+                companyAdminRepository.existsByCompany_IdAndUser_Id(companyId, actorUserId);
 
         if (!allowed) throw new SecurityException("Bạn không có quyền xem đơn này");
 

@@ -98,7 +98,7 @@ public class ApplicationWorkflowService extends BaseService implements Applicati
         Long companyId = app.getJob().getCompany().getId();
 
         boolean isCandidate = ownerId.equals(actorUserId);
-        boolean isCompanyAdmin = companyAdminRepository.existsByCompany_IdAndUser_Id(actorUserId, companyId);
+        boolean isCompanyAdmin = companyAdminRepository.existsByCompany_IdAndUser_Id(companyId, actorUserId);
 
         if (!isCandidate && !isCompanyAdmin) {
             throw new SecurityException("Bạn không có quyền xem timeline này");
