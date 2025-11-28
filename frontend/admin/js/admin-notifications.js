@@ -1,82 +1,270 @@
-/* File: frontend/admin/js/admin-notifications.js */
-document.addEventListener('DOMContentLoaded', function() {
-    loadFragments().then(() => {
-        // Tạm thời vô hiệu hóa
-        /*
-        if (!authService.isAuthenticated()) {
-            window.location.href = '../login.html'; // Sửa đường dẫn
-            return;
-        }
-        */
-        loadHistory();
-        const form = document.getElementById('notification-form');
-        form.addEventListener('submit', handleSendNotification);
-    });
+/*
+ * File: frontend/admin/js/admin-notifications.js
+ * Quản lí thông báo:
+ *  - GET  /admins/notifications              (lấy lịch sử thông báo đã gửi)
+ *  - POST /admins/notifications/all          (gửi cho tất cả user)
+ *  - POST /admins/notifications/candidates   (gửi cho Candidates)
+ *  - POST /admins/notifications/recruiters   (gửi cho Recruiters)
+ */
+
+let notificationsCache = [];
+
+document.addEventListener("DOMContentLoaded", () => {
+  // Kiểm tra đăng nhập giống admin-users.js
+  if (!authService.isAuthenticated()) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  // Load header/sidebar/footer rồi mới gắn handler + gọi API
+  loadFragments().then(() => {
+    attachNotificationFormHandler();
+    loadAdminNotifications();
+  });
 });
-async function loadHistory() {
-    showLoading();
-    try {
-        const mockHistory = [
-            { id: 1, title: 'Hệ thống sẽ bảo trì', body: 'Hệ thống sẽ bảo trì từ 2AM - 3AM. Vui lòng...', target: 'ALL', sentAt: '2025-11-11T10:30:00Z' },
-            { id: 2, title: 'Cập nhật chính sách mới', body: 'Chúng tôi vừa cập nhật chính sách bảo mật...', target: 'RECRUITER', sentAt: '2025-11-10T15:00:00Z' },
-            { id: 3, title: 'Chào mừng người dùng mới', body: 'Cảm ơn bạn đã tham gia JobPortal...', target: 'CANDIDATE', sentAt: '2025-11-09T09:00:00Z' }
-        ];
-        await new Promise(resolve => setTimeout(resolve, 500)); 
-        displayHistory(mockHistory);
-        showContent();
-    } catch (error) { showError('Không thể tải lịch sử thông báo.'); }
-    finally { hideLoading(); }
+
+/* ================== GỬI THÔNG BÁO (POST) ================== */
+
+function attachNotificationFormHandler() {
+  const form = document.getElementById("notification-form");
+  if (!form) return;
+
+  form.addEventListener("submit", handleSendNotification);
 }
-function displayHistory(history) {
-    const historyList = document.getElementById('history-list');
-    const emptyState = document.getElementById('empty-state');
-    historyList.innerHTML = '';
-    if (history.length === 0) { showEmptyState(); return; }
-    const targetMap = { 'ALL': 'Tất cả', 'CANDIDATE': 'Ứng viên', 'RECRUITER': 'Nhà tuyển dụng' };
-    history.forEach(item => {
-        const row = `
-            <tr class="hover:bg-gray-50 transition">
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.title}</td>
-                <td class="px-6 py-4 text-sm text-gray-700 max-w-xs truncate" title="${item.body}">${item.body}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                    <span class="px-2 py-0.5 bg-gray-100 text-gray-700 rounded text-xs font-semibold">${targetMap[item.target] || 'Không rõ'}</span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatDate(item.sentAt)}</td>
-            </tr>`;
-        historyList.innerHTML += row;
-    });
+
+/**
+ * Xác định endpoint theo target-group:
+ *  - ALL        -> POST /admins/notifications/all
+ *  - CANDIDATE  -> POST /admins/notifications/candidates
+ *  - RECRUITER  -> POST /admins/notifications/recruiters
+ * (Nếu sau này bạn muốn gửi riêng 1 user: thêm case "USER" trả về /admins/notifications/{userId})
+ */
+function buildSendNotificationPath(targetType) {
+  switch (targetType) {
+    case "ALL":
+      return "/admins/notifications/all";
+    case "CANDIDATE":
+      return "/admins/notifications/candidates";
+    case "RECRUITER":
+      return "/admins/notifications/recruiters";
+    default:
+      // fallback: cứ coi như ALL
+      return "/admins/notifications/all";
+  }
 }
+
 async function handleSendNotification(e) {
-    e.preventDefault();
-    const title = document.getElementById('title').value;
-    const body = document.getElementById('body').value;
-    const target = document.getElementById('target-group').value;
-    const sendBtn = document.getElementById('send-btn');
-    const successMessage = document.getElementById('success-message');
-    if (!title || !body) { alert("Vui lòng nhập Tiêu đề và Nội dung."); return; }
-    sendBtn.disabled = true; sendBtn.innerHTML = 'Đang gửi...';
-    hideElement(successMessage);
-    try {
-        console.log('Đang gửi (giả lập):', { title, body, target });
-        await new Promise(resolve => setTimeout(resolve, 1000)); 
-        showElement(successMessage);
-        document.getElementById('notification-form').reset();
-        loadHistory(); 
-    } catch (error) { alert('Lỗi: ' + error.message); }
-    finally {
-        sendBtn.disabled = false;
-        sendBtn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg> Gửi thông báo';
+  e.preventDefault();
+
+  const titleInput = document.getElementById("title");
+  const bodyInput = document.getElementById("body");
+  const targetSelect = document.getElementById("target-group");
+  const successMessage = document.getElementById("success-message");
+  const sendBtn = document.getElementById("send-btn");
+
+  if (!titleInput || !bodyInput || !targetSelect || !sendBtn) return;
+
+  const title = titleInput.value.trim();
+  const body = bodyInput.value.trim();
+  const targetType = targetSelect.value; // ALL | CANDIDATE | RECRUITER
+
+  if (!title || !body) {
+    alert("Vui lòng nhập đầy đủ tiêu đề và nội dung.");
+    return;
+  }
+
+  const path = buildSendNotificationPath(targetType);
+  const payload = { title, body };
+
+  sendBtn.disabled = true;
+  sendBtn.classList.add("opacity-60", "cursor-not-allowed");
+
+  try {
+    const res = await authService.apiRequest(path, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res) {
+      throw new Error("No response from server");
     }
+
+    if (!res.ok) {
+      const txt = await res.text().catch(() => "");
+      console.error("Send notification HTTP error:", txt);
+      throw new Error("HTTP error khi gửi thông báo");
+    }
+
+    const json = await res.json().catch(() => ({}));
+    console.log("Send notification result:", json);
+
+    if (json.success === false) {
+      alert(json.message || "Gửi thông báo thất bại.");
+      return;
+    }
+
+    // Hiển thị message thành công
+    if (successMessage) {
+      successMessage.classList.remove("hidden");
+      successMessage.textContent = "Gửi thông báo thành công!";
+      setTimeout(() => {
+        successMessage.classList.add("hidden");
+      }, 3000);
+    }
+
+    // Nếu muốn reset form:
+    // titleInput.value = "";
+    // bodyInput.value = "";
+    // targetSelect.value = "ALL";
+
+    // Load lại lịch sử thông báo
+    loadAdminNotifications();
+  } catch (err) {
+    console.error("❌ Lỗi khi gửi thông báo:", err);
+    alert("Đã xảy ra lỗi khi gửi thông báo. Vui lòng thử lại.");
+  } finally {
+    sendBtn.disabled = false;
+    sendBtn.classList.remove("opacity-60", "cursor-not-allowed");
+  }
 }
-function showLoading() { hideElement('error-state'); hideElement('empty-state'); showElement('loading'); }
-function hideLoading() { hideElement('loading'); }
-function showContent() { hideElement('loading'); hideElement('error-state'); hideElement('empty-state'); showElement('history-container'); }
-function showEmptyState() { hideElement('loading'); hideElement('error-state'); hideElement('history-container'); showElement('empty-state'); }
-function showError(message) { alert(message); }
-function formatDate(dateString) {
-    if (!dateString) return 'N/A';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+/* =============== GET LỊCH SỬ THÔNG BÁO (GET) =============== */
+
+async function loadAdminNotifications() {
+  const historyList = document.getElementById("history-list");
+  const loadingEl = document.getElementById("loading");
+  const emptyStateEl = document.getElementById("empty-state");
+
+  if (!historyList) return;
+
+  historyList.innerHTML = "";
+  loadingEl && loadingEl.classList.remove("hidden");
+  emptyStateEl && emptyStateEl.classList.add("hidden");
+
+  try {
+    const res = await authService.apiRequest("/admins/notifications");
+
+    if (!res) {
+      throw new Error("No response from server");
+    }
+    if (!res.ok) {
+      const txt = await res.text().catch(() => "");
+      console.error("Load notifications HTTP error:", txt);
+      throw new Error("HTTP error khi load notifications");
+    }
+
+    const json = await res.json();
+    if (!json.success || !json.data) {
+      throw new Error(json.message || "API error");
+    }
+
+    const page = json.data;
+    const items = page.content || [];
+
+    notificationsCache = items;
+
+    if (loadingEl) loadingEl.classList.add("hidden");
+
+    if (!items.length) {
+      emptyStateEl && emptyStateEl.classList.remove("hidden");
+      return;
+    }
+
+    renderNotificationsTable(items);
+  } catch (err) {
+    console.error("❌ Lỗi load notifications:", err);
+    if (loadingEl) loadingEl.classList.add("hidden");
+    if (emptyStateEl) {
+      emptyStateEl.classList.remove("hidden");
+      emptyStateEl.textContent =
+        "Không thể tải lịch sử thông báo. Vui lòng thử lại.";
+    }
+  }
 }
-window.handleSendNotification = handleSendNotification;
-window.loadHistory = loadHistory;
+
+/* =========== RENDER BẢNG LỊCH SỬ THÔNG BÁO =========== */
+
+function renderNotificationsTable(notifications) {
+  const tbody = document.getElementById("history-list");
+  if (!tbody) return;
+
+  if (!notifications || !notifications.length) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="4" class="px-6 py-6 text-center text-sm text-gray-500">
+          Chưa có thông báo nào được gửi.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = notifications
+    .map((n) => {
+      const title = n.title || "Không có tiêu đề";
+      const body = n.body || "";
+      const shortBody =
+        body.length > 80 ? body.slice(0, 80) + "..." : body;
+
+      const userEmail = n.user?.email || "Không rõ";
+      const userName = n.user?.name || "";
+      const target = userName || userEmail;
+
+      const createdAt = n.createdAt
+        ? formatDateTime(n.createdAt)
+        : "";
+
+      return `
+        <tr class="hover:bg-gray-50">
+          <td class="px-6 py-4 text-sm font-medium text-gray-900">
+            ${escapeHtml(title)}
+          </td>
+          <td class="px-6 py-4 text-sm text-gray-700">
+            ${escapeHtml(shortBody)}
+          </td>
+          <td class="px-6 py-4 text-sm text-gray-700">
+            ${escapeHtml(target)}
+            <div class="text-xs text-gray-500">
+              ${escapeHtml(userEmail)}
+            </div>
+          </td>
+          <td class="px-6 py-4 text-sm text-gray-500">
+            ${escapeHtml(createdAt)}
+          </td>
+        </tr>
+      `;
+    })
+    .join("");
+}
+
+/* ======================= HELPER ======================= */
+
+function formatDateTime(value) {
+  if (!value) return "";
+  const d = new Date(value);
+  if (isNaN(d.getTime())) return value;
+  const pad = (n) => (n < 10 ? "0" + n : n);
+  return (
+    pad(d.getDate()) +
+    "/" +
+    pad(d.getMonth() + 1) +
+    "/" +
+    d.getFullYear() +
+    " " +
+    pad(d.getHours()) +
+    ":" +
+    pad(d.getMinutes())
+  );
+}
+
+function escapeHtml(str) {
+  if (str === null || str === undefined) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
