@@ -24,7 +24,7 @@
                         <img src="img/icon-account.png" alt="User Avatar" class="w-6 h-6 rounded-full object-cover">
                         Tài khoản ▼
                     </button>
-                    <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200" style="z-index: 9998;">
+                    <div id="user-dropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 transform origin-top-right transition ease-out duration-150 opacity-0 scale-95 invisible pointer-events-none" style="z-index: 9998;">
                         <div class="py-1">
                             <a href="profile.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Hồ sơ của tôi</a>
                             <a href="notifications.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Thông báo</a>
@@ -53,7 +53,22 @@
             </svg>
         </button>
     </nav>
+    <!-- Mobile menu (hidden on md+) -->
+    <div id="mobile-menu" class="md:hidden hidden border-t border-gray-200 bg-white">
+        <div class="px-4 py-3 space-y-2">
+            <a href="index.html" class="block text-gray-700 hover:text-blue-600">Trang chủ</a>
+            <a href="job.html" class="block text-gray-700 hover:text-blue-600">Tìm việc</a>
+            <a href="companies.html" class="block text-gray-700 hover:text-blue-600">Công ty</a>
+            <a href="blog.html" class="block text-gray-700 hover:text-blue-600">Blog</a>
+            <a href="contact.html" class="block text-gray-700 hover:text-blue-600">Liên hệ</a>
+            <div id="mobile-auth-area" class="pt-3 border-t border-gray-100">
+                <a href="login.html" class="block text-gray-700 hover:text-blue-600">Đăng nhập</a>
+                <a href="register.html" class="block mt-2 bg-blue-600 text-white px-4 py-2 rounded text-center">Đăng ký</a>
+            </div>
+        </div>
+    </div>
 </header>
+<script src="js/header.js"></script>
 
 
 

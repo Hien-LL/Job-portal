@@ -76,6 +76,13 @@ async function loadFragments() {
   } catch (e) {
     console.warn('[FragmentsLoader] updateAuthUI not ready', e);
   }
+
+  // Dispatch an event so other scripts (loaded as fragments) can react
+  try {
+    document.dispatchEvent(new CustomEvent('fragments:loaded'));
+  } catch (e) {
+    console.warn('[FragmentsLoader] could not dispatch fragments:loaded', e);
+  }
 }
 
 /* =======================
