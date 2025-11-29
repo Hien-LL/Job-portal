@@ -88,26 +88,7 @@
       });
     }
 
-    // Close menus on outside click or ESC
-    if (!_globalListenersAttached) {
-      document.addEventListener('click', (e)=>{
-      const menu = document.getElementById('mobile-menu');
-      if (menu && !menu.classList.contains('hidden')) {
-        // if click outside menu and not on trigger
-        if (!e.target.closest('#mobile-menu') && !e.target.closest('.mobile-menu-trigger')) {
-          closeMobileMenu();
-        }
-      }
-      const dd = document.getElementById('user-dropdown');
-      if (dd && !(dd.classList.contains('invisible') || dd.classList.contains('opacity-0'))) {
-        if (!e.target.closest('#user-dropdown') && !e.target.closest('#user-menu-trigger')) {
-          closeUserDropdown();
-        }
-      }
-    });
-    document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape') { closeMobileMenu(); closeUserDropdown(); } });
-      _globalListenersAttached = true;
-    }
+    // Note: document-level click/keydown handlers are attached once globally below (delegation)
   }
 
   function syncAuthUI() {
@@ -198,4 +179,28 @@
       }
     }, 100);
   })();
+  // Attach a single delegated document handler (global) to reliably handle trigger clicks
+  if (!window.__jp_header_delegation_attached) {
+    window.__jp_header_delegation_attached = true;
+    document.addEventListener('click', function(e) {
+      try {
+        // user menu trigger
+        const ut = e.target.closest && e.target.closest('#user-menu-trigger');
+        if (ut) { e.stopPropagation(); toggleUserDropdown(); return; }
+
+        // mobile menu trigger
+        const mt = e.target.closest && e.target.closest('.mobile-menu-trigger');
+        if (mt) { e.stopPropagation(); toggleMobileMenu(); return; }
+
+        // clicks outside: close dropdowns/menus
+        if (!e.target.closest || !e.target.closest('#user-dropdown')) {
+          closeUserDropdown();
+        }
+        if (!e.target.closest || !e.target.closest('#mobile-menu')) {
+          closeMobileMenu();
+        }
+      } catch (err) { /* safe-ignore */ }
+    });
+    document.addEventListener('keydown', function(e){ if (e.key === 'Escape') { closeMobileMenu(); closeUserDropdown(); } });
+  }
 })();
