@@ -106,67 +106,15 @@ function updateAuthUI() {
     loggedInMenu.classList.remove('hidden');
     loggedInMenu.classList.add('flex');
     notLoggedInMenu.classList.add('hidden');
-    setupUserMenu();
+    // User menu is now handled by header.js delegated handlers
   } else {
     notLoggedInMenu.classList.remove('hidden');
     loggedInMenu.classList.add('hidden');
   }
 }
 
-// Setup user menu functionality
-function setupUserMenu() {
-  const userMenuTrigger = document.getElementById('user-menu-trigger');
-  const userDropdown = document.getElementById('user-dropdown');
-  const logoutBtn = document.getElementById('logout-btn');
-
-  if (userMenuTrigger && userDropdown) {
-    // Replace trigger node to remove previously attached listeners (safe for repeated fragment loads)
-    const newUserMenuTrigger = userMenuTrigger.cloneNode(true);
-    userMenuTrigger.parentNode.replaceChild(newUserMenuTrigger, userMenuTrigger);
-
-    // Toggle using same visibility classes as `header.js` so both approaches are compatible.
-    const toggleDropdown = () => {
-      const dd = userDropdown;
-      const isHidden = dd.classList.contains('invisible') || dd.classList.contains('opacity-0') || dd.classList.contains('hidden');
-      if (isHidden) {
-        dd.classList.remove('invisible', 'opacity-0', 'scale-95', 'pointer-events-none', 'hidden');
-        dd.classList.add('opacity-100', 'scale-100', 'pointer-events-auto', 'flex');
-      } else {
-        dd.classList.add('invisible', 'opacity-0', 'scale-95', 'pointer-events-none', 'hidden');
-        dd.classList.remove('opacity-100', 'scale-100', 'pointer-events-auto', 'flex');
-      }
-    };
-
-    newUserMenuTrigger.addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      toggleDropdown();
-    });
-
-    // Close dropdown on outside click (idempotent handler)
-    const outsideHandler = function(e) {
-      try {
-        if (!newUserMenuTrigger.contains(e.target) && !userDropdown.contains(e.target)) {
-          const dd = userDropdown;
-          if (!(dd.classList.contains('invisible') || dd.classList.contains('opacity-0') || dd.classList.contains('hidden'))) {
-            dd.classList.add('invisible', 'opacity-0', 'scale-95', 'pointer-events-none', 'hidden');
-            dd.classList.remove('opacity-100', 'scale-100', 'pointer-events-auto', 'flex');
-          }
-        }
-      } catch (err) { /* ignore if nodes removed */ }
-    };
-    document.addEventListener('click', outsideHandler);
-  }
-
-  if (logoutBtn) {
-    const newLogoutBtn = logoutBtn.cloneNode(true);
-    logoutBtn.parentNode.replaceChild(newLogoutBtn, logoutBtn);
-    newLogoutBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      logout();
-    });
-  }
-}
+// Note: User menu functionality is now handled by header.js delegated event handlers.
+// setupUserMenu() removed to avoid conflicts with header.js dropdown logic.
 
 // Logout -> delegate sang authService
 async function logout() {

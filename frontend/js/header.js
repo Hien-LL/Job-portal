@@ -182,25 +182,47 @@
   // Attach a single delegated document handler (global) to reliably handle trigger clicks
   if (!window.__jp_header_delegation_attached) {
     window.__jp_header_delegation_attached = true;
+    
     document.addEventListener('click', function(e) {
       try {
-        // user menu trigger
-        const ut = e.target.closest && e.target.closest('#user-menu-trigger');
-        if (ut) { e.stopPropagation(); toggleUserDropdown(); return; }
+        // user menu trigger — IMPORTANT: must use e.target.closest() with null-check
+        if (e.target && e.target.closest && e.target.closest('#user-menu-trigger')) {
+          e.stopPropagation();
+          toggleUserDropdown();
+          return;
+        }
 
         // mobile menu trigger
-        const mt = e.target.closest && e.target.closest('.mobile-menu-trigger');
-        if (mt) { e.stopPropagation(); toggleMobileMenu(); return; }
+        if (e.target && e.target.closest && e.target.closest('.mobile-menu-trigger')) {
+          e.stopPropagation();
+          toggleMobileMenu();
+          return;
+        }
 
-        // clicks outside: close dropdowns/menus
-        if (!e.target.closest || !e.target.closest('#user-dropdown')) {
-          closeUserDropdown();
+        // clicks outside dropdowns/menus: close them
+        const dd = document.getElementById('user-dropdown');
+        const mm = document.getElementById('mobile-menu');
+        
+        if (dd && e.target && e.target.closest) {
+          if (!e.target.closest('#user-dropdown') && !e.target.closest('#user-menu-trigger')) {
+            closeUserDropdown();
+          }
         }
-        if (!e.target.closest || !e.target.closest('#mobile-menu')) {
-          closeMobileMenu();
+        if (mm && e.target && e.target.closest) {
+          if (!e.target.closest('#mobile-menu') && !e.target.closest('.mobile-menu-trigger')) {
+            closeMobileMenu();
+          }
         }
-      } catch (err) { /* safe-ignore */ }
+      } catch (err) { console.warn('Delegation handler error:', err); }
     });
-    document.addEventListener('keydown', function(e){ if (e.key === 'Escape') { closeMobileMenu(); closeUserDropdown(); } });
+    
+    document.addEventListener('keydown', function(e) {
+      try {
+        if (e.key === 'Escape') { 
+          closeMobileMenu(); 
+          closeUserDropdown(); 
+        }
+      } catch (err) { console.warn('Keydown handler error:', err); }
+    });
   }
 })();
