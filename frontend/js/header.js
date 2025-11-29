@@ -157,6 +157,29 @@
   document.addEventListener('fragments:loaded', function() {
     try { attachHandlers(document); syncAuthUI(); } catch (e) { console.warn('fragments:loaded handler error', e); }
   });
+  // Fallback: observe DOM for header fragment insertion (covers edge timing cases)
+  try {
+    const observer = new MutationObserver((mutations, obs) => {
+      for (const m of mutations) {
+        for (const node of m.addedNodes) {
+          if (!(node instanceof HTMLElement)) continue;
+          if (node.id === 'main-header' || node.querySelector && node.querySelector('#main-header')) {
+            try { attachHandlers(document); syncAuthUI(); } catch (e) { console.warn('MutationObserver init error', e); }
+            obs.disconnect();
+            return;
+          }
+          // If fragment is a wrapper that contains header fragment placeholder
+          if (node.querySelector && (node.querySelector('[data-fragment="fragments/header.html"]') || node.querySelector('[data-fragment="fragments/header-recruiter.html"]') || node.querySelector('[data-fragment="fragments/header-candidate.html"]'))) {
+            // wait a tick for fragments-loader to inject
+            setTimeout(()=>{ try { attachHandlers(document); syncAuthUI(); } catch(e){ console.warn('MutationObserver delayed init', e); } }, 50);
+            obs.disconnect();
+            return;
+          }
+        }
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+  } catch (e) { /* ignore if MutationObserver unsupported */ }
   // Poll for authService if it's not yet available (some pages load header.js before auth.js)
   (function waitForAuthService(){
     if (window.authService && typeof authService.isAuthenticated === 'function') {
