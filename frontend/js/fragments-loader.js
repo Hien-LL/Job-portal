@@ -12,13 +12,21 @@ async function loadFragments() {
   for (const host of hosts) {
     let path = host.getAttribute('data-fragment');
 
-    // Header auto-detect
+    // Header auto-detect (guarded: authService may load after fragments-loader)
     if (path === 'fragments/header.html') {
       const headerType = host.getAttribute('data-header-type') || 'auto';
       if (headerType === 'auto') {
-        const userType = authService.getUserType();
-        if (userType === 'recruiter') path = 'fragments/header-recruiter.html';
-        else if (userType === 'candidate') path = 'fragments/header-candidate.html';
+        try {
+          if (window.authService && typeof authService.getUserType === 'function') {
+            const userType = authService.getUserType();
+            if (userType === 'recruiter') path = 'fragments/header-recruiter.html';
+            else if (userType === 'candidate') path = 'fragments/header-candidate.html';
+          } else {
+            // authService not ready yet — keep default header for now
+          }
+        } catch (e) {
+          console.warn('[FragmentsLoader] header auto-detect failed, using default header', e);
+        }
       } else if (headerType === 'recruiter') {
         path = 'fragments/header-recruiter.html';
       } else if (headerType === 'candidate') {
@@ -83,6 +91,11 @@ async function loadFragments() {
   } catch (e) {
     console.warn('[FragmentsLoader] could not dispatch fragments:loaded', e);
   }
+
+  // After fragments loaded, attach header/menu handlers (delegated) if present
+  try {
+    setupHeaderMenuHandlers && setupHeaderMenuHandlers();
+  } catch (e) { /* ignore */ }
 }
 
 /* =======================
@@ -115,6 +128,82 @@ function updateAuthUI() {
 
 // Note: User menu functionality is now handled by header.js delegated event handlers.
 // setupUserMenu() removed to avoid conflicts with header.js dropdown logic.
+
+// Delegated header/menu handlers (robust: works with checkbox "peer" toggles or JS toggles)
+function setupHeaderMenuHandlers() {
+  // Delegated click handler covers mobile menu toggles, logout, and clicking outside
+  document.addEventListener('click', function(e) {
+    try {
+      // Mobile menu trigger
+      const mobileBtn = e.target.closest && e.target.closest('.mobile-menu-trigger');
+      if (mobileBtn) {
+        e.stopPropagation();
+        const menu = document.getElementById('mobile-menu');
+        const isHidden = menu && menu.classList.contains('hidden');
+        if (menu) {
+          if (isHidden) menu.classList.remove('hidden'); else menu.classList.add('hidden');
+        }
+        // toggle aria
+        mobileBtn.setAttribute('aria-expanded', menu && !menu.classList.contains('hidden') ? 'true' : 'false');
+        return;
+      }
+
+      // Logout
+      if (e.target.closest && e.target.closest('#logout-btn')) {
+        e.preventDefault();
+        (async () => {
+          try {
+            if (window.authService && typeof authService.logout === 'function') {
+              await authService.logout();
+            } else if (window.authUtils && typeof authUtils.logout === 'function') {
+              await authUtils.logout();
+            } else {
+              // best-effort clear
+              try { authService && authService.clearAuthData && authService.clearAuthData(); } catch(_) {}
+              localStorage.removeItem('access_token');
+              localStorage.removeItem('refresh_token');
+              localStorage.removeItem('user_id');
+              localStorage.removeItem('user_type');
+            }
+          } catch (err) {
+            console.warn('[FragmentsLoader] logout error', err);
+          } finally {
+            window.location.href = 'login.html';
+          }
+        })();
+        return;
+      }
+
+      // Clicks outside header dropdowns should close mobile menu and uncheck peer toggles
+      const dd = document.getElementById('user-dropdown');
+      const mm = document.getElementById('mobile-menu');
+      if (dd && !e.target.closest('#user-dropdown') && !e.target.closest('label[for="user-menu-toggle"]') && !e.target.closest('#user-menu-toggle')) {
+        // if dropdown uses peer/checkbox, uncheck it; otherwise hide
+        const checkbox = document.getElementById('user-menu-toggle');
+        if (checkbox) checkbox.checked = false;
+        dd.classList.add('hidden');
+      }
+      if (mm && !e.target.closest('#mobile-menu') && !e.target.closest('.mobile-menu-trigger')) {
+        mm.classList.add('hidden');
+        document.querySelectorAll('.mobile-menu-trigger').forEach(b => b.setAttribute('aria-expanded', 'false'));
+      }
+    } catch (err) { console.warn('[FragmentsLoader] header handler error', err); }
+  });
+
+  // Close on Escape
+  document.addEventListener('keydown', function(e) {
+    try {
+      if (e.key === 'Escape') {
+        const checkbox = document.getElementById('user-menu-toggle');
+        if (checkbox) checkbox.checked = false;
+        const dd = document.getElementById('user-dropdown');
+        if (dd) dd.classList.add('hidden');
+        const mm = document.getElementById('mobile-menu');
+        if (mm) mm.classList.add('hidden');
+      }
+    } catch (err) { console.warn('[FragmentsLoader] key handler error', err); }
+  });
+}
 
 // Logout -> delegate sang authService
 async function logout() {
