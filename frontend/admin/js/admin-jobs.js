@@ -327,7 +327,7 @@ window.togglePublishJob = async function (id, currentlyPublished) {
 
   try {
     const res = await authService.apiRequest(`/admins/jobs/${id}/publish`, {
-      method: "PUT",
+      method: "PATCH",
     });
 
     if (!res) {
