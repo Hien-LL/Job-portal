@@ -183,46 +183,56 @@
   if (!window.__jp_header_delegation_attached) {
     window.__jp_header_delegation_attached = true;
     
-    document.addEventListener('click', function(e) {
-      try {
-        // user menu trigger — IMPORTANT: must use e.target.closest() with null-check
-        if (e.target && e.target.closest && e.target.closest('#user-menu-trigger')) {
-          e.stopPropagation();
-          toggleUserDropdown();
-          return;
-        }
-
-        // mobile menu trigger
-        if (e.target && e.target.closest && e.target.closest('.mobile-menu-trigger')) {
-          e.stopPropagation();
-          toggleMobileMenu();
-          return;
-        }
-
-        // clicks outside dropdowns/menus: close them
-        const dd = document.getElementById('user-dropdown');
-        const mm = document.getElementById('mobile-menu');
-        
-        if (dd && e.target && e.target.closest) {
-          if (!e.target.closest('#user-dropdown') && !e.target.closest('#user-menu-trigger')) {
-            closeUserDropdown();
+    // Retry mechanism: ensure handler attaches even if called before DOM ready
+    const setupDelegatedHandlers = () => {
+      document.addEventListener('click', function(e) {
+        try {
+          // user menu trigger — IMPORTANT: must use e.target.closest() with null-check
+          if (e.target && e.target.closest && e.target.closest('#user-menu-trigger')) {
+            e.stopPropagation();
+            toggleUserDropdown();
+            return;
           }
-        }
-        if (mm && e.target && e.target.closest) {
-          if (!e.target.closest('#mobile-menu') && !e.target.closest('.mobile-menu-trigger')) {
-            closeMobileMenu();
+
+          // mobile menu trigger
+          if (e.target && e.target.closest && e.target.closest('.mobile-menu-trigger')) {
+            e.stopPropagation();
+            toggleMobileMenu();
+            return;
           }
-        }
-      } catch (err) { console.warn('Delegation handler error:', err); }
-    });
+
+          // clicks outside dropdowns/menus: close them
+          const dd = document.getElementById('user-dropdown');
+          const mm = document.getElementById('mobile-menu');
+          
+          if (dd && e.target && e.target.closest) {
+            if (!e.target.closest('#user-dropdown') && !e.target.closest('#user-menu-trigger')) {
+              closeUserDropdown();
+            }
+          }
+          if (mm && e.target && e.target.closest) {
+            if (!e.target.closest('#mobile-menu') && !e.target.closest('.mobile-menu-trigger')) {
+              closeMobileMenu();
+            }
+          }
+        } catch (err) { console.warn('Delegation handler error:', err); }
+      });
+      
+      document.addEventListener('keydown', function(e) {
+        try {
+          if (e.key === 'Escape') { 
+            closeMobileMenu(); 
+            closeUserDropdown(); 
+          }
+        } catch (err) { console.warn('Keydown handler error:', err); }
+      });
+    };
     
-    document.addEventListener('keydown', function(e) {
-      try {
-        if (e.key === 'Escape') { 
-          closeMobileMenu(); 
-          closeUserDropdown(); 
-        }
-      } catch (err) { console.warn('Keydown handler error:', err); }
-    });
+    // Attach immediately if document is ready, otherwise wait for DOMContentLoaded
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', setupDelegatedHandlers);
+    } else {
+      setupDelegatedHandlers();
+    }
   }
 })();
