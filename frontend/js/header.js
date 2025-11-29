@@ -2,6 +2,7 @@
   // Responsive header behaviors: mobile menu toggle, user dropdown, auth visibility
   function $(sel, ctx){ return (ctx||document).querySelector(sel); }
   function $all(sel, ctx){ return Array.from((ctx||document).querySelectorAll(sel)); }
+  let _globalListenersAttached = false;
 
   function toggleMobileMenu() {
     const menu = document.getElementById('mobile-menu');
@@ -88,7 +89,8 @@
     }
 
     // Close menus on outside click or ESC
-    document.addEventListener('click', (e)=>{
+    if (!_globalListenersAttached) {
+      document.addEventListener('click', (e)=>{
       const menu = document.getElementById('mobile-menu');
       if (menu && !menu.classList.contains('hidden')) {
         // if click outside menu and not on trigger
@@ -104,6 +106,8 @@
       }
     });
     document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape') { closeMobileMenu(); closeUserDropdown(); } });
+      _globalListenersAttached = true;
+    }
   }
 
   function syncAuthUI() {
@@ -153,4 +157,22 @@
   document.addEventListener('fragments:loaded', function() {
     try { attachHandlers(document); syncAuthUI(); } catch (e) { console.warn('fragments:loaded handler error', e); }
   });
+  // Poll for authService if it's not yet available (some pages load header.js before auth.js)
+  (function waitForAuthService(){
+    if (window.authService && typeof authService.isAuthenticated === 'function') {
+      try { syncAuthUI(); } catch (e) { console.warn('syncAuthUI error after auth ready', e); }
+      return;
+    }
+    let retries = 0;
+    const maxRetries = 30; // ~3 seconds
+    const iv = setInterval(()=>{
+      retries++;
+      if (window.authService && typeof authService.isAuthenticated === 'function') {
+        clearInterval(iv);
+        try { syncAuthUI(); } catch (e) { console.warn('syncAuthUI error after auth ready', e); }
+      } else if (retries >= maxRetries) {
+        clearInterval(iv);
+      }
+    }, 100);
+  })();
 })();
