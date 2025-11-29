@@ -120,20 +120,42 @@ function setupUserMenu() {
   const logoutBtn = document.getElementById('logout-btn');
 
   if (userMenuTrigger && userDropdown) {
+    // Replace trigger node to remove previously attached listeners (safe for repeated fragment loads)
     const newUserMenuTrigger = userMenuTrigger.cloneNode(true);
     userMenuTrigger.parentNode.replaceChild(newUserMenuTrigger, userMenuTrigger);
+
+    // Toggle using same visibility classes as `header.js` so both approaches are compatible.
+    const toggleDropdown = () => {
+      const dd = userDropdown;
+      const isHidden = dd.classList.contains('invisible') || dd.classList.contains('opacity-0') || dd.classList.contains('hidden');
+      if (isHidden) {
+        dd.classList.remove('invisible', 'opacity-0', 'scale-95', 'pointer-events-none', 'hidden');
+        dd.classList.add('opacity-100', 'scale-100', 'pointer-events-auto', 'flex');
+      } else {
+        dd.classList.add('invisible', 'opacity-0', 'scale-95', 'pointer-events-none', 'hidden');
+        dd.classList.remove('opacity-100', 'scale-100', 'pointer-events-auto', 'flex');
+      }
+    };
 
     newUserMenuTrigger.addEventListener('click', function(e) {
       e.preventDefault();
       e.stopPropagation();
-      userDropdown.classList.toggle('hidden');
+      toggleDropdown();
     });
 
-    document.addEventListener('click', function(e) {
-      if (!newUserMenuTrigger.contains(e.target) && !userDropdown.contains(e.target)) {
-        userDropdown.classList.add('hidden');
-      }
-    });
+    // Close dropdown on outside click (idempotent handler)
+    const outsideHandler = function(e) {
+      try {
+        if (!newUserMenuTrigger.contains(e.target) && !userDropdown.contains(e.target)) {
+          const dd = userDropdown;
+          if (!(dd.classList.contains('invisible') || dd.classList.contains('opacity-0') || dd.classList.contains('hidden'))) {
+            dd.classList.add('invisible', 'opacity-0', 'scale-95', 'pointer-events-none', 'hidden');
+            dd.classList.remove('opacity-100', 'scale-100', 'pointer-events-auto', 'flex');
+          }
+        }
+      } catch (err) { /* ignore if nodes removed */ }
+    };
+    document.addEventListener('click', outsideHandler);
   }
 
   if (logoutBtn) {
